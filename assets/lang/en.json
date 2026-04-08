@@ -2,5 +2,10 @@
   "app_name": "My App",
   "hello": "Hello",
   "welcome": "Welcome",
-  "change_language": "Change Language"
+  "change_language": "Change Language",
+  "enter_your_phone_number": "Enter Your Phone Number",
+  "enter_your_number": "Enter Your Number",
+  "+880": "+880",
+  "by_proceeding,_you_consent_to_agree_with_our": "By proceeding, you consent to agree with our ",
+  "terms_&_conditions": "Terms & Conditions"
 }
