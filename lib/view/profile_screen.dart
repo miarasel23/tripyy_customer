@@ -9,7 +9,7 @@ class ProfileScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 3, // 👈 highlight Profile
+          currentIndex: 3,
           selectedItemColor: Colors.blue,
           unselectedItemColor: Colors.grey,
           type: BottomNavigationBarType.fixed,

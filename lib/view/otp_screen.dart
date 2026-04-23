@@ -7,6 +7,10 @@ import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/modules/localization/Controller/localization_controller.dart';
 import 'package:trippy_customer/routes/app_router.dart';
 import 'package:trippy_customer/utils/images.dart';
+import 'package:trippy_customer/view/editProfile_screen.dart';
+import 'package:trippy_customer/view/helpCenter_screen.dart';
+import 'package:trippy_customer/view/myTrip_screen.dart';
+import 'package:trippy_customer/view/offer_screen.dart';
 import 'package:trippy_customer/view/profile_screen.dart';
 
 class OtpScreen extends StatelessWidget {
@@ -96,7 +100,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      getIt<AppRouter>().push(ProfileScreen());
+                      getIt<AppRouter>().push(EditprofileScreen());
                     },
                     child: Text(
                       loc.translate("Continue"),
