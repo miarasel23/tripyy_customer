@@ -9,6 +9,7 @@ import 'package:trippy_customer/routes/app_router.dart';
 import 'package:trippy_customer/utils/images.dart';
 import 'package:trippy_customer/view/editProfile_screen.dart';
 import 'package:trippy_customer/view/helpCenter_screen.dart';
+import 'package:trippy_customer/view/home_screen.dart';
 import 'package:trippy_customer/view/myTrip_screen.dart';
 import 'package:trippy_customer/view/offer_screen.dart';
 import 'package:trippy_customer/view/profile_screen.dart';
@@ -100,7 +101,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      getIt<AppRouter>().push(EditprofileScreen());
+                      getIt<AppRouter>().push(HomeScreen());
                     },
                     child: Text(
                       loc.translate("Continue"),

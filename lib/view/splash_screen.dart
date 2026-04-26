@@ -5,7 +5,7 @@ import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/modules/localization/Controller/localization_controller.dart';
 import 'package:trippy_customer/routes/app_router.dart';
 import 'package:trippy_customer/utils/images.dart';
-import 'package:trippy_customer/view/home_page.dart';
+import 'package:trippy_customer/view/numberInput_screen.dart';
 import 'package:trippy_customer/widgets/inverted_curve_clipper.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     Future.delayed(const Duration(seconds: 4), () {
       getIt<AppRouter>().pushReplacement(
-        HomePage(controller: widget.controller),
+        NumberInputScreen(controller: widget.controller),
       );
     });
     super.initState();

@@ -7,10 +7,10 @@ import 'package:trippy_customer/routes/app_router.dart';
 import 'package:trippy_customer/utils/images.dart';
 import 'package:trippy_customer/view/otp_screen.dart';
 
-class HomePage extends StatelessWidget {
+class NumberInputScreen extends StatelessWidget {
   final LocalizationController controller;
 
-  const HomePage({super.key, required this.controller});
+  const NumberInputScreen({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,13 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  getIt<AppRouter>().push(OtpScreen(number: numberField.text, loc: loc, controller: controller,));
+                  getIt<AppRouter>().push(
+                    OtpScreen(
+                      number: numberField.text,
+                      loc: loc,
+                      controller: controller,
+                    ),
+                  );
                 },
                 child: Text(
                   loc.translate("Continue"),
