@@ -40,6 +40,8 @@ dependencies:
   get_it: ^9.2.1
   flutter_pin_code_fields: ^2.2.0
   pin_code_fields: ^9.3.0
+  bloc: ^9.2.0
+  equatable: ^2.0.8
 
 dev_dependencies:
   flutter_test:

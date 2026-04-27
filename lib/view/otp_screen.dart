@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pin_code_fields/flutter_pin_code_fields.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/modules/localization/Controller/localization_controller.dart';
 import 'package:trippy_customer/routes/app_router.dart';
-import 'package:trippy_customer/utils/images.dart';
-import 'package:trippy_customer/view/editProfile_screen.dart';
-import 'package:trippy_customer/view/helpCenter_screen.dart';
 import 'package:trippy_customer/view/home_screen.dart';
-import 'package:trippy_customer/view/myTrip_screen.dart';
-import 'package:trippy_customer/view/offer_screen.dart';
-import 'package:trippy_customer/view/profile_screen.dart';
+import 'package:trippy_customer/view/main_bottom_nav_bar_screen.dart';
 
 class OtpScreen extends StatelessWidget {
   final String number;
@@ -101,7 +95,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      getIt<AppRouter>().push(HomeScreen());
+                      getIt<AppRouter>().push(MainBottomNavBarScreen());
                     },
                     child: Text(
                       loc.translate("Continue"),

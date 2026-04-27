@@ -64,7 +64,7 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(18),
+        padding: EdgeInsets.only(left: 18, right: 18, top: 18, bottom: 2),
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(

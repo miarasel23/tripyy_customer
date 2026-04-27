@@ -9,6 +9,7 @@ class OfferScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        forceMaterialTransparency: true,
         backgroundColor: Colors.white,
         title: Text(
           "Offers",
@@ -21,7 +22,7 @@ class OfferScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 2),
         child: ListView.builder(
           itemCount: 10,
           itemBuilder: (context,index) {

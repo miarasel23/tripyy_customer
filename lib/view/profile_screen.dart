@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -6,33 +7,14 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(statusBarColor: Colors.white),
+    );
     return SafeArea(
       child: Scaffold(
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: 3,
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: Colors.white,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: "Home",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.train_sharp),
-              label: "My Trip",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              label: "Offers",
-            ),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          ],
-        ),
         backgroundColor: Colors.white,
         body: Padding(
-          padding: EdgeInsets.all(18.0),
+          padding: EdgeInsets.only(left: 18, right: 18, top: 18, bottom: 2),
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Padding(
@@ -306,7 +288,8 @@ class ProfileScreen extends StatelessWidget {
                                         materialTapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                         activeTrackColor: Colors.blue,
-                                        inactiveTrackColor: Colors.grey.shade300,
+                                        inactiveTrackColor:
+                                            Colors.grey.shade300,
                                         thumbColor: WidgetStateProperty.all(
                                           Colors.white,
                                         ),
