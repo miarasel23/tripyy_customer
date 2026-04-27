@@ -17,7 +17,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         child: Column(
           children: [
-            SizedBox(height: 50),
+            SizedBox(height: 50), 
             ListTile(
               leading: Icon(Icons.person),
               title: Text("Edit Profile"),
