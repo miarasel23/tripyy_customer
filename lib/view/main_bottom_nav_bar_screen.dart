@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_bloc.dart';
 import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_event.dart';
 import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_state.dart';
+import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/view/home_screen.dart';
 import 'package:trippy_customer/view/myTrip_screen.dart';
 import 'package:trippy_customer/view/offer_screen.dart';
@@ -24,6 +25,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
   ];
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       body: BlocBuilder<MainBottomNavBarBloc, MainBottomNavBarState>(
         builder: (context, state) {
@@ -57,7 +59,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.home_outlined),
                   ),
-                  label: "Home",
+                  label: loc.translate("Home"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -66,7 +68,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.train_sharp),
                   ),
-                  label: "My Trip",
+                  label: loc.translate("My_Trip"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -75,7 +77,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.home_outlined),
                   ),
-                  label: "Offers",
+                  label: loc.translate("Offers"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -84,7 +86,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.person),
                   ),
-                  label: "Profile",
+                  label: loc.translate("Profile"),
                 ),
               ],
             );

@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 
 class HelpcenterScreen extends StatelessWidget {
   const HelpcenterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          "Help Center",
+          loc.translate("Help_Center"),
           style: GoogleFonts.poppins(
             color: Colors.black,
             fontSize: 20,
@@ -43,7 +45,7 @@ class HelpcenterScreen extends StatelessWidget {
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          "How can we help you?",
+                          loc.translate("How_can_we_help_you?"),
                           style: GoogleFonts.poppins(color: Colors.white, fontSize: 25),
                         ),
                       ),
@@ -52,11 +54,11 @@ class HelpcenterScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 helpCenterCommonTasks(
-                  operation: 'Chat with Garibook',
+                  operation: loc.translate('Chat_with_Garibook'),
                   icon: Icon(Icons.chat_rounded, color: Colors.blue, size: 30),
                 ),
                 helpCenterCommonTasks(
-                  operation: 'Talk to customer care',
+                  operation: loc.translate('Talk_to_customer_care'),
                   icon: Icon(Icons.chat_rounded, color: Colors.blue, size: 30),
                 ),
                 helpCenterCommonTasks(
@@ -64,7 +66,7 @@ class HelpcenterScreen extends StatelessWidget {
                   icon: Icon(Icons.mail, color: Colors.blue, size: 30),
                 ),
                 helpCenterCommonTasks(
-                  operation: 'National Emergency Service',
+                  operation: loc.translate('National_Emergency_Service'),
                   icon: Icon(Icons.emergency, color: Colors.blue, size: 30),
                 ),
               ],

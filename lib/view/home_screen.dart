@@ -20,14 +20,14 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: 50), 
             ListTile(
               leading: Icon(Icons.person),
-              title: Text("Edit Profile"),
+              title: Text(loc.translate("Edit_Profile")),
               onTap: () {
                 getIt<AppRouter>().push(EditprofileScreen());
               },
             ),
             ListTile(
               leading: Icon(Icons.help_center),
-              title: Text("Help Center"),
+              title: Text(loc.translate("Help_Center")),
               onTap: () {
                 getIt<AppRouter>().push(HelpcenterScreen());
               },
@@ -71,12 +71,12 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              locationSearchingWidget(),
+              locationSearchingWidget(loc),
               SizedBox(height: 6),
-              locationSaveWidgetRow(),
+              locationSaveWidgetRow(loc),
               SizedBox(height: 10),
               Text(
-                "Services",
+                loc.translate("Services"),
                 style: GoogleFonts.poppins(
                   fontSize: 17,
                   color: Colors.black,
@@ -84,7 +84,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 13),
-              servicesSection(),
+              servicesSection(loc),
               SizedBox(height: 13),
               imagePlaceHolderContainer(),
               SizedBox(height: 13),
@@ -92,7 +92,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Saved Routes",
+                    loc.translate("Saved_Routes"),
                     style: GoogleFonts.poppins(
                       color: Colors.black,
                       fontSize: 17,
@@ -102,7 +102,7 @@ class HomeScreen extends StatelessWidget {
                   GestureDetector(
                     onTap: () {},
                     child: Text(
-                      "See All",
+                      loc.translate("See_All"),
                       style: GoogleFonts.poppins(
                         color: Color(0xffa5a5a5),
                         fontSize: 17,
@@ -113,10 +113,10 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
-              savedRoutesSection(),
+              savedRoutesSection(loc),
               SizedBox(height: 25),
               Text(
-                "Additional Services",
+                loc.translate("Additional_Services"),
                 style: GoogleFonts.poppins(
                   color: Colors.black,
                   fontSize: 17,
@@ -124,7 +124,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              additionalServiceSection(),
+              additionalServiceSection(loc),
             ],
           ),
         ),
@@ -132,7 +132,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget servicesSection() {
+  Widget servicesSection(AppLocalizations loc) {
     return GridView.count(
       padding: EdgeInsets.symmetric(horizontal: 0),
       crossAxisCount: 3,
@@ -141,29 +141,29 @@ class HomeScreen extends StatelessWidget {
       children: [
         serviceWidget(
           icon: Icon(Icons.car_crash, size: 70, color: Colors.blue),
-          label: 'Intercity',
+          label: loc.translate('Intercity'),
         ),
         serviceWidget(
           icon: Icon(Icons.car_crash, size: 70, color: Colors.blue),
-          label: 'Hourly',
+          label: loc.translate('Hourly'),
         ),
         serviceWidget(
           icon: Icon(Icons.car_crash, size: 70, color: Colors.blue),
-          label: 'Airport Rental',
+          label: loc.translate('Airport_Rental'),
         ),
         serviceWidget(
           icon: Icon(Icons.car_crash, size: 70, color: Colors.blue),
-          label: 'Return Trip',
+          label: loc.translate('Return_Trip'),
         ),
         serviceWidget(
           icon: Icon(Icons.car_crash, size: 70, color: Colors.blue),
-          label: 'Ride Share',
+          label: loc.translate('Ride_Share'),
         ),
       ],
     );
   }
 
-  Widget additionalServiceSection() {
+  Widget additionalServiceSection(AppLocalizations loc) {
     return SizedBox(
       height: 160,
       child: ListView.builder(
@@ -172,14 +172,14 @@ class HomeScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [additionalServicesWidget(), SizedBox(width: 10)],
+            children: [additionalServicesWidget(loc), SizedBox(width: 10)],
           );
         },
       ),
     );
   }
 
-  Widget additionalServicesWidget() {
+  Widget additionalServicesWidget(AppLocalizations loc) {
     return Container(
       width: 220,
       clipBehavior: Clip.hardEdge,
@@ -209,7 +209,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Tourist Bus",
+                  loc.translate("Tourist_Bus"),
                   style: GoogleFonts.poppins(
                     color: Colors.black,
                     fontSize: 12,
@@ -218,7 +218,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  "Comfortable and reliable buses for group tours and long journeys",
+                  loc.translate("Comfortable_and_reliable_buses_for_group_tours_and_long_journeys"),
                   style: GoogleFonts.poppins(
                     color: Color(0xff656c74),
                     fontSize: 9,
@@ -233,7 +233,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget savedRoutesSection() {
+  Widget savedRoutesSection(AppLocalizations loc) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(10),
@@ -248,7 +248,7 @@ class HomeScreen extends StatelessWidget {
           Icon(Icons.route_sharp, color: Colors.blue, size: 40),
           SizedBox(height: 3),
           Text(
-            "No Saved Routes",
+            loc.translate("No_Saved_Routes"),
             style: GoogleFonts.poppins(
               color: Colors.black,
               fontSize: 15,
@@ -259,7 +259,7 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              "Save your favorite pickup and drop - off locations to book faster next time.",
+              loc.translate("Save_your_favorite_pickup_and_drop_-_off_locations_to_book_faster_next_time."),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 color: Color(0xffbfc6ce),
@@ -277,7 +277,7 @@ class HomeScreen extends StatelessWidget {
             ),
             onPressed: () {},
             child: Text(
-              "Add Routes",
+              loc.translate("Add_Routes"),
               style: GoogleFonts.poppins(
                 color: Colors.blue,
                 fontSize: 14,
@@ -317,18 +317,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget locationSaveWidgetRow() {
+  Widget locationSaveWidgetRow(AppLocalizations loc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         locationSaveWidget(
           icon: Icon(Icons.home, size: 14, color: Colors.black),
-          label: 'Home',
+          label: loc.translate('Home'),
+          loc: loc
         ),
         locationSaveWidget(
           icon: Icon(Icons.add_home_work_sharp, size: 14, color: Colors.black),
-          label: 'Work',
+          label: loc.translate('Work'),
+          loc: loc
         ),
         Container(
           padding: EdgeInsets.all(8),
@@ -349,7 +351,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget locationSaveWidget({required Widget icon, required String label}) {
+  Widget locationSaveWidget({required Widget icon, required String label, required AppLocalizations loc}) {
     return Container(
       width: 130,
       padding: EdgeInsets.all(10),
@@ -380,7 +382,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
           Text(
-            "Add Locaton",
+            loc.translate("Add_Locaton"),
             style: GoogleFonts.poppins(color: Color(0xffa7a7a7), fontSize: 11),
           ),
         ],
@@ -388,7 +390,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget locationSearchingWidget() {
+  Widget locationSearchingWidget(AppLocalizations loc) {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -401,7 +403,7 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Where are you going?",
+            loc.translate("Where_are_you_going?"),
             style: GoogleFonts.poppins(
               color: Colors.black,
               fontSize: 17,
@@ -415,7 +417,7 @@ class HomeScreen extends StatelessWidget {
               Icon(Icons.search, color: Colors.blue, size: 30),
               SizedBox(width: 3),
               Text(
-                "Find the location",
+                loc.translate("Find_the_location"),
                 style: GoogleFonts.poppins(
                   color: Colors.black,
                   fontSize: 15,

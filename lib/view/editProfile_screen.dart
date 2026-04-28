@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 
 class EditprofileScreen extends StatefulWidget {
   const EditprofileScreen({super.key});
@@ -13,14 +14,15 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
   final TextEditingController _phoneNumber = TextEditingController();
   @override
   Widget build(BuildContext context) {
-    _name.text = "arif";
-    _phoneNumber.text = "01816801552";
+    final loc = AppLocalizations.of(context);
+    _name.text = loc.translate("arif");
+    _phoneNumber.text = loc.translate("01816801552");
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          "Profile",
+          loc.translate("Profile"),
           style: GoogleFonts.poppins(
             color: Colors.black,
             fontSize: 20,
@@ -81,7 +83,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
             ),
             SizedBox(height: 38),
             Text(
-              "Name",
+              loc.translate("Name"),
               style: GoogleFonts.poppins(
                 color: Colors.black,
                 fontSize: 15,
@@ -102,7 +104,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
             ),
             SizedBox(height: 20),
             Text(
-              "Phone Number",
+              loc.translate("Phone_Number"),
               style: GoogleFonts.poppins(
                 color: Colors.black,
                 fontSize: 15,
@@ -123,7 +125,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
             ),
             SizedBox(height: 20),
             Text(
-              "Gender",
+              loc.translate("Gender"),
               style: GoogleFonts.poppins(
                 color: Colors.black,
                 fontSize: 15,
@@ -152,7 +154,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                         value: true,
                         onChanged: (value) {},
                       ),
-                      Text("Male"),
+                      Text(loc.translate("Male")),
                     ],
                   ),
                 ),
@@ -174,7 +176,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                         value: false,
                         onChanged: (value) {},
                       ),
-                      Text("Female"),
+                      Text(loc.translate("Female")),
                     ],
                   ),
                 ),
@@ -191,7 +193,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                     ),
                     onPressed: () {},
                     child: Text(
-                      "Delete Account",
+                      loc.translate("Delete_Account"),
                       style: GoogleFonts.poppins(color: Colors.red),
                     ),
                   ),
@@ -202,7 +204,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                     onPressed: () {},
                     child: Text(
-                      "Update",
+                      loc.translate("Update"),
                       style: GoogleFonts.poppins(color: Colors.white),
                     ),
                   ),
