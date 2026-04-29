@@ -5,7 +5,6 @@ import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/modules/localization/Controller/localization_controller.dart';
 import 'package:trippy_customer/routes/app_router.dart';
-import 'package:trippy_customer/view/home_screen.dart';
 import 'package:trippy_customer/view/main_bottom_nav_bar_screen.dart';
 
 class OtpScreen extends StatelessWidget {

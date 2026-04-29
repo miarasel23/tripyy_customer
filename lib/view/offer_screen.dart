@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/data/services/service_locator.dart';
+import 'package:trippy_customer/routes/app_router.dart';
 import 'package:trippy_customer/utils/images.dart';
+import 'package:trippy_customer/view/viewDetails_screen.dart';
 
 class OfferScreen extends StatelessWidget {
   const OfferScreen({super.key});
@@ -27,15 +30,13 @@ class OfferScreen extends StatelessWidget {
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 2),
         child: ListView.builder(
           itemCount: 10,
-          itemBuilder: (context,index) {
+          itemBuilder: (context, index) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                offerBanner(loc),
-                SizedBox(height: 20),],
+              children: [offerBanner(loc), SizedBox(height: 20)],
             );
-          }
+          },
         ),
       ),
     );
@@ -74,12 +75,16 @@ class OfferScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                loc.translate("১_এপ্রিল_৩০_এপ্রিল_২০২৬_পর্যন্ত_গাড়িবুক-এ_যেকোনো_ইন্টারসিটি_ট্রিপেই_৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!"),
+                loc.translate(
+                  "১_এপ্রিল_৩০_এপ্রিল_২০২৬_পর্যন্ত_গাড়িবুক-এ_যেকোনো_ইন্টারসিটি_ট্রিপেই_৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!",
+                ),
                 style: TextStyle(color: Color(0xffb3b3b3), fontSize: 13),
               ),
               SizedBox(height: 5),
               GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  getIt<AppRouter>().push(ViewdetailsScreen());
+                },
                 child: Text(
                   loc.translate("See_Details"),
                   style: TextStyle(
