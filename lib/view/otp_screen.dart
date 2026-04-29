@@ -117,7 +117,7 @@ class OtpScreen extends StatelessWidget {
                         ),
                         children: [
                           TextSpan(
-                            text: "02:00",
+                            text: loc.translate("02:00"),
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.black,

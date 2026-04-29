@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.white),
     );
@@ -73,7 +75,7 @@ class ProfileScreen extends StatelessWidget {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      "5",
+                                      loc.translate("5"),
                                       style: TextStyle(
                                         fontSize: 10,
                                         color: Colors.black,
@@ -96,7 +98,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 38),
                   Text(
-                    "arif",
+                    loc.translate("arif"),
                     style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
                   ),
                   TextButton(
@@ -109,7 +111,7 @@ class ProfileScreen extends StatelessWidget {
                       print("clicked");
                     },
                     child: Text(
-                      "View Profile",
+                      loc.translate("View_Profile"),
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 15,
@@ -147,7 +149,7 @@ class ProfileScreen extends StatelessWidget {
                               ),
                             ),
                             SizedBox(width: 3),
-                            Text("Points", style: TextStyle(fontSize: 14)),
+                            Text(loc.translate("Points"), style: TextStyle(fontSize: 14)),
                             SizedBox(width: 50),
                             Icon(Icons.arrow_forward_ios_outlined, size: 15),
                           ],
@@ -170,7 +172,7 @@ class ProfileScreen extends StatelessWidget {
                               size: 24,
                             ),
                             SizedBox(width: 3),
-                            Text("Voucher", style: TextStyle(fontSize: 14)),
+                            Text(loc.translate("Voucher"), style: TextStyle(fontSize: 14)),
                             SizedBox(width: 50),
                             Icon(Icons.arrow_forward_ios_outlined, size: 15),
                           ],
@@ -182,7 +184,7 @@ class ProfileScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "PREFERENCES",
+                      loc.translate("PREFERENCES"),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.black,
@@ -222,7 +224,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "Language",
+                                    loc.translate("Language"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
@@ -238,7 +240,7 @@ class ProfileScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      "English",
+                                      loc.translate("English"),
                                       style: TextStyle(color: Colors.black),
                                     ),
                                   ),
@@ -270,7 +272,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "Notification",
+                                    loc.translate("Notification"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
@@ -322,7 +324,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "Tutorial",
+                                    loc.translate("Tutorial"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
@@ -339,7 +341,7 @@ class ProfileScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "LEGAL",
+                      loc.translate("LEGAL"),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.black,
@@ -379,7 +381,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "Help",
+                                    loc.translate("Help"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
@@ -410,7 +412,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "Terms & Conditions",
+                                    loc.translate("Terms_&_Conditions"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
@@ -441,7 +443,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "trip terms & Conditions",
+                                    loc.translate("trip_terms_&_Conditions"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],
@@ -472,7 +474,7 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    "Privacy Policy",
+                                    loc.translate("Privacy_Policy"),
                                     style: TextStyle(color: Colors.black),
                                   ),
                                 ],

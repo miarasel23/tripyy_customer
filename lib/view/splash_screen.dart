@@ -54,9 +54,23 @@ class _SplashScreenState extends State<SplashScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(height: 45),
-                      firstLine(),
-                      secondLine(),
-                      SizedBox(height: 16),
+                      widget.controller.locale.languageCode == "bn"
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                firstLine(),
+                                SizedBox(height: 8),
+                                secondLine(),
+                              ],
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                firstLineEn(),
+                                SizedBox(height: 8),
+                                secondLineEn(),
+                              ],
+                            ),
 
                       Padding(
                         padding: const EdgeInsets.all(18.0),
@@ -71,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                           onPressed: () {},
                           child: Text(
-                            "Get Started",
+                            loc.translate("Get_Started"),
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -119,6 +133,22 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  Row secondLineEn() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("All", style: TextStyle(fontSize: 22)),
+        SizedBox(width: 4),
+        Text(
+          "Over",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(width: 4),
+        Text("Bangladesh!", style: TextStyle(fontSize: 22)),
+      ],
+    );
+  }
+
   Row firstLine() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -132,6 +162,25 @@ class _SplashScreenState extends State<SplashScreen> {
         SizedBox(width: 4),
         Text(
           "শহরে",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  Row firstLineEn() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "City",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(width: 4),
+        Text("to", style: TextStyle(fontSize: 22)),
+        SizedBox(width: 4),
+        Text(
+          "City",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
       ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/utils/images.dart';
 
 class OfferScreen extends StatelessWidget {
@@ -6,13 +7,14 @@ class OfferScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
         backgroundColor: Colors.white,
         title: Text(
-          "Offers",
+          loc.translate("Offers"),
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -30,7 +32,7 @@ class OfferScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                offerBanner(),
+                offerBanner(loc),
                 SizedBox(height: 20),],
             );
           }
@@ -39,7 +41,7 @@ class OfferScreen extends StatelessWidget {
     );
   }
 
-  Widget offerBanner() {
+  Widget offerBanner(AppLocalizations loc) {
     return Column(
       children: [
         Container(
@@ -64,7 +66,7 @@ class OfferScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
+                loc.translate("৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!"),
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 15,
@@ -72,14 +74,14 @@ class OfferScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                "১ এপ্রিল ৩০ এপ্রিল ২০২৬ পর্যন্ত গাড়িবুক-এ যেকোনো ইন্টারসিটি ট্রিপেই ৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
+                loc.translate("১_এপ্রিল_৩০_এপ্রিল_২০২৬_পর্যন্ত_গাড়িবুক-এ_যেকোনো_ইন্টারসিটি_ট্রিপেই_৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!"),
                 style: TextStyle(color: Color(0xffb3b3b3), fontSize: 13),
               ),
               SizedBox(height: 5),
               GestureDetector(
                 onTap: () {},
                 child: Text(
-                  "See Details",
+                  loc.translate("See_Details"),
                   style: TextStyle(
                     color: Colors.blue,
                     decorationColor: Colors.blue,

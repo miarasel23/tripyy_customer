@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/widgets/timeline_tile.dart';
 
 class MytripScreen extends StatelessWidget {
@@ -7,13 +8,14 @@ class MytripScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         forceMaterialTransparency: true,
         backgroundColor: Colors.white,
         title: Text(
-          "MyTrip",
+          loc.translate("My_Trip"),
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -44,7 +46,7 @@ class MytripScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        "Car Rental",
+                        loc.translate("Car_Rental"),
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize: 16,
@@ -61,7 +63,7 @@ class MytripScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        "Wedding Car",
+                        loc.translate("Wedding_Car"),
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize: 16,
@@ -99,14 +101,14 @@ class MytripScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Hourly",
+                                  loc.translate("Hourly"),
                                   style: GoogleFonts.poppins(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 Text(
-                                  "08 Feb 2026, 05:30 PM",
+                                  loc.translate("08_Feb_2026,_05:30_PM"),
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
                                     fontSize: 12,
@@ -128,7 +130,7 @@ class MytripScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {},
-                          child: Text("Cancelled"),
+                          child: Text(loc.translate("Cancelled")),
                         ),
                       ],
                     ),
@@ -144,14 +146,14 @@ class MytripScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Pickup",
+                                loc.translate("Pickup"),
                                 style: TextStyle(
                                   color: Color(0xffb3b3b3),
                                   fontSize: 14,
                                 ),
                               ),
                               Text(
-                                "Meena Bazar - Ashkhona Branch, Airport - Dakshinkhan Road, Dhaka",
+                                loc.translate("Meena_Bazar_-_Ashkhona_Branch,_Airport_-_Dakshinkhan_Road,_Dhaka"),
                                 style: GoogleFonts.poppins(
                                   color: Colors.black,
                                   fontSize: 14,
@@ -179,14 +181,14 @@ class MytripScreen extends StatelessWidget {
                             children: [
                               SizedBox(height: 2),
                               Text(
-                                "Hour",
+                                loc.translate("Hour"),
                                 style: TextStyle(
                                   color: Color(0xffb3b3b3),
                                   fontSize: 14,
                                 ),
                               ),
                               Text(
-                                "7",
+                                loc.translate("7"),
                                 style: GoogleFonts.poppins(
                                   color: Colors.black,
                                   fontSize: 14,
@@ -209,7 +211,7 @@ class MytripScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {},
-                          child: Text("View Details",style: GoogleFonts.poppins(),),
+                          child: Text(loc.translate("View_Details"),style: GoogleFonts.poppins(),),
                         ),
                       ),
                     ),
@@ -242,14 +244,14 @@ class MytripScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Round Way",
+                                  loc.translate("Round_Way"),
                                   style: GoogleFonts.poppins(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 Text(
-                                  "31 Jan 2026, 07:00 AM",
+                                  loc.translate("31_Jan_2026,_07:00_AM"),
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
                                     fontSize: 12,
@@ -271,7 +273,7 @@ class MytripScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {},
-                          child: Text("Cancelled"),
+                          child: Text(loc.translate("Cancelled")),
                         ),
                       ],
                     ),
@@ -286,14 +288,14 @@ class MytripScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Pickup",
+                            loc.translate("Pickup"),
                             style: TextStyle(
                               color: Color(0xffb3b3b3),
                               fontSize: 14,
                             ),
                           ),
                           Text(
-                            "BRTA mirpur 13 mosjid moor, mosque, BRTA Road, Dhaka",
+                            loc.translate("BRTA_mirpur_13_mosjid_moor,_mosque,_BRTA_Road,_Dhaka"),
                             style: GoogleFonts.poppins(
                               color: Colors.black,
                               fontSize: 14,
@@ -342,14 +344,14 @@ class MytripScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Drop Off",
+                            loc.translate("Drop_Off"),
                             style: TextStyle(
                               color: Color(0xffb3b3b3),
                               fontSize: 14,
                             ),
                           ),
                           Text(
-                            "তিন ভাই মঞ্জিল, Jamalpur, Mymensingh",
+                            loc.translate("তিন_ভাই_মঞ্জিল,_Jamalpur,_Mymensingh"),
                             style: GoogleFonts.poppins(
                               color: Colors.black,
                               fontSize: 14,
@@ -400,7 +402,7 @@ class MytripScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {},
-                          child: Text("View Details",style: GoogleFonts.poppins(),),
+                          child: Text(loc.translate("View_Details"),style: GoogleFonts.poppins(),),
                         ),
                       ),
                     ),
