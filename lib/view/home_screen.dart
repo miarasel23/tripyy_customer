@@ -3,8 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/routes/app_router.dart';
+import 'package:trippy_customer/view/additionalService_screen.dart';
 import 'package:trippy_customer/view/editProfile_screen.dart';
 import 'package:trippy_customer/view/helpCenter_screen.dart';
+import 'package:trippy_customer/view/savedLocation_screen.dart';
+import 'package:trippy_customer/view/savedRoutes_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,7 +20,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         child: Column(
           children: [
-            SizedBox(height: 50), 
+            SizedBox(height: 50),
             ListTile(
               leading: Icon(Icons.person),
               title: Text(loc.translate("Edit_Profile")),
@@ -100,7 +103,9 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      getIt<AppRouter>().push(SavedroutesScreen());
+                    },
                     child: Text(
                       loc.translate("See_All"),
                       style: GoogleFonts.poppins(
@@ -180,55 +185,62 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget additionalServicesWidget(AppLocalizations loc) {
-    return Container(
-      width: 220,
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        color: Color(0xffeef7fe),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 220,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+    return GestureDetector(
+      onTap: () {
+        getIt<AppRouter>().push(AdditionalserviceScreen());
+      },
+      child: Container(
+        width: 220,
+        clipBehavior: Clip.hardEdge,
+        decoration: BoxDecoration(
+          color: Color(0xffeef7fe),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 220,
+              height: 100,
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
               ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(5),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  loc.translate("Tourist_Bus"),
-                  style: GoogleFonts.poppins(
-                    color: Colors.black,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+            Padding(
+              padding: EdgeInsets.all(5),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.translate("Tourist_Bus"),
+                    style: GoogleFonts.poppins(
+                      color: Colors.black,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  loc.translate("Comfortable_and_reliable_buses_for_group_tours_and_long_journeys"),
-                  style: GoogleFonts.poppins(
-                    color: Color(0xff656c74),
-                    fontSize: 9,
-                    fontWeight: FontWeight.w400,
+                  SizedBox(height: 2),
+                  Text(
+                    loc.translate(
+                      "Comfortable_and_reliable_buses_for_group_tours_and_long_journeys",
+                    ),
+                    style: GoogleFonts.poppins(
+                      color: Color(0xff656c74),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -259,7 +271,9 @@ class HomeScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              loc.translate("Save_your_favorite_pickup_and_drop_-_off_locations_to_book_faster_next_time."),
+              loc.translate(
+                "Save_your_favorite_pickup_and_drop_-_off_locations_to_book_faster_next_time.",
+              ),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 color: Color(0xffbfc6ce),
@@ -325,25 +339,30 @@ class HomeScreen extends StatelessWidget {
         locationSaveWidget(
           icon: Icon(Icons.home, size: 14, color: Colors.black),
           label: loc.translate('Home'),
-          loc: loc
+          loc: loc,
         ),
         locationSaveWidget(
           icon: Icon(Icons.add_home_work_sharp, size: 14, color: Colors.black),
           label: loc.translate('Work'),
-          loc: loc
+          loc: loc,
         ),
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Color(0xffeef7fe),
-            shape: BoxShape.circle,
-          ),
-          child: Align(
-            alignment: Alignment.center,
-            child: Icon(
-              Icons.arrow_forward_ios,
-              color: Color(0xff5681e6),
-              size: 20,
+        GestureDetector(
+          onTap: () {
+            getIt<AppRouter>().push(SavedlocationScreen());
+          },
+          child: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Color(0xffeef7fe),
+              shape: BoxShape.circle,
+            ),
+            child: Align(
+              alignment: Alignment.center,
+              child: Icon(
+                Icons.arrow_forward_ios,
+                color: Color(0xff5681e6),
+                size: 20,
+              ),
             ),
           ),
         ),
@@ -351,7 +370,11 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget locationSaveWidget({required Widget icon, required String label, required AppLocalizations loc}) {
+  Widget locationSaveWidget({
+    required Widget icon,
+    required String label,
+    required AppLocalizations loc,
+  }) {
     return Container(
       width: 130,
       padding: EdgeInsets.all(10),
