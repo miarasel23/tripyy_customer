@@ -4,12 +4,13 @@ class TimelineTile extends StatelessWidget {
   final Widget icon;
   final Widget child;
   final bool isLast;
+  final int tiles;
 
   const TimelineTile({
     super.key,
     required this.icon,
     required this.child,
-    this.isLast = false,
+    this.isLast = false, required this.tiles,
   });
 
   @override
@@ -25,7 +26,7 @@ class TimelineTile extends StatelessWidget {
             if (!isLast)
               Column(
                 children: List.generate(
-                  8,
+                  tiles,
                   (index) => Padding(
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Container(

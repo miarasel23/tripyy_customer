@@ -42,7 +42,15 @@ class SavedlocationScreen extends StatelessWidget {
             SizedBox(height: 5),
             Align(
               alignment: Alignment.centerRight,
-              child: CustomAddButton(loc: loc),
+              child: CustomAddButton(
+                loc: loc,
+                labelKey: 'Add_Location',
+                icon: Icon(
+                  Icons.add_circle_outline,
+                  size: 20,
+                  color: Colors.blue,
+                ),
+              ),
             ),
           ],
         ),
@@ -101,5 +109,3 @@ class SavedlocationScreen extends StatelessWidget {
     );
   }
 }
-
-

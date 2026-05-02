@@ -87,5 +87,13 @@
   "Saved_Locations": "সংরক্ষিত অবস্থান",
   "Set_your_address": "আপনার ঠিকানা সেট করুন",
   "Add_Location": "লোকেশান যোগ করুন",
-  "Call_us_for_details:<number>": "বিস্তারিত জানতে ফোন করুন: +8809856748512"
+  "Call_us_for_details:<number>": "বিস্তারিত জানতে ফোন করুন: +8809856748512",
+  "Add_Route": "রুট যোগ করুন",
+  "Trip_Details": "ভ্রমণের বিবরণ",
+  "Sedan": "সেডান",
+  "4_seats": "4টি আসন",
+  "One_Way": "এক রাস্তা",
+  "Booking_ID": "বুকিং আইডি",
+  "Total_fare": "মোট ভাড়া",
+  "PickUp_date_and_Time": "পিক আপের তারিখ এবং সময়"
 }

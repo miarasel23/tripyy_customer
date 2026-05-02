@@ -54,7 +54,7 @@
   "08_Feb_2026,_05:30_PM": "08 Feb 2026, 05:30 PM",
   "Cancelled": "Cancelled",
   "Pickup": "Pickup",
-  "Meena_Bazar_-_Ashkhona_Branch,_Airport_-_Dakshinkhan_Road,_Dhaka": "Meena_Bazar - Ashkhona Branch, Airport - Dakshinkhan Road, Dhaka",
+  "Meena_Bazar_-_Ashkhona_Branch,_Airport_-_Dakshinkhan_Road,_Dhaka": "Meena Bazar - Ashkhona Branch, Airport - Dakshinkhan Road, Dhaka",
   "Hour": "Hour",
   "7": "7",
   "View_Details": "View Details",
@@ -88,5 +88,12 @@
   "Set_your_address": "Set your address",
   "Add_Location": "Add Location",
   "Call_us_for_details:<number>": "Call us for details: +8809856748512",
-  "Saved_Routes": "Saved Routes"
+  "Add_Route": "Add Route",
+  "Trip_Details": "Trip Details",
+  "Sedan": "Sedan",
+  "4_seats": "4 seats",
+  "One_Way": "One way",
+  "Booking_ID": "Booking ID",
+  "Total_fare": "Total fare",
+  "PickUp_date_and_Time": "Pick Up date and Time"
 }

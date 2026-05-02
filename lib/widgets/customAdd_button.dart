@@ -3,44 +3,38 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 
 class CustomAddButton extends StatelessWidget {
-  const CustomAddButton({
-    super.key,
-    required this.loc,
-  });
+  const CustomAddButton({super.key, required this.loc, required this.labelKey, required this.icon});
 
   final AppLocalizations loc;
+  final String labelKey;
+  final Widget icon;
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        side: BorderSide(
-          color: Colors.blue,
-          width: 1.5
+    return IntrinsicWidth(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          side: BorderSide(color: Colors.blue, width: 1.5),
+          elevation: 0,
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.blue,
         ),
-        elevation: 0,
-        fixedSize: Size(160, 30),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.blue,
-      ),
-      onPressed: () {},
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(
-            Icons.add_circle_outline,
-            size: 20,
-            color: Colors.blue,
-          ),
-          Text(
-            loc.translate("Add_Location"),
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: Colors.blue,
-              fontWeight: FontWeight.w500,
+        onPressed: () {},
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            icon,
+            SizedBox(width: 5),
+            Text(
+              loc.translate(labelKey),
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Colors.blue,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -6,6 +6,7 @@ import 'package:trippy_customer/routes/app_router.dart';
 import 'package:trippy_customer/view/additionalService_screen.dart';
 import 'package:trippy_customer/view/editProfile_screen.dart';
 import 'package:trippy_customer/view/helpCenter_screen.dart';
+import 'package:trippy_customer/view/points_screen.dart';
 import 'package:trippy_customer/view/savedLocation_screen.dart';
 import 'package:trippy_customer/view/savedRoutes_screen.dart';
 
@@ -455,33 +456,38 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget starPointsWidget(AppLocalizations loc) {
-    return Container(
-      padding: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Color(0xfffff9d6),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: Color(0xfffdc205),
-              shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: () {
+        getIt<AppRouter>().push(PointsScreen());
+      },
+      child: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Color(0xfffff9d6),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Color(0xfffdc205),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.star, color: Colors.white, size: 15),
             ),
-            child: Icon(Icons.star, color: Colors.white, size: 15),
-          ),
-          SizedBox(width: 8),
-          Text(
-            loc.translate("470"),
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+            SizedBox(width: 8),
+            Text(
+              loc.translate("470"),
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
