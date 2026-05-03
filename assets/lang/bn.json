@@ -95,5 +95,9 @@
   "One_Way": "এক রাস্তা",
   "Booking_ID": "বুকিং আইডি",
   "Total_fare": "মোট ভাড়া",
-  "PickUp_date_and_Time": "পিক আপের তারিখ এবং সময়"
+  "PickUp_date_and_Time": "পিক আপের তারিখ এবং সময়",
+  "Available_Points": "উপলব্ধ পয়েন্ট",
+  "50": "৫০",
+  "Bronze": "ব্রোঞ্জ",
+  "Point_History": "পয়েন্ট ইতিহাস"
 }

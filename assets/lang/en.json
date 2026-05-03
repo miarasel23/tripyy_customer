@@ -95,5 +95,9 @@
   "One_Way": "One way",
   "Booking_ID": "Booking ID",
   "Total_fare": "Total fare",
-  "PickUp_date_and_Time": "Pick Up date and Time"
+  "PickUp_date_and_Time": "Pick Up date and Time",
+  "Available_Points": "Available Points",
+  "50": "50",
+  "Bronze": "BRONZE",
+  "Point_History": "Point History"
 }
