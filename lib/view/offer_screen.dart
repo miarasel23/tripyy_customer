@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/data/services/service_locator.dart';
-import 'package:trippy_customer/routes/app_router.dart';
+import 'package:trippy_customer/routes/app_routes.dart';
 import 'package:trippy_customer/utils/images.dart';
 import 'package:trippy_customer/view/viewDetails_screen.dart';
 
@@ -82,9 +82,9 @@ class OfferScreen extends StatelessWidget {
               ),
               SizedBox(height: 5),
               GestureDetector(
-                onTap: () {
-                  getIt<AppRouter>().push(ViewdetailsScreen());
-                },
+                // onTap: () {
+                //   getIt<AppRouter>().push(ViewdetailsScreen());
+                // },
                 child: Text(
                   loc.translate("See_Details"),
                   style: TextStyle(

@@ -4,7 +4,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/modules/localization/Controller/localization_controller.dart';
-import 'package:trippy_customer/routes/app_router.dart';
+import 'package:trippy_customer/routes/app_routes.dart';
 import 'package:trippy_customer/view/main_bottom_nav_bar_screen.dart';
 
 class OtpScreen extends StatelessWidget {
@@ -34,9 +34,9 @@ class OtpScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(left: 13.0, top: 5),
               child: InkWell(
-                onTap: () {
-                  getIt<AppRouter>().pop();
-                },
+                // onTap: () {
+                //   getIt<AppRouter>().pop();
+                // },
                 child: Icon(Icons.arrow_back),
               ),
             ),
@@ -94,7 +94,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      getIt<AppRouter>().push(MainBottomNavBarScreen());
+                      // getIt<AppRouter>().push(MainBottomNavBarScreen());
                     },
                     child: Text(
                       loc.translate("Continue"),

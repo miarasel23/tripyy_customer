@@ -3,7 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/data/services/service_locator.dart';
-import 'package:trippy_customer/routes/app_router.dart';
+import 'package:trippy_customer/routes/app_routes.dart';
 
 class AdditionalserviceScreen extends StatelessWidget {
   const AdditionalserviceScreen({super.key});
@@ -43,7 +43,7 @@ class AdditionalserviceScreen extends StatelessWidget {
                   left: 13,
                   child: GestureDetector(
                     onTap: () {
-                      getIt<AppRouter>().pop();
+                      // getIt<AppRouter>().pop();
                     },
                     child: Icon(
                       Icons.arrow_back,
@@ -99,7 +99,7 @@ class AdditionalserviceScreen extends StatelessWidget {
                             style: GoogleFonts.poppins(fontSize: 16),
                           ),
                         ),
-                        SizedBox(height: 5,)
+                        SizedBox(height: 5),
                       ],
                     ),
                   ),

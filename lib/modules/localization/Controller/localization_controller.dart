@@ -6,6 +6,7 @@ class LocalizationController extends ChangeNotifier {
   Locale get locale => _locale;
 
   void changeLanguage(String code) {
+    print("Changing language to: $code");
     _locale = Locale(code);
     notifyListeners();
   }

@@ -1,13 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/data/services/service_locator.dart';
-import 'package:trippy_customer/routes/app_router.dart';
-import 'package:trippy_customer/view/additionalService_screen.dart';
-import 'package:trippy_customer/view/editProfile_screen.dart';
-import 'package:trippy_customer/view/helpCenter_screen.dart';
-import 'package:trippy_customer/view/savedLocation_screen.dart';
-import 'package:trippy_customer/view/savedRoutes_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -25,14 +18,14 @@ class HomeScreen extends StatelessWidget {
               leading: Icon(Icons.person),
               title: Text(loc.translate("Edit_Profile")),
               onTap: () {
-                getIt<AppRouter>().push(EditprofileScreen());
+                // getIt<AppRouter>().push(EditprofileScreen());
               },
             ),
             ListTile(
               leading: Icon(Icons.help_center),
               title: Text(loc.translate("Help_Center")),
               onTap: () {
-                getIt<AppRouter>().push(HelpcenterScreen());
+                // getIt<AppRouter>().push(HelpcenterScreen());
               },
             ),
           ],
@@ -104,7 +97,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      getIt<AppRouter>().push(SavedroutesScreen());
+                      // getIt<AppRouter>().push(SavedroutesScreen());
                     },
                     child: Text(
                       loc.translate("See_All"),
@@ -187,7 +180,7 @@ class HomeScreen extends StatelessWidget {
   Widget additionalServicesWidget(AppLocalizations loc) {
     return GestureDetector(
       onTap: () {
-        getIt<AppRouter>().push(AdditionalserviceScreen());
+        // getIt<AppRouter>().push(AdditionalserviceScreen());
       },
       child: Container(
         width: 220,
@@ -348,7 +341,7 @@ class HomeScreen extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            getIt<AppRouter>().push(SavedlocationScreen());
+            // getIt<AppRouter>().push(SavedlocationScreen());
           },
           child: Container(
             padding: EdgeInsets.all(8),

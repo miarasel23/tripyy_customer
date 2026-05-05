@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_bloc.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization_delegate.dart';
-import 'package:trippy_customer/data/services/service_locator.dart';
-import 'package:trippy_customer/modules/localization/Controller/localization_controller.dart';
-import 'package:trippy_customer/routes/app_router.dart';
-import 'package:trippy_customer/view/splash_screen.dart';
 
-Future<void> main() async {
-  await setupServiceLocator();
+import 'controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_bloc.dart';
+import 'core/utils/localization/app_localization_delegate.dart';
+import 'modules/localization/Controller/localization_controller.dart';
 
+import 'routes/app_routes.dart';
+import 'routes/route_generator.dart';
+
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -27,26 +27,21 @@ class MyApp extends StatelessWidget {
         return BlocProvider(
           create: (_) => MainBottomNavBarBloc(),
           child: MaterialApp(
-            navigatorKey: getIt<AppRouter>().navigatorKey,
             debugShowCheckedModeBanner: false,
 
-            // ✅ Locale from controller
+            // 🌍 Localization
             locale: controller.locale,
-
-            // ✅ Supported languages
             supportedLocales: const [Locale('en'), Locale('bn')],
-
-            // ✅ VERY IMPORTANT (FIX ERROR)
             localizationsDelegates: const [
               AppLocalizationsDelegate(),
-
-              // 🔥 REQUIRED
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
 
-            home: SplashScreen(controller: controller),
+            // 🔥 ROUTING
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: RouteGenerator.generateRoute,
           ),
         );
       },
