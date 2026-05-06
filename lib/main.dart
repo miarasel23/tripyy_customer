@@ -15,22 +15,22 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final LocalizationController controller = LocalizationController();
-
   MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, _) {
-        return BlocProvider(
-          create: (_) => MainBottomNavBarBloc(),
-          child: MaterialApp(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => LocalizationBloc()),
+        BlocProvider(create: (_) => MainBottomNavBarBloc()),
+      ],
+      child: BlocBuilder<LocalizationBloc, LocalizationState>(
+        builder: (context, localizationState) {
+          return MaterialApp(
             debugShowCheckedModeBanner: false,
 
             // 🌍 Localization
-            locale: controller.locale,
+            locale: localizationState.locale,
             supportedLocales: const [Locale('en'), Locale('bn')],
             localizationsDelegates: const [
               AppLocalizationsDelegate(),
@@ -42,9 +42,9 @@ class MyApp extends StatelessWidget {
             // 🔥 ROUTING
             initialRoute: AppRoutes.splash,
             onGenerateRoute: RouteGenerator.generateRoute,
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

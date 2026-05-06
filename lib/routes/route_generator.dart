@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../modules/auth/view/screen/numberInput_screen.dart';
+import '../core/utils/localization/app_localization.dart';
+import '../modules/auth/view/screen/number_Input_screen.dart';
+import '../modules/dashbiard/view/screen/dashboard_screen.dart';
+import '../modules/otp/view/screen/otp_signin_screen.dart';
 import '../modules/splash/view/splash_screen.dart';
 
 import 'app_routes.dart';
@@ -14,8 +17,12 @@ class RouteGenerator {
       case AppRoutes.numberInput:
         return MaterialPageRoute(builder: (_) => NumberInputScreen());
 
-      // case AppRoutes.dashboard:
-      //   return MaterialPageRoute(builder: (_) => const DashboardScreen());
+      case AppRoutes.otp:
+        final number = settings.arguments as String? ?? "";
+        return MaterialPageRoute(builder: (_) => OtpSignIn(number: number));
+
+      case AppRoutes.dashboard:
+        return MaterialPageRoute(builder: (_) => const DashboardScreen());
 
       default:
         return MaterialPageRoute(

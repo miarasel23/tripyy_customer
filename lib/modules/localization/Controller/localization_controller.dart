@@ -1,13 +1,20 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
-class LocalizationController extends ChangeNotifier {
-  Locale _locale = const Locale('en');
+class ChangeLanguageEvent {
+  final String languageCode;
+  ChangeLanguageEvent(this.languageCode);
+}
 
-  Locale get locale => _locale;
+class LocalizationState {
+  final Locale locale;
+  LocalizationState({required this.locale});
+}
 
-  void changeLanguage(String code) {
-    print("Changing language to: $code");
-    _locale = Locale(code);
-    notifyListeners();
+class LocalizationBloc extends Bloc<ChangeLanguageEvent, LocalizationState> {
+  LocalizationBloc() : super(LocalizationState(locale: const Locale('en'))) {
+    on<ChangeLanguageEvent>((event, emit) {
+      emit(LocalizationState(locale: Locale(event.languageCode)));
+    });
   }
 }

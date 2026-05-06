@@ -4,7 +4,7 @@ import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_
 import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_event.dart';
 import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_state.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/view/home_screen.dart';
+import 'package:trippy_customer/modules/dashbiard/view/screen/dashboard_screen.dart';
 import 'package:trippy_customer/view/myTrip_screen.dart';
 import 'package:trippy_customer/view/offer_screen.dart';
 import 'package:trippy_customer/view/profile_screen.dart';
@@ -18,7 +18,7 @@ class MainBottomNavBarScreen extends StatefulWidget {
 
 class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
   final List<Widget> _screens = const [
-    HomeScreen(),
+    DashboardScreen(),
     MytripScreen(),
     OfferScreen(),
     ProfileScreen(),
@@ -55,7 +55,9 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                 BottomNavigationBarItem(
                   icon: IconTheme(
                     data: IconThemeData(
-                      color: state.selectedIndex == 0 ? Colors.blue : Colors.grey,
+                      color: state.selectedIndex == 0
+                          ? Colors.blue
+                          : Colors.grey,
                     ),
                     child: Icon(Icons.home_outlined),
                   ),
@@ -64,7 +66,9 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                 BottomNavigationBarItem(
                   icon: IconTheme(
                     data: IconThemeData(
-                      color: state.selectedIndex == 1 ? Colors.blue : Colors.grey,
+                      color: state.selectedIndex == 1
+                          ? Colors.blue
+                          : Colors.grey,
                     ),
                     child: Icon(Icons.train_sharp),
                   ),
@@ -73,7 +77,9 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                 BottomNavigationBarItem(
                   icon: IconTheme(
                     data: IconThemeData(
-                      color: state.selectedIndex == 2 ? Colors.blue : Colors.grey,
+                      color: state.selectedIndex == 2
+                          ? Colors.blue
+                          : Colors.grey,
                     ),
                     child: Icon(Icons.home_outlined),
                   ),
@@ -82,7 +88,9 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                 BottomNavigationBarItem(
                   icon: IconTheme(
                     data: IconThemeData(
-                      color: state.selectedIndex == 3 ? Colors.blue : Colors.grey,
+                      color: state.selectedIndex == 3
+                          ? Colors.blue
+                          : Colors.grey,
                     ),
                     child: Icon(Icons.person),
                   ),

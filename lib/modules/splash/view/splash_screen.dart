@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
 import '../../../routes/app_routes.dart';
+import '../../../utils/colors_code.dart';
 import '../../../utils/images.dart';
 import '../../../widgets/inverted_curve_clipper.dart';
 
@@ -26,10 +27,9 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final langCode = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.pageBackground,
       body: SafeArea(
         child: Stack(
           children: [
@@ -48,28 +48,16 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: Container(
                   width: double.infinity,
                   height: 400,
-                  decoration: const BoxDecoration(color: Color(0xffededed)),
+                  color: AppColors.pageBackground,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 45),
 
-                      /// 🌍 Language Based Text
-                      langCode == "bn"
-                          ? Column(
-                              children: [
-                                firstLine(),
-                                const SizedBox(height: 8),
-                                secondLine(),
-                              ],
-                            )
-                          : Column(
-                              children: [
-                                firstLineEn(),
-                                const SizedBox(height: 8),
-                                secondLineEn(),
-                              ],
-                            ),
+                      /// 🌍 Localized Text
+                      firstLine(loc),
+                      const SizedBox(height: 8),
+                      secondLine(loc),
 
                       const SizedBox(height: 20),
 
@@ -78,8 +66,8 @@ class _SplashScreenState extends State<SplashScreen> {
                         padding: const EdgeInsets.all(18.0),
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xff0e52ff),
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors.submitButton,
+                            foregroundColor: AppColors.submitButtonText,
                             minimumSize: const Size(double.infinity, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
@@ -92,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
                             );
                           },
                           child: Text(
-                            loc.translate("Get_Started"),
+                            loc.translate("get_started"),
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -113,12 +101,12 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Container(
                 padding: const EdgeInsets.all(8.0),
                 decoration: const BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.pageBackground,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.location_on,
-                  color: Colors.blue,
+                  color: AppColors.primary,
                   size: 30,
                 ),
               ),
@@ -129,74 +117,39 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  /// 🔤 TEXT FUNCTIONS
+  /// 🔤 TEXT UI
 
-  Row firstLine() {
+  Widget firstLine(AppLocalizations loc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
+      children: [
         Text(
-          "শহর",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          loc.translate("city"),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        SizedBox(width: 4),
-        Text("থেকে", style: TextStyle(fontSize: 22)),
-        SizedBox(width: 4),
+        const SizedBox(width: 4),
+        Text(loc.translate("to"), style: const TextStyle(fontSize: 22)),
+        const SizedBox(width: 4),
         Text(
-          "শহরে",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          loc.translate("city"),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
       ],
     );
   }
 
-  Row secondLine() {
+  Widget secondLine(AppLocalizations loc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Text("সারা", style: TextStyle(fontSize: 22)),
-        SizedBox(width: 4),
+      children: [
+        Text(loc.translate("all"), style: const TextStyle(fontSize: 22)),
+        const SizedBox(width: 4),
         Text(
-          "বাংলাদেশ",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          loc.translate("over"),
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
-        SizedBox(width: 4),
-        Text("জুড়ে!", style: TextStyle(fontSize: 22)),
-      ],
-    );
-  }
-
-  Row firstLineEn() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Text(
-          "City",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(width: 4),
-        Text("to", style: TextStyle(fontSize: 22)),
-        SizedBox(width: 4),
-        Text(
-          "City",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
-  Row secondLineEn() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        Text("All", style: TextStyle(fontSize: 22)),
-        SizedBox(width: 4),
-        Text(
-          "Over",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(width: 4),
-        Text("Bangladesh!", style: TextStyle(fontSize: 22)),
+        const SizedBox(width: 4),
+        Text(loc.translate("bangladesh"), style: const TextStyle(fontSize: 22)),
       ],
     );
   }

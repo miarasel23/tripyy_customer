@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/localization/app_localization.dart';
-import '../../../../routes/app_routes.dart';
-import '../../../../utils/colors_code.dart';
 import '../../../localization/Controller/localization_controller.dart';
 
 class NumberInputScreen extends StatelessWidget {
@@ -38,12 +36,12 @@ class NumberInputScreen extends StatelessWidget {
                   const SizedBox(height: 10),
                   localizationState.locale.languageCode == "en"
                       ? richTextEnglish(loc)
-                      : richTextBangle(loc),
+                      : richTextBangla(loc),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.submitButton,
-                      foregroundColor: AppColors.submitButtonText,
+                      backgroundColor: const Color(0xff0e52ff),
+                      foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -52,16 +50,15 @@ class NumberInputScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushNamed(
                         context,
-                        AppRoutes.otp,
+                        '/otp',
                         arguments: numberField.text,
                       );
                     },
                     child: Text(
-                      loc.translate("continue"),
+                      loc.translate("Continue"),
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.submitButtonText, // ✅ correct
                       ),
                     ),
                   ),
@@ -70,28 +67,26 @@ class NumberInputScreen extends StatelessWidget {
                     children: [
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.submitButtonText,
-                          backgroundColor: AppColors.submitButton,
+                          foregroundColor: Colors.black,
                         ),
                         onPressed: () {
-                          context.read<LocalizationBloc>().add(
-                            ChangeLanguageEvent('en'),
-                          );
+                          context
+                              .read<LocalizationBloc>()
+                              .add(ChangeLanguageEvent('en'));
                         },
-                        child: Text(loc.translate("english")),
+                        child: const Text("English"),
                       ),
                       const SizedBox(width: 5),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.submitButtonText,
-                          backgroundColor: AppColors.submitButton,
+                          foregroundColor: Colors.black,
                         ),
                         onPressed: () {
-                          context.read<LocalizationBloc>().add(
-                            ChangeLanguageEvent('bn'),
-                          );
+                          context
+                              .read<LocalizationBloc>()
+                              .add(ChangeLanguageEvent('bn'));
                         },
-                        child: Text(loc.translate("bengal")),
+                        child: const Text("বাংলা"),
                       ),
                     ],
                   ),
@@ -112,7 +107,7 @@ class NumberInputScreen extends StatelessWidget {
         children: [
           TextSpan(
             text: "Terms and Conditions",
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 14,
               color: Colors.black,
               fontWeight: FontWeight.w600,
@@ -123,7 +118,7 @@ class NumberInputScreen extends StatelessWidget {
     );
   }
 
-  Widget richTextBangle(AppLocalizations loc) {
+  Widget richTextBangla(AppLocalizations loc) {
     return RichText(
       text: TextSpan(
         text: "এগিয়ে যাওয়ার মাধ্যমে, আপনি আমাদের ",
@@ -131,9 +126,9 @@ class NumberInputScreen extends StatelessWidget {
         children: [
           TextSpan(
             text: "শর্তাবলী ও নিয়মাবলীর ",
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 16,
-              color: AppColors.textPrimary,
+              color: Colors.black,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -176,13 +171,14 @@ class NumberInputScreen extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Icon(Icons.phone, size: 25),
+                        // Replace with your actual flag image
+                        const Icon(Icons.flag, size: 25),
                         const SizedBox(width: 16),
                         Text(
-                          loc.translate("+880"),
+                          "+880",
                           style: GoogleFonts.poppins(
                             fontSize: 14,
-                            color: AppColors.textPrimary,
+                            color: Colors.black,
                           ),
                         ),
                       ],
@@ -199,7 +195,7 @@ class NumberInputScreen extends StatelessWidget {
                         hintStyle: GoogleFonts.poppins(
                           fontSize: 17,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.hintText.withOpacity(0.5),
+                          color: const Color(0xffa2a3a4),
                         ),
                         border: InputBorder.none,
                       ),
