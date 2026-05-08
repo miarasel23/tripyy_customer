@@ -1,0 +1,112 @@
+{
+  "app_name": "ট্রিপি",
+  "hello": "হ্যালো",
+  "welcome": "স্বাগতম",
+  "change_language": "ভাষা পরিবর্তন করুন",
+
+  "enter_phone_number": "আপনার ফোন নম্বর লিখুন",
+  "enter_number": "আপনার নম্বর লিখুন",
+  "country_code": "+৮৮০",
+
+  "consent_message": "এগিয়ে যাওয়ার মাধ্যমে, আপনি আমাদের শর্তাবলীতে সম্মত হচ্ছেন।",
+  "enter_otp": "আপনাকে পাঠানো ওটিপিটি এখানে প্রবেশ করান",
+
+  "change_number": "নম্বর পরিবর্তন করুন",
+  "continue": "সামনে যান",
+  "resend_code": "কোড আবার পাঠান",
+
+  "profile": "প্রোফাইল",
+  "name": "নাম",
+  "phone_number": "ফোন নাম্বার",
+  "gender": "লিঙ্গ",
+  "delete_account": "একাউন্ট ডিলিট",
+  "update": "আপডেট",
+
+  "male": "পুরুষ",
+  "female": "মহিলা",
+
+  "help_center": "সাহায্য কেন্দ্র",
+  "how_can_we_help": "আমরা কিভাবে আপনাকে সাহায্য করতে পারি?",
+  "chat_support": "গারিবুকের সাথে চ্যাট করুন",
+  "customer_care": "কাস্টমার কেয়ারে কথা বলুন",
+  "emergency_service": "ন্যাশনাল ইমারজেসি সার্ভিস",
+
+  "services": "সার্ভিসেস",
+  "saved_routes": "সংরক্ষিত রুট",
+  "see_all": "সব দেখুন",
+
+  "additional_services": "আরও সার্ভিস",
+  "intercity": "আন্তঃনগর",
+  "hourly": "ঘণ্টায়",
+  "airport_rental": "বিমানবন্দর ভাড়া",
+  "return_trip": "রিটার্ন ট্রিপ",
+  "ride_share": "রাইড শেয়ার করুন",
+  "tourist_bus": "পর্যটক বাস",
+
+  "no_saved_routes": "সংরক্ষিত রুট নেই",
+  "save_routes_hint": "পরের বার দ্রুত বুক করার জন্য আপনার পছন্দের পিকআপ ও ড্রপ-অফ স্থানগুলো সংরক্ষণ করুন।",
+  "add_routes": "রুট যোগ করুন",
+
+  "home": "বাড়ি",
+  "work": "কর্ম",
+  "add_location": "অবস্থান যোগ করুন",
+
+  "where_are_you_going": "তুমি কোথায় যাচ্ছো?",
+  "find_location": "অবস্থান খুঁজুন",
+  "470": "৪৭০",
+
+  "my_trip": "আমার ভ্রমণ",
+  "offers": "অফারস",
+  "edit_profile": "এডিট প্রোফাইল",
+
+  "tour_bus_description": "দলবদ্ধ ভ্রমণ ও দীর্ঘ যাত্রার জন্য আরামদায়ক ও নির্ভরযোগ্য বাস",
+  "car_rental": "গাড়ি ভাড়া",
+  "wedding_car": "বিয়ের গাড়ি",
+
+  "cancelled": "বাতিল",
+  "pickup": "পিকআপ",
+  "drop_off": "ড্রপ অফ",
+  "hour": "ঘন্টা",
+  "view_details": "বিস্তারিত দেখুন",
+  "round_trip": "গোলাকার পথ",
+
+  "cashback_offer_title": "৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
+  "cashback_offer_description": "১ এপ্রিল ৩০ এপ্রিল ২০২৬ পর্যন্ত গাড়িবুক-এ যেকোনো ইন্টারসিটি ট্রিপেই ৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
+
+  "view_profile": "প্রোফাইল দেখুন",
+  "points": "পয়েন্টস",
+  "voucher": "ভাউচার",
+
+  "preferences": "পছন্দসমূহ",
+  "language": "ভাষা",
+  "english": "ইংরেজি",
+  "notification": "বিজ্ঞপ্তি",
+  "tutorial": "টিউটোরিয়াল",
+
+  "legal": "আইনি",
+  "help": "সাহায্য",
+  "trip_terms_conditions": "ভ্রমণের শর্তাবলী",
+  "privacy_policy": "গোপনীয়তা নীতি",
+
+  "get_started": "শুরু করুন",
+  "terms_conditions": "শর্তাবলী",
+
+  "boishak_400": "বৈশাখ ৪০০",
+  "saved_locations": "সংরক্ষিত অবস্থান",
+  "set_address": "আপনার ঠিকানা সেট করুন",
+
+  "call_for_details": "বিস্তারিত জানতে ফোন করুন: {number}",
+  "city": "শহর",
+  "to": "থেকে",
+  "all": "সারা",
+  "over": "জুড়ে",
+  "bengal": "বাংলা",
+  "bangladesh": "বাংলাদেশ!",
+  "enter_your_number": "০১XXXXXXXXX",
+  "full_name": "পুরো নাম",
+  "enter_your_phone_number": "আপনার ফোন নম্বর লিখুন",
+  "+880": "+৮৮০",
+  "enter_the_otp_sent_to_you_at": "আপনাকে পাঠানো ওটিপিটি এখানে প্রবেশ করান",
+  "resend_code_in": "কোড পুনরায় পাঠানো হচ্ছে {time}"
+
+}
