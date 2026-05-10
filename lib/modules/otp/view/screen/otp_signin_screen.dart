@@ -85,7 +85,7 @@ class OtpSignIn extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          Navigator.pushNamed(context, AppRoutes.dashboard);
+                          Navigator.pushNamed(context, AppRoutes.bottomNav);
                         },
                         child: Text(
                           loc.translate("continue"),

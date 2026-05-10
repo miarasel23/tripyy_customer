@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:trippy_customer/view/editProfile_screen.dart';
+import 'package:trippy_customer/view/helpCenter_screen.dart';
+import 'package:trippy_customer/view/main_bottom_nav_bar_screen.dart';
 
 import '../core/utils/localization/app_localization.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
@@ -23,6 +26,14 @@ class RouteGenerator {
 
       case AppRoutes.dashboard:
         return MaterialPageRoute(builder: (_) => const DashboardScreen());
+
+      case AppRoutes.editProfile:
+        return MaterialPageRoute(builder: (_) => const EditprofileScreen());
+      
+      case AppRoutes.helpCenter:
+        return MaterialPageRoute(builder: (_) => const HelpcenterScreen());
+      case AppRoutes.bottomNav:
+        return MaterialPageRoute(builder: (_) => const MainBottomNavBarScreen());
 
       default:
         return MaterialPageRoute(

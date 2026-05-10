@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 
 class EditprofileScreen extends StatefulWidget {
   const EditprofileScreen({super.key});
@@ -15,16 +16,16 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    _name.text = loc.translate("arif");
-    _phoneNumber.text = loc.translate("01816801552");
+    _name.text = loc.translate("user_name");
+    _phoneNumber.text = loc.translate("user_phone_number");
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.editProfileScreenBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.editProfileScreenAppBarBackground,
         title: Text(
           loc.translate("Profile"),
           style: GoogleFonts.poppins(
-            color: Colors.black,
+            color: AppColors.editProfileScreenProfileText,
             fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
@@ -41,7 +42,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.black,
+                    color: AppColors.editProfileScreenBackgroundContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   width: double.infinity,
@@ -55,10 +56,14 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       border: Border.all(width: 3, color: Colors.white),
-                      color: Colors.blue,
+                      color: AppColors.editProfileScreenProfileIconContainer,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person, color: Colors.white, size: 35),
+                    child: Icon(
+                      Icons.person,
+                      color: AppColors.editProfileScreenProfileIcon,
+                      size: 35,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -69,13 +74,21 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                     padding: EdgeInsets.all(4.0),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: AppColors.editProfileScreenEditButtonContainer,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(
+                        color:
+                            AppColors.editProfileScreenEditButtonContainerSide,
+                        width: 2,
+                      ),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(1.0),
-                      child: Icon(Icons.edit, color: Colors.white, size: 15),
+                      child: Icon(
+                        Icons.edit,
+                        color: AppColors.editProfileScreenEditButtonIcon,
+                        size: 15,
+                      ),
                     ),
                   ),
                 ),
@@ -83,9 +96,9 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
             ),
             SizedBox(height: 38),
             Text(
-              loc.translate("Name"),
+              loc.translate("name"),
               style: GoogleFonts.poppins(
-                color: Colors.black,
+                color: AppColors.editProfileScreenNameText,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -95,7 +108,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
               controller: _name,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Color(0xffedf6ff),
+                fillColor: AppColors.editProfileScreenNameTextfield,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
                   borderSide: BorderSide.none,
@@ -104,9 +117,9 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
             ),
             SizedBox(height: 20),
             Text(
-              loc.translate("Phone_Number"),
+              loc.translate("phone_number"),
               style: GoogleFonts.poppins(
-                color: Colors.black,
+                color: AppColors.editProfileScreenPhoneText,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -116,7 +129,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
               controller: _phoneNumber,
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Color(0xffedf6ff),
+                fillColor: AppColors.editProfileScreenPhoneTextfield,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
                   borderSide: BorderSide.none,
@@ -125,7 +138,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
             ),
             SizedBox(height: 20),
             Text(
-              loc.translate("Gender"),
+              loc.translate("gender"),
               style: GoogleFonts.poppins(
                 color: Colors.black,
                 fontSize: 15,
@@ -140,7 +153,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                   width: 140,
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Color(0xffedf6ff),
+                    color: AppColors.editProfileScreenMaleCheckboxContainer,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Row(
@@ -154,7 +167,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                         value: true,
                         onChanged: (value) {},
                       ),
-                      Text(loc.translate("Male")),
+                      Text(loc.translate("male")),
                     ],
                   ),
                 ),
@@ -162,7 +175,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                   width: 140,
                   padding: EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: Color(0xffedf6ff),
+                    color: AppColors.editProfileScreenFemaleCheckboxContainer,
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Row(
@@ -176,7 +189,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                         value: false,
                         onChanged: (value) {},
                       ),
-                      Text(loc.translate("Female")),
+                      Text(loc.translate("female")),
                     ],
                   ),
                 ),
@@ -189,23 +202,33 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                 Expanded(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xfffadedd),
+                      backgroundColor: AppColors
+                          .editProfileScreenDeleteButtonElevatedbuttonBackground,
                     ),
                     onPressed: () {},
                     child: Text(
-                      loc.translate("Delete_Account"),
-                      style: GoogleFonts.poppins(color: Colors.red),
+                      loc.translate("delete_account"),
+                      style: GoogleFonts.poppins(
+                        color: AppColors
+                            .editProfileScreenDeleteButtonElevatedbuttonForeground,
+                      ),
                     ),
                   ),
                 ),
-                SizedBox(width: 8,),
+                SizedBox(width: 8),
                 Expanded(
                   child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors
+                          .editProfileScreenUpdateButtonElevatedbuttonBackground,
+                    ),
                     onPressed: () {},
                     child: Text(
-                      loc.translate("Update"),
-                      style: GoogleFonts.poppins(color: Colors.white),
+                      loc.translate("update"),
+                      style: GoogleFonts.poppins(
+                        color: AppColors
+                            .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                      ),
                     ),
                   ),
                 ),

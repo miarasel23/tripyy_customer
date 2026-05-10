@@ -61,7 +61,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.home_outlined),
                   ),
-                  label: loc.translate("Home"),
+                  label: loc.translate("home"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -72,7 +72,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.train_sharp),
                   ),
-                  label: loc.translate("My_Trip"),
+                  label: loc.translate("my_trip"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -83,7 +83,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.home_outlined),
                   ),
-                  label: loc.translate("Offers"),
+                  label: loc.translate("offers"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -94,7 +94,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     ),
                     child: Icon(Icons.person),
                   ),
-                  label: loc.translate("Profile"),
+                  label: loc.translate("profile"),
                 ),
               ],
             );

@@ -3,4 +3,7 @@ class AppRoutes {
   static const numberInput = '/number_input';
   static const otp = '/otp';
   static const dashboard = '/dashboard';
+  static const editProfile = '/edit_profile';
+  static const helpCenter = '/help_center';
+  static const bottomNav = '/bottom_nav';
 }

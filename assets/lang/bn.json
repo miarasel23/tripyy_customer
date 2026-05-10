@@ -107,6 +107,7 @@
   "enter_your_phone_number": "আপনার ফোন নম্বর লিখুন",
   "+880": "+৮৮০",
   "enter_the_otp_sent_to_you_at": "আপনাকে পাঠানো ওটিপিটি এখানে প্রবেশ করান",
-  "resend_code_in": "কোড পুনরায় পাঠানো হচ্ছে {time}"
-
+  "resend_code_in": "কোড পুনরায় পাঠানো হচ্ছে {time}",
+  "user_name": "আরিফ",
+  "user_phone_number": "০১৮১৬৮০১৫৫২"
 }

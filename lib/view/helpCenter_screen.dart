@@ -13,7 +13,7 @@ class HelpcenterScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: Text(
-          loc.translate("Help_Center"),
+          loc.translate("help_center"),
           style: GoogleFonts.poppins(
             color: Colors.black,
             fontSize: 20,
@@ -45,7 +45,7 @@ class HelpcenterScreen extends StatelessWidget {
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          loc.translate("How_can_we_help_you?"),
+                          loc.translate("how_can_we_help"),
                           style: GoogleFonts.poppins(color: Colors.white, fontSize: 25),
                         ),
                       ),
@@ -54,11 +54,11 @@ class HelpcenterScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 helpCenterCommonTasks(
-                  operation: loc.translate('Chat_with_Garibook'),
+                  operation: loc.translate('chat_support'),
                   icon: Icon(Icons.chat_rounded, color: Colors.blue, size: 30),
                 ),
                 helpCenterCommonTasks(
-                  operation: loc.translate('Talk_to_customer_care'),
+                  operation: loc.translate('customer_care'),
                   icon: Icon(Icons.chat_rounded, color: Colors.blue, size: 30),
                 ),
                 helpCenterCommonTasks(
@@ -66,7 +66,7 @@ class HelpcenterScreen extends StatelessWidget {
                   icon: Icon(Icons.mail, color: Colors.blue, size: 30),
                 ),
                 helpCenterCommonTasks(
-                  operation: loc.translate('National_Emergency_Service'),
+                  operation: loc.translate('emergency_service'),
                   icon: Icon(Icons.emergency, color: Colors.blue, size: 30),
                 ),
               ],
