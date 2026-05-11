@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 
 class HelpcenterScreen extends StatelessWidget {
   const HelpcenterScreen({super.key});
@@ -9,13 +10,13 @@ class HelpcenterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.helpCenterScreenBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.helpCenterScreenAppBarBackground,
         title: Text(
           loc.translate("help_center"),
           style: GoogleFonts.poppins(
-            color: Colors.black,
+            color: AppColors.helpCenterScreenAppBarText,
             fontSize: 20,
             fontWeight: FontWeight.w400,
           ),
@@ -35,18 +36,25 @@ class HelpcenterScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: AppColors.helpCenterScreenQuestionContainer,
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Icon(Icons.call, color: Colors.white, size: 70),
+                      Icon(
+                        Icons.call,
+                        color: AppColors.helpCenterScreenQuestionIcon,
+                        size: 70,
+                      ),
                       SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           loc.translate("how_can_we_help"),
-                          style: GoogleFonts.poppins(color: Colors.white, fontSize: 25),
+                          style: GoogleFonts.poppins(
+                            color: AppColors.helpCenterScreenQuestionText,
+                            fontSize: 25,
+                          ),
                         ),
                       ),
                     ],
@@ -55,19 +63,35 @@ class HelpcenterScreen extends StatelessWidget {
                 SizedBox(height: 30),
                 helpCenterCommonTasks(
                   operation: loc.translate('chat_support'),
-                  icon: Icon(Icons.chat_rounded, color: Colors.blue, size: 30),
+                  icon: Icon(
+                    Icons.chat_rounded,
+                    color: AppColors.helpCenterScreenTasksIcon,
+                    size: 30,
+                  ),
                 ),
                 helpCenterCommonTasks(
                   operation: loc.translate('customer_care'),
-                  icon: Icon(Icons.chat_rounded, color: Colors.blue, size: 30),
+                  icon: Icon(
+                    Icons.chat_rounded,
+                    color: AppColors.helpCenterScreenTasksIcon,
+                    size: 30,
+                  ),
                 ),
                 helpCenterCommonTasks(
                   operation: 'support@garibook.com',
-                  icon: Icon(Icons.mail, color: Colors.blue, size: 30),
+                  icon: Icon(
+                    Icons.mail,
+                    color: AppColors.helpCenterScreenTasksIcon,
+                    size: 30,
+                  ),
                 ),
                 helpCenterCommonTasks(
                   operation: loc.translate('emergency_service'),
-                  icon: Icon(Icons.emergency, color: Colors.blue, size: 30),
+                  icon: Icon(
+                    Icons.emergency,
+                    color: AppColors.helpCenterScreenTasksIcon,
+                    size: 30,
+                  ),
                 ),
               ],
             ),
@@ -91,7 +115,7 @@ class HelpcenterScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Color(0xffedf6ff),
+              color: AppColors.helpCenterScreenTasksContainer,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Row(
@@ -107,13 +131,16 @@ class HelpcenterScreen extends StatelessWidget {
                       operation,
                       style: GoogleFonts.poppins(
                         fontSize: 15,
-                        color: Colors.black,
+                        color: AppColors.helpCenterScreenTasksText,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
                 ),
-                Icon(Icons.arrow_forward_ios, color: Colors.black),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: AppColors.helpCenterScreenTasksForwardIcon,
+                ),
               ],
             ),
           ),

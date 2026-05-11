@@ -103,4 +103,15 @@ class AppColors {
   static const Color editProfileScreenUpdateButtonElevatedbuttonBackground = Colors.blue;
   static const Color editProfileScreenUpdateButtonElevatedbuttonForeground = Colors.white;
 
+  //Help Center
+  static const Color helpCenterScreenBackground = Colors.white;
+  static const Color helpCenterScreenAppBarBackground = Colors.white;
+  static const Color helpCenterScreenAppBarText = Colors.black;
+  static const Color helpCenterScreenQuestionContainer = Colors.blue;
+  static const Color helpCenterScreenQuestionIcon = Colors.white;
+  static const Color helpCenterScreenQuestionText = Colors.white;
+  static const Color helpCenterScreenTasksIcon = Colors.blue;
+  static const Color helpCenterScreenTasksForwardIcon = Colors.black;
+  static const Color helpCenterScreenTasksContainer = Color(0xffedf6ff);
+  static const Color helpCenterScreenTasksText = Colors.black;
 }
