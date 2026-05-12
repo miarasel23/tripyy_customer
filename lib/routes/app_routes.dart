@@ -6,4 +6,6 @@ class AppRoutes {
   static const editProfile = '/edit_profile';
   static const helpCenter = '/help_center';
   static const bottomNav = '/bottom_nav';
+  static const savedLoc = '/saved_loc';
+  static const savedRoute = '/saved_route';
 }

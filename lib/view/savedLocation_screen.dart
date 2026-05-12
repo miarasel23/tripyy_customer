@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 import 'package:trippy_customer/widgets/customAdd_button.dart';
 
 class SavedlocationScreen extends StatelessWidget {
@@ -10,14 +11,14 @@ class SavedlocationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.savedLocationsScreenBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.savedLocationsScreenAppBarBackground,
         title: Text(
-          loc.translate("Saved_Locations"),
+          loc.translate("saved_locations"),
           style: GoogleFonts.poppins(
             fontSize: 20,
-            color: Colors.black,
+            color: AppColors.savedLocationsScreenAppBarText,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -30,19 +31,35 @@ class SavedlocationScreen extends StatelessWidget {
           children: [
             savedLocationCredentials(
               loc,
-              Icon(Icons.home_filled, color: Colors.black, size: 30),
-              "Home",
+              Icon(
+                Icons.home_filled,
+                color: AppColors.savedLocationsScreenSavedLocationIcon,
+                size: 30,
+              ),
+              "home",
             ),
             SizedBox(height: 8),
             savedLocationCredentials(
               loc,
-              Icon(Icons.work, color: Colors.black, size: 30),
-              "Work",
+              Icon(
+                Icons.work,
+                color: AppColors.savedLocationsScreenSavedLocationIcon,
+                size: 30,
+              ),
+              "work",
             ),
             SizedBox(height: 5),
             Align(
               alignment: Alignment.centerRight,
-              child: CustomAddButton(loc: loc),
+              child: CustomAddButton(
+                loc: loc,
+                labelKey: 'add_location',
+                icon: Icon(
+                  Icons.add_circle_outline,
+                  size: 20,
+                  color: Colors.blue,
+                ),
+              ),
             ),
           ],
         ),
@@ -58,7 +75,7 @@ class SavedlocationScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: Color(0xffeef7fe),
+        color: AppColors.savedLocationsScreenSavedLocationContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -79,15 +96,15 @@ class SavedlocationScreen extends StatelessWidget {
                     loc.translate(label),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: Colors.black,
+                      color: AppColors.savedLocationsScreenSavedLocationTitle,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   Text(
-                    loc.translate("Set_your_address"),
+                    loc.translate("set_address"),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: Colors.black,
+                      color: AppColors.savedLocationsScreenSavedLocationDetails,
                       fontWeight: FontWeight.w200,
                     ),
                   ),
@@ -95,11 +112,13 @@ class SavedlocationScreen extends StatelessWidget {
               ),
             ],
           ),
-          Icon(Icons.arrow_forward_ios_rounded, size: 20, color: Colors.black),
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 20,
+            color: AppColors.savedLocationsScreenSavedLocationArrow,
+          ),
         ],
       ),
     );
   }
 }
-
-

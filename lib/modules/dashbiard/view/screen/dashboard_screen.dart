@@ -71,7 +71,7 @@ class DashboardScreen extends StatelessWidget {
             children: [
               locationSearchingWidget(loc),
               SizedBox(height: 6),
-              locationSaveWidgetRow(loc),
+              locationSaveWidgetRow(loc, context),
               SizedBox(height: 10),
               Text(
                 loc.translate("services"),
@@ -99,7 +99,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      // getIt<AppRouter>().push(SavedroutesScreen());
+                      Navigator.pushNamed(context, AppRoutes.savedRoute);
                     },
                     child: Text(
                       loc.translate("see_all"),
@@ -347,7 +347,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget locationSaveWidgetRow(AppLocalizations loc) {
+  Widget locationSaveWidgetRow(AppLocalizations loc, BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -372,7 +372,7 @@ class DashboardScreen extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () {
-            // getIt<AppRouter>().push(SavedlocationScreen());
+            Navigator.pushNamed(context, AppRoutes.savedLoc);
           },
           child: Container(
             padding: EdgeInsets.all(8),

@@ -114,4 +114,14 @@ class AppColors {
   static const Color helpCenterScreenTasksForwardIcon = Colors.black;
   static const Color helpCenterScreenTasksContainer = Color(0xffedf6ff);
   static const Color helpCenterScreenTasksText = Colors.black;
+  
+  //Saved Locations
+  static const Color savedLocationsScreenBackground = Colors.white;
+  static const Color savedLocationsScreenAppBarBackground = Colors.white;
+  static const Color savedLocationsScreenAppBarText = Colors.black;
+  static const Color savedLocationsScreenSavedLocationIcon = Colors.black;
+  static const Color savedLocationsScreenSavedLocationContainer = Color(0xffeef7fe);
+  static const Color savedLocationsScreenSavedLocationTitle = Colors.black;
+  static const Color savedLocationsScreenSavedLocationDetails = Colors.black;
+  static const Color savedLocationsScreenSavedLocationArrow = Colors.black;
 }

@@ -138,7 +138,11 @@ class MytripScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(Icons.timer_rounded, color: Colors.yellow, size: 25),
+                        Icon(
+                          Icons.timer_rounded,
+                          color: Colors.yellow,
+                          size: 25,
+                        ),
                         SizedBox(width: 5),
                         Expanded(
                           child: Column(
@@ -153,7 +157,9 @@ class MytripScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                loc.translate("Meena_Bazar_-_Ashkhona_Branch,_Airport_-_Dakshinkhan_Road,_Dhaka"),
+                                loc.translate(
+                                  "Meena_Bazar_-_Ashkhona_Branch,_Airport_-_Dakshinkhan_Road,_Dhaka",
+                                ),
                                 style: GoogleFonts.poppins(
                                   color: Colors.black,
                                   fontSize: 14,
@@ -161,7 +167,10 @@ class MytripScreen extends StatelessWidget {
                                 ),
                               ),
                               SizedBox(height: 2),
-                              Divider(thickness: 1, color: Colors.grey.shade300),
+                              Divider(
+                                thickness: 1,
+                                color: Colors.grey.shade300,
+                              ),
                             ],
                           ),
                         ),
@@ -172,7 +181,11 @@ class MytripScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.timer_rounded, color: Colors.yellow, size: 25),
+                        Icon(
+                          Icons.timer_rounded,
+                          color: Colors.yellow,
+                          size: 25,
+                        ),
                         SizedBox(width: 5),
                         Expanded(
                           child: Column(
@@ -210,8 +223,13 @@ class MytripScreen extends StatelessWidget {
                             backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,
                           ),
-                          onPressed: () {},
-                          child: Text(loc.translate("View_Details"),style: GoogleFonts.poppins(),),
+                          onPressed: () {
+                            // getIt<AppRouter>().push(TripdetailsScreen());
+                          },
+                          child: Text(
+                            loc.translate("View_Details"),
+                            style: GoogleFonts.poppins(),
+                          ),
                         ),
                       ),
                     ),
@@ -284,25 +302,30 @@ class MytripScreen extends StatelessWidget {
                         size: 25,
                         color: Colors.yellow,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            loc.translate("Pickup"),
-                            style: TextStyle(
-                              color: Color(0xffb3b3b3),
-                              fontSize: 14,
+                      tiles: 7,
+                      child: Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              loc.translate("Pickup"),
+                              style: TextStyle(
+                                color: Color(0xffb3b3b3),
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                          Text(
-                            loc.translate("BRTA_mirpur_13_mosjid_moor,_mosque,_BRTA_Road,_Dhaka"),
-                            style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              loc.translate(
+                                "BRTA_mirpur_13_mosjid_moor,_mosque,_BRTA_Road,_Dhaka",
+                              ),
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     // Row(
@@ -340,25 +363,30 @@ class MytripScreen extends StatelessWidget {
                         size: 25,
                         color: Colors.yellow,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            loc.translate("Drop_Off"),
-                            style: TextStyle(
-                              color: Color(0xffb3b3b3),
-                              fontSize: 14,
+                      tiles: 7,
+                      child: Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              loc.translate("Drop_Off"),
+                              style: TextStyle(
+                                color: Color(0xffb3b3b3),
+                                fontSize: 14,
+                              ),
                             ),
-                          ),
-                          Text(
-                            loc.translate("তিন_ভাই_মঞ্জিল,_Jamalpur,_Mymensingh"),
-                            style: GoogleFonts.poppins(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
+                            Text(
+                              loc.translate(
+                                "তিন_ভাই_মঞ্জিল,_Jamalpur,_Mymensingh",
+                              ),
+                              style: GoogleFonts.poppins(
+                                color: Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     // Row(
@@ -401,8 +429,13 @@ class MytripScreen extends StatelessWidget {
                             backgroundColor: Colors.blue,
                             foregroundColor: Colors.white,
                           ),
-                          onPressed: () {},
-                          child: Text(loc.translate("View_Details"),style: GoogleFonts.poppins(),),
+                          onPressed: () {
+                            // getIt<AppRouter>().push(TripdetailsScreen());
+                          },
+                          child: Text(
+                            loc.translate("View_Details"),
+                            style: GoogleFonts.poppins(),
+                          ),
                         ),
                       ),
                     ),
