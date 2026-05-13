@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:trippy_customer/view/editProfile_screen.dart';
-import 'package:trippy_customer/view/helpCenter_screen.dart';
-import 'package:trippy_customer/view/main_bottom_nav_bar_screen.dart';
-import 'package:trippy_customer/view/savedLocation_screen.dart';
-import 'package:trippy_customer/view/savedRoutes_screen.dart';
+import 'package:trippy_customer/modules/editProfile/view/screen/editProfile_screen.dart';
+import 'package:trippy_customer/modules/helpCenter/view/screen/helpCenter_screen.dart';
+import 'package:trippy_customer/modules/mainBottomNavBar/view/screen/main_bottom_nav_bar_screen.dart';
+import 'package:trippy_customer/modules/savedLocation/view/screen/savedLocation_screen.dart';
+import 'package:trippy_customer/modules/savedRoutes/view/screen/savedRoutes_screen.dart';
+import 'package:trippy_customer/modules/viewDetails/view/screen/viewDetails_screen.dart';
 
 import '../core/utils/localization/app_localization.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
@@ -40,6 +41,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const SavedlocationScreen());
       case AppRoutes.savedRoute:
         return MaterialPageRoute(builder: (_) => const SavedroutesScreen());
+      case AppRoutes.viewDetails:
+        return MaterialPageRoute(builder: (_) => const ViewdetailsScreen());
 
       default:
         return MaterialPageRoute(

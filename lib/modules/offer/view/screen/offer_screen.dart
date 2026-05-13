@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/data/services/service_locator.dart';
 import 'package:trippy_customer/routes/app_routes.dart';
 import 'package:trippy_customer/utils/images.dart';
-import 'package:trippy_customer/view/viewDetails_screen.dart';
 
 class OfferScreen extends StatelessWidget {
   const OfferScreen({super.key});
@@ -17,7 +15,7 @@ class OfferScreen extends StatelessWidget {
         forceMaterialTransparency: true,
         backgroundColor: Colors.white,
         title: Text(
-          loc.translate("Offers"),
+          loc.translate("offers"),
           style: TextStyle(
             color: Colors.black,
             fontSize: 20,
@@ -34,7 +32,7 @@ class OfferScreen extends StatelessWidget {
             return Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: [offerBanner(loc), SizedBox(height: 20)],
+              children: [offerBanner(loc, context), SizedBox(height: 20)],
             );
           },
         ),
@@ -42,7 +40,7 @@ class OfferScreen extends StatelessWidget {
     );
   }
 
-  Widget offerBanner(AppLocalizations loc) {
+  Widget offerBanner(AppLocalizations loc, BuildContext context) {
     return Column(
       children: [
         Container(
@@ -67,7 +65,7 @@ class OfferScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                loc.translate("৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!"),
+                loc.translate("offer_title"),
                 style: TextStyle(
                   color: Colors.black,
                   fontSize: 15,
@@ -76,17 +74,18 @@ class OfferScreen extends StatelessWidget {
               ),
               Text(
                 loc.translate(
-                  "১_এপ্রিল_৩০_এপ্রিল_২০২৬_পর্যন্ত_গাড়িবুক-এ_যেকোনো_ইন্টারসিটি_ট্রিপেই_৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!",
+                  "offer_desc",
                 ),
                 style: TextStyle(color: Color(0xffb3b3b3), fontSize: 13),
               ),
               SizedBox(height: 5),
               GestureDetector(
-                // onTap: () {
-                //   getIt<AppRouter>().push(ViewdetailsScreen());
-                // },
+                onTap: () {
+                  // getIt<AppRouter>().push(ViewdetailsScreen());
+                  Navigator.pushNamed(context, AppRoutes.viewDetails);
+                },
                 child: Text(
-                  loc.translate("See_Details"),
+                  loc.translate("see_details"),
                   style: TextStyle(
                     color: Colors.blue,
                     decorationColor: Colors.blue,

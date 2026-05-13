@@ -16,7 +16,7 @@ class ViewdetailsScreen extends StatelessWidget {
         title: Align(
           alignment: Alignment.center,
           child: Text(
-            loc.translate("BOISHAK_400"),
+            loc.translate("boishak_400"),
             style: GoogleFonts.poppins(
               fontSize: 20,
               color: Colors.black,
@@ -42,7 +42,7 @@ class ViewdetailsScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              loc.translate("BOISHAK_400"),
+              loc.translate("boishak_400"),
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -51,7 +51,7 @@ class ViewdetailsScreen extends StatelessWidget {
             SizedBox(height: 10),
             Text(
               loc.translate(
-                "১_এপ্রিল_৩০_এপ্রিল_২০২৬_পর্যন্ত_গাড়িবুক-এ_যেকোনো_ইন্টারসিটি_ট্রিপেই_৭০০_টাকা_ক্যাশব্যাক_জেতার_সুযোগ!",
+                "offer_desc",
               ),
               style: GoogleFonts.poppins(
                 fontSize: 15,

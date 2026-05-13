@@ -124,4 +124,10 @@ class AppColors {
   static const Color savedLocationsScreenSavedLocationTitle = Colors.black;
   static const Color savedLocationsScreenSavedLocationDetails = Colors.black;
   static const Color savedLocationsScreenSavedLocationArrow = Colors.black;
+
+  //My Trip
+  static const Color myTripScreenBackground = Colors.white;
+  static const Color myTripScreenAppBarBackground = Colors.white;
+  static const Color myTripScreenAppBarText = Colors.black;
+    
 }

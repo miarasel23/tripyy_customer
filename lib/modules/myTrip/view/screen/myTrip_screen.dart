@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/routes/app_routes.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 import 'package:trippy_customer/widgets/timeline_tile.dart';
 
 class MytripScreen extends StatelessWidget {
@@ -10,14 +12,14 @@ class MytripScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.myTripScreenBackground,
       appBar: AppBar(
         forceMaterialTransparency: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.myTripScreenAppBarBackground,
         title: Text(
-          loc.translate("My_Trip"),
+          loc.translate("my_trip"),
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.myTripScreenAppBarText,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -46,7 +48,7 @@ class MytripScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        loc.translate("Car_Rental"),
+                        loc.translate("car_rental"),
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize: 16,
@@ -63,7 +65,7 @@ class MytripScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
-                        loc.translate("Wedding_Car"),
+                        loc.translate("wedding_car"),
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize: 16,
@@ -101,14 +103,14 @@ class MytripScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  loc.translate("Hourly"),
+                                  loc.translate("hourly"),
                                   style: GoogleFonts.poppins(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 Text(
-                                  loc.translate("08_Feb_2026,_05:30_PM"),
+                                  loc.translate("date_and_time"),
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
                                     fontSize: 12,
@@ -130,7 +132,7 @@ class MytripScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {},
-                          child: Text(loc.translate("Cancelled")),
+                          child: Text(loc.translate("cancelled")),
                         ),
                       ],
                     ),
@@ -150,16 +152,14 @@ class MytripScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                loc.translate("Pickup"),
+                                loc.translate("pickup"),
                                 style: TextStyle(
                                   color: Color(0xffb3b3b3),
                                   fontSize: 14,
                                 ),
                               ),
                               Text(
-                                loc.translate(
-                                  "Meena_Bazar_-_Ashkhona_Branch,_Airport_-_Dakshinkhan_Road,_Dhaka",
-                                ),
+                                loc.translate("trip_address"),
                                 style: GoogleFonts.poppins(
                                   color: Colors.black,
                                   fontSize: 14,
@@ -194,7 +194,7 @@ class MytripScreen extends StatelessWidget {
                             children: [
                               SizedBox(height: 2),
                               Text(
-                                loc.translate("Hour"),
+                                loc.translate("hour"),
                                 style: TextStyle(
                                   color: Color(0xffb3b3b3),
                                   fontSize: 14,
@@ -227,7 +227,7 @@ class MytripScreen extends StatelessWidget {
                             // getIt<AppRouter>().push(TripdetailsScreen());
                           },
                           child: Text(
-                            loc.translate("View_Details"),
+                            loc.translate("view_details"),
                             style: GoogleFonts.poppins(),
                           ),
                         ),
@@ -262,14 +262,14 @@ class MytripScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  loc.translate("Round_Way"),
+                                  loc.translate("round_way"),
                                   style: GoogleFonts.poppins(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
                                 Text(
-                                  loc.translate("31_Jan_2026,_07:00_AM"),
+                                  loc.translate("date_and_time"),
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
                                     fontSize: 12,
@@ -291,7 +291,7 @@ class MytripScreen extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () {},
-                          child: Text(loc.translate("Cancelled")),
+                          child: Text(loc.translate("cancelled")),
                         ),
                       ],
                     ),
@@ -308,16 +308,14 @@ class MytripScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              loc.translate("Pickup"),
+                              loc.translate("pickup"),
                               style: TextStyle(
                                 color: Color(0xffb3b3b3),
                                 fontSize: 14,
                               ),
                             ),
                             Text(
-                              loc.translate(
-                                "BRTA_mirpur_13_mosjid_moor,_mosque,_BRTA_Road,_Dhaka",
-                              ),
+                              loc.translate("trip_address"),
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 fontSize: 14,
@@ -369,16 +367,14 @@ class MytripScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              loc.translate("Drop_Off"),
+                              loc.translate("drop_off"),
                               style: TextStyle(
                                 color: Color(0xffb3b3b3),
                                 fontSize: 14,
                               ),
                             ),
                             Text(
-                              loc.translate(
-                                "তিন_ভাই_মঞ্জিল,_Jamalpur,_Mymensingh",
-                              ),
+                              loc.translate("trip_address"),
                               style: GoogleFonts.poppins(
                                 color: Colors.black,
                                 fontSize: 14,
@@ -431,9 +427,10 @@ class MytripScreen extends StatelessWidget {
                           ),
                           onPressed: () {
                             // getIt<AppRouter>().push(TripdetailsScreen());
+                            Navigator.pushNamed(context, AppRoutes.viewDetails);
                           },
                           child: Text(
-                            loc.translate("View_Details"),
+                            loc.translate("view_details"),
                             style: GoogleFonts.poppins(),
                           ),
                         ),

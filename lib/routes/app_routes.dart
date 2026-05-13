@@ -8,4 +8,5 @@ class AppRoutes {
   static const bottomNav = '/bottom_nav';
   static const savedLoc = '/saved_loc';
   static const savedRoute = '/saved_route';
+  static const viewDetails = '/view_details';
 }
