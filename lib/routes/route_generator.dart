@@ -4,7 +4,7 @@ import 'package:trippy_customer/modules/helpCenter/view/screen/helpCenter_screen
 import 'package:trippy_customer/modules/mainBottomNavBar/view/screen/main_bottom_nav_bar_screen.dart';
 import 'package:trippy_customer/modules/savedLocation/view/screen/savedLocation_screen.dart';
 import 'package:trippy_customer/modules/savedRoutes/view/screen/savedRoutes_screen.dart';
-import 'package:trippy_customer/modules/viewDetails/view/screen/viewDetails_screen.dart';
+import 'package:trippy_customer/modules/offerDetails/view/screen/offerDetails_screen.dart';
 
 import '../core/utils/localization/app_localization.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
@@ -32,17 +32,19 @@ class RouteGenerator {
 
       case AppRoutes.editProfile:
         return MaterialPageRoute(builder: (_) => const EditprofileScreen());
-      
+
       case AppRoutes.helpCenter:
         return MaterialPageRoute(builder: (_) => const HelpcenterScreen());
       case AppRoutes.bottomNav:
-        return MaterialPageRoute(builder: (_) => const MainBottomNavBarScreen());
+        return MaterialPageRoute(
+          builder: (_) => const MainBottomNavBarScreen(),
+        );
       case AppRoutes.savedLoc:
         return MaterialPageRoute(builder: (_) => const SavedlocationScreen());
       case AppRoutes.savedRoute:
         return MaterialPageRoute(builder: (_) => const SavedroutesScreen());
       case AppRoutes.viewDetails:
-        return MaterialPageRoute(builder: (_) => const ViewdetailsScreen());
+        return MaterialPageRoute(builder: (_) => const OfferdetailsScreen());
 
       default:
         return MaterialPageRoute(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
 import 'package:trippy_customer/routes/app_routes.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 import 'package:trippy_customer/utils/images.dart';
 
 class OfferScreen extends StatelessWidget {
@@ -10,14 +11,14 @@ class OfferScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.offerScreenBackground,
       appBar: AppBar(
         forceMaterialTransparency: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.offerScreenAppBarBackground,
         title: Text(
           loc.translate("offers"),
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.offerScreenAppBarText,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -46,7 +47,7 @@ class OfferScreen extends StatelessWidget {
         Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: Colors.black,
+            color: AppColors.offerScreenImgBannerContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           width: double.infinity,
@@ -67,16 +68,17 @@ class OfferScreen extends StatelessWidget {
               Text(
                 loc.translate("offer_title"),
                 style: TextStyle(
-                  color: Colors.black,
+                  color: AppColors.offerScreenImgBannerTitleText,
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                 ),
               ),
               Text(
-                loc.translate(
-                  "offer_desc",
+                loc.translate("offer_desc"),
+                style: TextStyle(
+                  color: AppColors.offerScreenImgBannerDescriptionText,
+                  fontSize: 13,
                 ),
-                style: TextStyle(color: Color(0xffb3b3b3), fontSize: 13),
               ),
               SizedBox(height: 5),
               GestureDetector(
@@ -87,8 +89,8 @@ class OfferScreen extends StatelessWidget {
                 child: Text(
                   loc.translate("see_details"),
                   style: TextStyle(
-                    color: Colors.blue,
-                    decorationColor: Colors.blue,
+                    color: AppColors.offerScreenButtonText,
+                    decorationColor: AppColors.offerScreenButtonTextDecoration,
                     decoration: TextDecoration.underline,
                     fontWeight: FontWeight.w600,
                   ),

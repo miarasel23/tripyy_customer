@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -14,7 +15,7 @@ class ProfileScreen extends StatelessWidget {
     );
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.profileScreenBackground,
         body: Padding(
           padding: EdgeInsets.only(left: 18, right: 18, top: 18, bottom: 2),
           child: SingleChildScrollView(
@@ -30,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.black,
+                          color: AppColors.profileScreenCoverBanner,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         width: double.infinity,
@@ -43,13 +44,17 @@ class ProfileScreen extends StatelessWidget {
                           padding: EdgeInsets.all(8.0),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            border: Border.all(width: 3, color: Colors.white),
-                            color: Color(0xffd9e5ff),
+                            border: Border.all(
+                              width: 3,
+                              color: AppColors
+                                  .profileScreenProfileBackgroundBorder,
+                            ),
+                            color: AppColors.profileScreenProfileBackground,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             Icons.person,
-                            color: Color(0xffa1a1a1),
+                            color: AppColors.profileScreenProfileIcon,
                             size: 35,
                           ),
                         ),
@@ -61,7 +66,8 @@ class ProfileScreen extends StatelessWidget {
                           padding: EdgeInsets.all(4.0),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: Color(0xfffaeea9),
+                            color:
+                                AppColors.profileScreenProfileRatingContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -78,13 +84,15 @@ class ProfileScreen extends StatelessWidget {
                                       loc.translate("5"),
                                       style: TextStyle(
                                         fontSize: 10,
-                                        color: Colors.black,
+                                        color: AppColors
+                                            .profileScreenProfileRatingText,
                                       ),
                                     ),
                                     SizedBox(width: 5),
                                     Icon(
                                       Icons.star,
-                                      color: Color(0xffffc00a),
+                                      color: AppColors
+                                          .profileScreenProfileRatingStar,
                                       size: 10,
                                     ),
                                   ],
@@ -98,7 +106,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 38),
                   Text(
-                    loc.translate("arif"),
+                    loc.translate("user_name"),
                     style: TextStyle(fontSize: 19, fontWeight: FontWeight.w600),
                   ),
                   TextButton(
@@ -111,12 +119,13 @@ class ProfileScreen extends StatelessWidget {
                       print("clicked");
                     },
                     child: Text(
-                      loc.translate("View_Profile"),
+                      loc.translate("view_profile"),
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: AppColors.profileScreenViewProfileText,
                         fontSize: 15,
                         decoration: TextDecoration.underline,
-                        decorationColor: Colors.blue,
+                        decorationColor:
+                            AppColors.profileScreenViewProfileTextDecoration,
                         decorationThickness: 2,
                       ),
                     ),
@@ -128,7 +137,7 @@ class ProfileScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(6.0),
                         decoration: BoxDecoration(
-                          color: Color(0xfffffac3),
+                          color: AppColors.profileScreenPointsContainer,
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -139,17 +148,21 @@ class ProfileScreen extends StatelessWidget {
                               alignment: Alignment.center,
                               padding: EdgeInsets.all(2.0),
                               decoration: BoxDecoration(
-                                color: Color(0xfffe6c05),
+                                color:
+                                    AppColors.profileScreenPointsBadgeContainer,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.star,
-                                color: Colors.white,
+                                color: AppColors.profileScreenPointsBadgeIcon,
                                 size: 14,
                               ),
                             ),
                             SizedBox(width: 3),
-                            Text(loc.translate("Points"), style: TextStyle(fontSize: 14)),
+                            Text(
+                              loc.translate("points"),
+                              style: TextStyle(fontSize: 14),
+                            ),
                             SizedBox(width: 50),
                             Icon(Icons.arrow_forward_ios_outlined, size: 15),
                           ],
@@ -159,7 +172,7 @@ class ProfileScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.all(6.0),
                         decoration: BoxDecoration(
-                          color: Color(0xffedf6ff),
+                          color: AppColors.profileScreenVoucherContainer,
                           shape: BoxShape.rectangle,
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -168,11 +181,14 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.countertops,
-                              color: Color(0xff0f53fb),
+                              color: AppColors.profileScreenVoucherIcon,
                               size: 24,
                             ),
                             SizedBox(width: 3),
-                            Text(loc.translate("Voucher"), style: TextStyle(fontSize: 14)),
+                            Text(
+                              loc.translate("voucher"),
+                              style: TextStyle(fontSize: 14),
+                            ),
                             SizedBox(width: 50),
                             Icon(Icons.arrow_forward_ios_outlined, size: 15),
                           ],
@@ -184,10 +200,10 @@ class ProfileScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      loc.translate("PREFERENCES"),
+                      loc.translate("preferences"),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: Colors.black,
+                        color: AppColors.profileScreenPreferencesText,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -198,7 +214,7 @@ class ProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.circular(12),
-                      color: Color(0xffedf6ff),
+                      color: AppColors.profileScreenPreferencesContainer,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -207,7 +223,8 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors
+                                .profileScreenPreferencesOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -220,12 +237,16 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors
+                                        .profileScreenPreferencesOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("Language"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("language"),
+                                    style: TextStyle(
+                                      color: AppColors
+                                          .profileScreenPreferencesOptionsText,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -235,13 +256,17 @@ class ProfileScreen extends StatelessWidget {
                                   Container(
                                     padding: EdgeInsets.all(5),
                                     decoration: BoxDecoration(
-                                      color: Color(0xfff2f2f2),
+                                      color: AppColors
+                                          .profileScreenPreferencesOptionsHighlighter,
                                       shape: BoxShape.rectangle,
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Text(
-                                      loc.translate("English"),
-                                      style: TextStyle(color: Colors.black),
+                                      loc.translate("english"),
+                                      style: TextStyle(
+                                        color: AppColors
+                                            .profileScreenPreferencesOptionsHighlighterText,
+                                      ),
                                     ),
                                   ),
                                   SizedBox(width: 18),
@@ -255,7 +280,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.profileScreenPreferencesOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -268,12 +293,12 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors.profileScreenPreferencesOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("Notification"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("notification"),
+                                    style: TextStyle(color: AppColors.profileScreenPreferencesOptionsText),
                                   ),
                                 ],
                               ),
@@ -289,11 +314,11 @@ class ProfileScreen extends StatelessWidget {
                                         onChanged: (val) {},
                                         materialTapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
-                                        activeTrackColor: Colors.blue,
+                                        activeTrackColor: AppColors.profileScreenPreferencesOptionsSwitchActiveTrackColor,
                                         inactiveTrackColor:
-                                            Colors.grey.shade300,
+                                            AppColors.profileScreenPreferencesOptionsSwitchInactiveTrackColor,
                                         thumbColor: WidgetStateProperty.all(
-                                          Colors.white,
+                                          AppColors.profileScreenPreferencesOptionsSwitchThumbColor,
                                         ),
                                       ),
                                     ),
@@ -307,7 +332,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.profileScreenPreferencesOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -320,12 +345,12 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors.profileScreenPreferencesOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("Tutorial"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("tutorial"),
+                                    style: TextStyle(color: AppColors.profileScreenPreferencesOptionsText),
                                   ),
                                 ],
                               ),
@@ -341,10 +366,10 @@ class ProfileScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      loc.translate("LEGAL"),
+                      loc.translate("legal"),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: Colors.black,
+                        color: AppColors.profileScreenLegalText,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -355,7 +380,7 @@ class ProfileScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
                       borderRadius: BorderRadius.circular(12),
-                      color: Color(0xffedf6ff),
+                      color: AppColors.profileScreenLegalContainer,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -364,7 +389,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.profileScreenLegalOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -377,12 +402,12 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors.profileScreenLegalOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("Help"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("help"),
+                                    style: TextStyle(color: AppColors.profileScreenLegalOptionsText),
                                   ),
                                 ],
                               ),
@@ -395,7 +420,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.profileScreenLegalOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -408,12 +433,12 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors.profileScreenLegalOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("Terms_&_Conditions"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("terms_conditions"),
+                                    style: TextStyle(color: AppColors.profileScreenLegalOptionsText),
                                   ),
                                 ],
                               ),
@@ -426,7 +451,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.profileScreenLegalOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -439,12 +464,12 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors.profileScreenLegalOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("trip_terms_&_Conditions"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("trip_terms_conditions"),
+                                    style: TextStyle(color: AppColors.profileScreenLegalOptionsText),
                                   ),
                                 ],
                               ),
@@ -457,7 +482,7 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.all(15.0),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: AppColors.profileScreenLegalOptionsContainer,
                             shape: BoxShape.rectangle,
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -470,12 +495,12 @@ class ProfileScreen extends StatelessWidget {
                                   Icon(
                                     Icons.signal_wifi_connected_no_internet_4,
                                     size: 20,
-                                    color: Colors.blue,
+                                    color: AppColors.profileScreenLegalOptionsIcon,
                                   ),
                                   SizedBox(width: 5),
                                   Text(
-                                    loc.translate("Privacy_Policy"),
-                                    style: TextStyle(color: Colors.black),
+                                    loc.translate("privacy_policy"),
+                                    style: TextStyle(color: AppColors.profileScreenLegalOptionsText),
                                   ),
                                 ],
                               ),

@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+import 'package:trippy_customer/utils/colors_code.dart';
 
-class ViewdetailsScreen extends StatelessWidget {
-  const ViewdetailsScreen({super.key});
+class OfferdetailsScreen extends StatelessWidget {
+  const OfferdetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.offerDetailsScreenBackground,
       appBar: AppBar(
         forceMaterialTransparency: true,
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.offerDetailsScreenAppBarBackground,
         title: Align(
           alignment: Alignment.center,
           child: Text(
             loc.translate("boishak_400"),
             style: GoogleFonts.poppins(
               fontSize: 20,
-              color: Colors.black,
+              color: AppColors.offerDetailsScreenAppBarText,
               fontWeight: FontWeight.w200,
             ),
           ),
@@ -36,7 +37,7 @@ class ViewdetailsScreen extends StatelessWidget {
               width: double.infinity,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.black,
+                color: AppColors.offerDetailsScreenOfferContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
@@ -50,9 +51,7 @@ class ViewdetailsScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              loc.translate(
-                "offer_desc",
-              ),
+              loc.translate("offer_desc"),
               style: GoogleFonts.poppins(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,

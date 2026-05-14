@@ -40,7 +40,7 @@ class MytripScreen extends StatelessWidget {
                   child: Container(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.myTripScreenCarRentalContainer,
                       border: Border(
                         bottom: BorderSide(color: Colors.blue, width: 2),
                       ),
@@ -50,7 +50,7 @@ class MytripScreen extends StatelessWidget {
                       child: Text(
                         loc.translate("car_rental"),
                         style: GoogleFonts.poppins(
-                          color: Colors.black,
+                          color: AppColors.myTripScreenCarRentalText,
                           fontSize: 16,
                           fontWeight: FontWeight.w300,
                         ),
@@ -61,13 +61,15 @@ class MytripScreen extends StatelessWidget {
                 Expanded(
                   child: Container(
                     alignment: Alignment.center,
-                    decoration: BoxDecoration(color: Colors.white),
+                    decoration: BoxDecoration(
+                      color: AppColors.myTripScreenWeddingCarContainer,
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.only(bottom: 8),
                       child: Text(
                         loc.translate("wedding_car"),
                         style: GoogleFonts.poppins(
-                          color: Colors.black,
+                          color: AppColors.myTripScreenWeddingCarText,
                           fontSize: 16,
                           fontWeight: FontWeight.w300,
                         ),
@@ -83,7 +85,7 @@ class MytripScreen extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 14),
                 decoration: BoxDecoration(
-                  color: Color(0xffedf6ff),
+                  color: AppColors.myTripScreenCancelledTripContainer,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -96,7 +98,11 @@ class MytripScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.car_crash, color: Colors.blue, size: 35),
+                            Icon(
+                              Icons.car_crash,
+                              color: AppColors.myTripScreenCancelledTripCarIcon,
+                              size: 35,
+                            ),
                             SizedBox(width: 4),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -112,7 +118,8 @@ class MytripScreen extends StatelessWidget {
                                 Text(
                                   loc.translate("date_and_time"),
                                   style: TextStyle(
-                                    color: Colors.grey.shade500,
+                                    color: AppColors
+                                        .myTripScreenCancelledTripDateText,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -128,8 +135,10 @@ class MytripScreen extends StatelessWidget {
                               horizontal: 8,
                               vertical: 4,
                             ),
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors
+                                .myTripScreenCancelledTripCancelledButtonbackground,
+                            foregroundColor: AppColors
+                                .myTripScreenCancelledTripCancelledButtonforeground,
                           ),
                           onPressed: () {},
                           child: Text(loc.translate("cancelled")),
@@ -142,7 +151,7 @@ class MytripScreen extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.timer_rounded,
-                          color: Colors.yellow,
+                          color: AppColors.myTripScreenCancelledTripPickupIcon,
                           size: 25,
                         ),
                         SizedBox(width: 5),
@@ -154,14 +163,16 @@ class MytripScreen extends StatelessWidget {
                               Text(
                                 loc.translate("pickup"),
                                 style: TextStyle(
-                                  color: Color(0xffb3b3b3),
+                                  color: AppColors
+                                      .myTripScreenCancelledTripPickupText,
                                   fontSize: 14,
                                 ),
                               ),
                               Text(
                                 loc.translate("trip_address"),
                                 style: GoogleFonts.poppins(
-                                  color: Colors.black,
+                                  color: AppColors
+                                      .myTripScreenCancelledTripTripAddressText,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -169,7 +180,7 @@ class MytripScreen extends StatelessWidget {
                               SizedBox(height: 2),
                               Divider(
                                 thickness: 1,
-                                color: Colors.grey.shade300,
+                                color: AppColors.myTripScreenCancelledDivider,
                               ),
                             ],
                           ),
@@ -183,7 +194,7 @@ class MytripScreen extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.timer_rounded,
-                          color: Colors.yellow,
+                          color: AppColors.myTripScreenCancelledTripPickupIcon,
                           size: 25,
                         ),
                         SizedBox(width: 5),
@@ -196,14 +207,16 @@ class MytripScreen extends StatelessWidget {
                               Text(
                                 loc.translate("hour"),
                                 style: TextStyle(
-                                  color: Color(0xffb3b3b3),
+                                  color: AppColors
+                                      .myTripScreenCancelledTripPickupText,
                                   fontSize: 14,
                                 ),
                               ),
                               Text(
                                 loc.translate("7"),
                                 style: GoogleFonts.poppins(
-                                  color: Colors.black,
+                                  color: AppColors
+                                      .myTripScreenCancelledTripTripAddressText,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -220,8 +233,10 @@ class MytripScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                AppColors.myTripScreenCancelledButtonbackground,
+                            foregroundColor:
+                                AppColors.myTripScreenCancelledButtonforeground,
                           ),
                           onPressed: () {
                             // getIt<AppRouter>().push(TripdetailsScreen());
@@ -242,7 +257,7 @@ class MytripScreen extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.symmetric(horizontal: 10, vertical: 14),
                 decoration: BoxDecoration(
-                  color: Color(0xffedf6ff),
+                  color: AppColors.myTripScreenCancelledTripContainer,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -255,7 +270,11 @@ class MytripScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(Icons.car_crash, color: Colors.blue, size: 35),
+                            Icon(
+                              Icons.car_crash,
+                              color: AppColors.myTripScreenCancelledTripCarIcon,
+                              size: 35,
+                            ),
                             SizedBox(width: 4),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -271,7 +290,8 @@ class MytripScreen extends StatelessWidget {
                                 Text(
                                   loc.translate("date_and_time"),
                                   style: TextStyle(
-                                    color: Colors.grey.shade500,
+                                    color: AppColors
+                                        .myTripScreenCancelledTripDateText,
                                     fontSize: 12,
                                   ),
                                 ),
@@ -287,8 +307,10 @@ class MytripScreen extends StatelessWidget {
                               horizontal: 8,
                               vertical: 4,
                             ),
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors
+                                .myTripScreenCancelledTripCancelledButtonbackground,
+                            foregroundColor: AppColors
+                                .myTripScreenCancelledTripCancelledButtonforeground,
                           ),
                           onPressed: () {},
                           child: Text(loc.translate("cancelled")),
@@ -300,7 +322,7 @@ class MytripScreen extends StatelessWidget {
                       icon: Icon(
                         Icons.timer_rounded,
                         size: 25,
-                        color: Colors.yellow,
+                        color: AppColors.myTripScreenCancelledTripPickupIcon,
                       ),
                       tiles: 7,
                       child: Expanded(
@@ -310,14 +332,16 @@ class MytripScreen extends StatelessWidget {
                             Text(
                               loc.translate("pickup"),
                               style: TextStyle(
-                                color: Color(0xffb3b3b3),
+                                color: AppColors
+                                    .myTripScreenCancelledTripPickupText,
                                 fontSize: 14,
                               ),
                             ),
                             Text(
                               loc.translate("trip_address"),
                               style: GoogleFonts.poppins(
-                                color: Colors.black,
+                                color: AppColors
+                                    .myTripScreenCancelledTripTripAddressText,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -359,7 +383,7 @@ class MytripScreen extends StatelessWidget {
                       icon: Icon(
                         Icons.timer_rounded,
                         size: 25,
-                        color: Colors.yellow,
+                        color: AppColors.myTripScreenCancelledTripPickupIcon,
                       ),
                       tiles: 7,
                       child: Expanded(
@@ -369,14 +393,16 @@ class MytripScreen extends StatelessWidget {
                             Text(
                               loc.translate("drop_off"),
                               style: TextStyle(
-                                color: Color(0xffb3b3b3),
+                                color: AppColors
+                                    .myTripScreenCancelledTripPickupText,
                                 fontSize: 14,
                               ),
                             ),
                             Text(
                               loc.translate("trip_address"),
                               style: GoogleFonts.poppins(
-                                color: Colors.black,
+                                color: AppColors
+                                    .myTripScreenCancelledTripTripAddressText,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -422,12 +448,13 @@ class MytripScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                AppColors.myTripScreenCancelledButtonbackground,
+                            foregroundColor:
+                                AppColors.myTripScreenCancelledButtonforeground,
                           ),
                           onPressed: () {
                             // getIt<AppRouter>().push(TripdetailsScreen());
-                            Navigator.pushNamed(context, AppRoutes.viewDetails);
                           },
                           child: Text(
                             loc.translate("view_details"),
