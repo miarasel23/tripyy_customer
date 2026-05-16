@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trippy_customer/modules/additionalService/view/screen/additionalService_screen.dart';
 
 import '../modules/auth/view/screen/number_Input_screen.dart';
 import '../modules/dashbiard/view/screen/dashboard_screen.dart';
@@ -43,6 +44,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const SavedroutesScreen());
       case AppRoutes.viewDetails:
         return MaterialPageRoute(builder: (_) => const OfferdetailsScreen());
+      case AppRoutes.additionalService:
+        return MaterialPageRoute(builder: (_) => const AdditionalserviceScreen());
 
       default:
         return MaterialPageRoute(

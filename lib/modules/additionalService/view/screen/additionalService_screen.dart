@@ -3,6 +3,7 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/colors_code.dart';
 
 class AdditionalserviceScreen extends StatelessWidget {
   const AdditionalserviceScreen({super.key});
@@ -11,7 +12,7 @@ class AdditionalserviceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.additionalServiceScreenBackground,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,17 +24,19 @@ class AdditionalserviceScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   height: 220,
-                  decoration: BoxDecoration(color: Colors.blue),
+                  decoration: BoxDecoration(
+                    color: AppColors.additionalServiceScreenNameContainer,
+                  ),
                 ),
                 Positioned(
                   bottom: 8,
                   left: 20,
                   child: Text(
-                    "Tourist Bus",
+                    loc.translate("additional_service_name"),
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.additionalServiceScreenNameText,
                     ),
                   ),
                 ),
@@ -42,11 +45,11 @@ class AdditionalserviceScreen extends StatelessWidget {
                   left: 13,
                   child: GestureDetector(
                     onTap: () {
-                      // getIt<AppRouter>().pop();
+                      Navigator.pop(context);
                     },
                     child: Icon(
                       Icons.arrow_back,
-                      color: Colors.white,
+                      color: AppColors.additionalServiceScreenNameContainerIcon,
                       size: 30,
                     ),
                   ),
@@ -58,7 +61,7 @@ class AdditionalserviceScreen extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.additionalServiceScreenDescriptionContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -66,13 +69,7 @@ class AdditionalserviceScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Markdown(
-                      data: """
-**Need a comfortable bus for your group tour?** Our tourist bus option is perfect for larger parties travelling together. Skip the hussle of finding transportation and enjoy a stress-free journey.
-              
-- **Perfect for groups:** Be it is 15 people or 25 people, travel comfortably together.
-- **Perfect for groups:** Be it is 15 people or 25 people, travel comfortably together.
-              
-**No bidding needed-** Travel without the hassle of checking bids. Relax and Enjoy.""",
+                      data: loc.translate("additional_service_desc"),
                       styleSheet: MarkdownStyleSheet(
                         p: GoogleFonts.poppins(fontSize: 17),
 
@@ -89,12 +86,14 @@ class AdditionalserviceScreen extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
-                            foregroundColor: Colors.white,
+                            backgroundColor: AppColors
+                                .additionalServiceScreenCallMessageButtonBackground,
+                            foregroundColor: AppColors
+                                .additionalServiceScreenCallMessageButtonForeground,
                           ),
                           onPressed: () {},
                           child: Text(
-                            loc.translate("Call_us_for_details:<number>"),
+                            loc.translate("call_message_and_number"),
                             style: GoogleFonts.poppins(fontSize: 16),
                           ),
                         ),

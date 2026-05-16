@@ -125,7 +125,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
-              additionalServiceSection(loc),
+              additionalServiceSection(loc, context),
             ],
           ),
         ),
@@ -186,7 +186,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget additionalServiceSection(AppLocalizations loc) {
+  Widget additionalServiceSection(AppLocalizations loc, BuildContext context) {
     return SizedBox(
       height: 160,
       child: ListView.builder(
@@ -195,17 +195,17 @@ class DashboardScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [additionalServicesWidget(loc), SizedBox(width: 10)],
+            children: [additionalServicesWidget(loc, context), SizedBox(width: 10)],
           );
         },
       ),
     );
   }
 
-  Widget additionalServicesWidget(AppLocalizations loc) {
+  Widget additionalServicesWidget(AppLocalizations loc, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // getIt<AppRouter>().push(AdditionalserviceScreen());
+        Navigator.pushNamed(context, AppRoutes.additionalService);
       },
       child: Container(
         width: 220,

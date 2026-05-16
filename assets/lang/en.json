@@ -3,40 +3,31 @@
   "hello": "Hello",
   "welcome": "Welcome",
   "change_language": "Change Language",
-
   "enter_phone_number": "Enter Your Phone Number",
   "enter_number": "Enter Your Number",
   "country_code": "+880",
-
   "consent_message": "By proceeding, you consent to agree with our",
   "enter_otp": "Enter the OTP sent to you at",
-
   "change_number": "Change Number",
   "continue": "Continue",
   "resend_code": "Resend code in",
-
   "profile": "Profile",
   "name": "Name",
   "phone_number": "Phone Number",
   "gender": "Gender",
   "delete_account": "Delete Account",
   "update": "Update",
-
   "male": "Male",
   "female": "Female",
-
   "help_center": "Help Center",
   "how_can_we_help": "How can we help you?",
   "chat_support": "Chat with Garibook",
   "customer_care": "Talk to customer care",
   "emergency_service": "National Emergency Service",
-
   "edit_profile": "Edit Profile",
-
   "services": "Services",
   "saved_routes": "Saved Routes",
   "see_all": "See All",
-
   "additional_services": "Additional Services",
   "intercity": "Intercity",
   "hourly": "Hourly",
@@ -44,58 +35,43 @@
   "return_trip": "Return Trip",
   "ride_share": "Ride Share",
   "tourist_bus": "Tourist Bus",
-
   "tour_bus_description": "Comfortable and reliable buses for group tours and long journeys",
-
   "no_saved_routes": "No Saved Routes",
   "save_routes_hint": "Save your favorite pickup and drop-off locations to book faster next time.",
   "add_routes": "Add Routes",
-
   "home": "Home",
   "work": "Work",
   "add_location": "Add Location",
-
   "where_are_you_going": "Where are you going?",
   "find_location": "Find the location",
-
   "my_trip": "My Trip",
   "offers": "Offers",
-
   "car_rental": "Car Rental",
   "wedding_car": "Wedding Car",
-
   "cancelled": "Cancelled",
   "pickup": "Pickup",
   "drop_off": "Drop Off",
   "hour": "Hour",
-
   "view_details": "View Details",
   "round_trip": "Round Trip",
-
   "view_profile": "View Profile",
   "points": "Points",
   "voucher": "Voucher",
-
   "preferences": "Preferences",
   "language": "Language",
   "english": "English",
   "notification": "Notification",
   "tutorial": "Tutorial",
-
   "legal": "Legal",
   "help": "Help",
   "terms_conditions": "Terms & Conditions",
   "trip_terms_conditions": "Trip Terms & Conditions",
   "privacy_policy": "Privacy Policy",
-
   "get_started": "Get Started",
   "all": "All",
-
   "boishak_400": "Boishak 400",
-
   "saved_locations": "Saved Locations",
   "set_address": "Set your address",
-
   "call_for_details": "Call us for details: {number}",
   "city": "City",
   "to": "to",
@@ -108,15 +84,18 @@
   "470": "470",
   "bengal": "Bengal",
   "enter_the_otp_sent_to_you_at": "Enter the OTP sent to you at",
-   "resend_code_in": "Resend code in {time}",
-   "user_name": "arif",
-   "user_phone_number": "01816801552",
-   "date_and_time": "08 Feb 2026, 05:30 PM",
-   "trip_address": "Meena Bazar - Ashkhona Branch, Airport - Dakshinkhan Road, Dhaka",
-   "7": "7",
-   "round_way": "Round Way",
-   "offer_desc": "১ এপ্রিল ৩০ এপ্রিল ২০২৬ পর্যন্ত গাড়িবুক-এ যেকোনো ইন্টারসিটি ট্রিপেই ৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
-   "offer_title": "৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
-   "see_details": "See Details",
-   "rating_score": "5"
+  "resend_code_in": "Resend code in {time}",
+  "user_name": "arif",
+  "user_phone_number": "01816801552",
+  "date_and_time": "08 Feb 2026, 05:30 PM",
+  "trip_address": "Meena Bazar - Ashkhona Branch, Airport - Dakshinkhan Road, Dhaka",
+  "7": "7",
+  "round_way": "Round Way",
+  "offer_desc": "১ এপ্রিল ৩০ এপ্রিল ২০২৬ পর্যন্ত গাড়িবুক-এ যেকোনো ইন্টারসিটি ট্রিপেই ৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
+  "offer_title": "৭০০ টাকা ক্যাশব্যাক জেতার সুযোগ!",
+  "see_details": "See Details",
+  "rating_score": "5",
+  "additional_service_name": "Tourist Bus",
+  "additional_service_desc": " **Need a comfortable bus for your group tour?** Our tourist bus option is perfect for larger parties travelling together. Skip the hussle of finding transportation and enjoy a stress-free journey.\n\n- **Perfect for groups:** Be it is 15 people or 25 people, travel comfortably together.\n- **Perfect for groups:** Be it is 15 people or 25 people, travel comfortably together.\n\n**No bidding needed-** Travel without the hassle of checking bids. Relax and Enjoy.",
+  "call_message_and_number": "Call us for details: +8809678112234"
 }

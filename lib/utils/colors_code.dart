@@ -215,4 +215,13 @@ class AppColors {
   static const Color profileScreenLegalOptionsSwitchActiveTrackColor = Colors.blue;
   static const Color profileScreenLegalOptionsSwitchInactiveTrackColor = Color.fromRGBO(224, 224, 224, 1);
   static const Color profileScreenLegalOptionsSwitchThumbColor = Colors.white;
+
+  //additional service
+  static const Color additionalServiceScreenBackground = Colors.black;
+  static const Color additionalServiceScreenNameContainer = Colors.blue;
+  static const Color additionalServiceScreenNameContainerIcon = Colors.white;
+  static const Color additionalServiceScreenNameText = Colors.white;
+  static const Color additionalServiceScreenDescriptionContainer = Colors.white;
+  static const Color additionalServiceScreenCallMessageButtonBackground = Colors.blue;
+  static const Color additionalServiceScreenCallMessageButtonForeground = Colors.white;
 }
