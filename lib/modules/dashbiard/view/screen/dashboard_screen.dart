@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/routes/app_routes.dart';
-import 'package:trippy_customer/utils/colors_code.dart';
+
+import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../routes/app_routes.dart';
+import '../../../../utils/colors_code.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});

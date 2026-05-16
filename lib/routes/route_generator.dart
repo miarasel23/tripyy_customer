@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:trippy_customer/modules/editProfile/view/screen/editProfile_screen.dart';
-import 'package:trippy_customer/modules/helpCenter/view/screen/helpCenter_screen.dart';
-import 'package:trippy_customer/modules/mainBottomNavBar/view/screen/main_bottom_nav_bar_screen.dart';
-import 'package:trippy_customer/modules/savedLocation/view/screen/savedLocation_screen.dart';
-import 'package:trippy_customer/modules/savedRoutes/view/screen/savedRoutes_screen.dart';
-import 'package:trippy_customer/modules/offerDetails/view/screen/offerDetails_screen.dart';
 
-import '../core/utils/localization/app_localization.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
 import '../modules/dashbiard/view/screen/dashboard_screen.dart';
+import '../modules/editProfile/view/screen/editProfile_screen.dart';
+import '../modules/helpCenter/view/screen/helpCenter_screen.dart';
+import '../modules/mainBottomNavBar/view/screen/main_bottom_nav_bar_screen.dart';
+import '../modules/offerDetails/view/screen/offerDetails_screen.dart';
 import '../modules/otp/view/screen/otp_signin_screen.dart';
+import '../modules/savedLocation/view/screen/savedLocation_screen.dart';
+import '../modules/savedRoutes/view/screen/savedRoutes_screen.dart';
 import '../modules/splash/view/splash_screen.dart';
-
 import 'app_routes.dart';
 
 class RouteGenerator {

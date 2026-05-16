@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization.dart';
+
+import '../core/utils/localization/app_localization.dart';
 
 class CustomAddButton extends StatelessWidget {
   const CustomAddButton({

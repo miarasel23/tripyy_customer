@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/widgets/customAdd_button.dart';
-import 'package:trippy_customer/widgets/timeline_tile.dart';
+
+import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../widgets/customAdd_button.dart';
+import '../../../../widgets/timeline_tile.dart';
 
 class SavedroutesScreen extends StatelessWidget {
   const SavedroutesScreen({super.key});

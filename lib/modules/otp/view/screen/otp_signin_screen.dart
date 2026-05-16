@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';

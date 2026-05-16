@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/utils/colors_code.dart';
-import 'package:trippy_customer/widgets/customAdd_button.dart';
+
+import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/colors_code.dart';
+import '../../../../widgets/customAdd_button.dart';
 
 class SavedlocationScreen extends StatelessWidget {
   const SavedlocationScreen({super.key});

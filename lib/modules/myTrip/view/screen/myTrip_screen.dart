@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/routes/app_routes.dart';
-import 'package:trippy_customer/utils/colors_code.dart';
-import 'package:trippy_customer/widgets/timeline_tile.dart';
+
+import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/colors_code.dart';
+import '../../../../widgets/timeline_tile.dart';
 
 class MytripScreen extends StatelessWidget {
   const MytripScreen({super.key});

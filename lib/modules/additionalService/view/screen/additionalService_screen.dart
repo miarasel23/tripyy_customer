@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/core/utils/localization/app_localization.dart';
-import 'package:trippy_customer/data/services/service_locator.dart';
-import 'package:trippy_customer/routes/app_routes.dart';
+
+import '../../../../core/utils/localization/app_localization.dart';
 
 class AdditionalserviceScreen extends StatelessWidget {
   const AdditionalserviceScreen({super.key});
