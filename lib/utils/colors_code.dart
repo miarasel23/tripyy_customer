@@ -131,6 +131,7 @@ class AppColors {
   static const Color savedLocationsScreenSavedLocationContainer = Color(
     0xffeef7fe,
   );
+  static const Color savedLocationsScreenSavedLocationButton = Colors.blue;
   static const Color savedLocationsScreenSavedLocationTitle = Colors.black;
   static const Color savedLocationsScreenSavedLocationDetails = Colors.black;
   static const Color savedLocationsScreenSavedLocationArrow = Colors.black;
@@ -199,12 +200,18 @@ class AppColors {
   static const Color profileScreenPreferencesOptionsContainer = Colors.white;
   static const Color profileScreenPreferencesOptionsIcon = Colors.blue;
   static const Color profileScreenPreferencesOptionsText = Colors.black;
-  static const Color profileScreenPreferencesOptionsHighlighter = Color(0xfff2f2f2);
-  static const Color profileScreenPreferencesOptionsHighlighterText = Colors.black;
-  static const Color profileScreenPreferencesOptionsSwitchActiveTrackColor = Colors.blue;
-  static const Color profileScreenPreferencesOptionsSwitchInactiveTrackColor = Color.fromRGBO(224, 224, 224, 1);
-  static const Color profileScreenPreferencesOptionsSwitchThumbColor = Colors.white;
-  
+  static const Color profileScreenPreferencesOptionsHighlighter = Color(
+    0xfff2f2f2,
+  );
+  static const Color profileScreenPreferencesOptionsHighlighterText =
+      Colors.black;
+  static const Color profileScreenPreferencesOptionsSwitchActiveTrackColor =
+      Colors.blue;
+  static const Color profileScreenPreferencesOptionsSwitchInactiveTrackColor =
+      Color.fromRGBO(224, 224, 224, 1);
+  static const Color profileScreenPreferencesOptionsSwitchThumbColor =
+      Colors.white;
+
   static const Color profileScreenLegalText = Colors.black;
   static const Color profileScreenLegalContainer = Color(0xffedf6ff);
   static const Color profileScreenLegalOptionsContainer = Colors.white;
@@ -212,8 +219,10 @@ class AppColors {
   static const Color profileScreenLegalOptionsText = Colors.black;
   static const Color profileScreenLegalOptionsHighlighter = Color(0xfff2f2f2);
   static const Color profileScreenLegalOptionsHighlighterText = Colors.black;
-  static const Color profileScreenLegalOptionsSwitchActiveTrackColor = Colors.blue;
-  static const Color profileScreenLegalOptionsSwitchInactiveTrackColor = Color.fromRGBO(224, 224, 224, 1);
+  static const Color profileScreenLegalOptionsSwitchActiveTrackColor =
+      Colors.blue;
+  static const Color profileScreenLegalOptionsSwitchInactiveTrackColor =
+      Color.fromRGBO(224, 224, 224, 1);
   static const Color profileScreenLegalOptionsSwitchThumbColor = Colors.white;
 
   //additional service
@@ -222,6 +231,32 @@ class AppColors {
   static const Color additionalServiceScreenNameContainerIcon = Colors.white;
   static const Color additionalServiceScreenNameText = Colors.white;
   static const Color additionalServiceScreenDescriptionContainer = Colors.white;
-  static const Color additionalServiceScreenCallMessageButtonBackground = Colors.blue;
-  static const Color additionalServiceScreenCallMessageButtonForeground = Colors.white;
+  static const Color additionalServiceScreenCallMessageButtonBackground =
+      Colors.blue;
+  static const Color additionalServiceScreenCallMessageButtonForeground =
+      Colors.white;
+
+  //saved Routes
+  static const Color savedRoutesScreenBackground = Colors.white;
+  static const Color savedRoutesScreenAppBarBackground = Colors.white;
+  static const Color savedRoutesScreenAppBarText = Colors.black;
+  static const Color savedRoutesScreenContainer = Color(0xffeef7fe);
+  static const Color savedRoutesScreenTimelineIcon = Colors.amber;
+  static const Color savedRoutesScreenTimelineEditIcon = Colors.blue;
+  static const Color savedRoutesScreenTimelineDeleteIcon = Colors.red;
+  static const Color savedRoutesScreenButton = Colors.blue;
+
+  //custom add button
+  static const Color customAddButtonBorder = Colors.blue;
+  static const Color customAddButtonBackground = Colors.white;
+  static const Color customAddButtonForeground = Colors.blue;
+  static const Color customAddButtonText = Colors.blue;
+
+  //trip details
+  static const Color tripDetailsScreenBackground = Colors.white;
+  static const Color tripDetailsScreenAppBarBackground = Colors.white;
+  static const Color tripDetailsScreenContainer = Color(0xffeef7fe);
+  static const Color tripDetailsScreenSeatInfoLogo = Color.fromRGBO(117, 117, 117, 1);
+  static const Color tripDetailsScreenSeatInfoText = Color.fromRGBO(158, 158, 158, 1);
+  static const Color tripDetailsScreenTypeBackground = Color(0xffeef7fe);
 }

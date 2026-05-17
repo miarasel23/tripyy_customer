@@ -58,7 +58,7 @@ class SavedlocationScreen extends StatelessWidget {
                 icon: Icon(
                   Icons.add_circle_outline,
                   size: 20,
-                  color: Colors.blue,
+                  color: AppColors.savedLocationsScreenSavedLocationButton,
                 ),
               ),
             ),

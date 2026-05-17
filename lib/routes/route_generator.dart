@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trippy_customer/modules/additionalService/view/screen/additionalService_screen.dart';
 
+import '../modules/additionalService/view/screen/additionalService_screen.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
 import '../modules/dashbiard/view/screen/dashboard_screen.dart';
 import '../modules/editProfile/view/screen/editProfile_screen.dart';
@@ -11,6 +11,7 @@ import '../modules/otp/view/screen/otp_signin_screen.dart';
 import '../modules/savedLocation/view/screen/savedLocation_screen.dart';
 import '../modules/savedRoutes/view/screen/savedRoutes_screen.dart';
 import '../modules/splash/view/splash_screen.dart';
+import '../modules/tripDetails/view/screen/trip_details_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -46,6 +47,8 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const OfferdetailsScreen());
       case AppRoutes.additionalService:
         return MaterialPageRoute(builder: (_) => const AdditionalserviceScreen());
+      case AppRoutes.tripDetails:
+        return MaterialPageRoute(builder: (_) => const TripDetailsScreen());
 
       default:
         return MaterialPageRoute(

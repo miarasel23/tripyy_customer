@@ -1,0 +1,2 @@
+1. I am using disabledBackgroundColor and disabledForegroundColor because if the button is not clickable then backgroundColor property does not work so I have to use disabledBackgroundColor.
+

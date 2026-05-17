@@ -10,4 +10,5 @@ class AppRoutes {
   static const savedRoute = '/saved_route';
   static const viewDetails = '/view_details';
   static const additionalService = '/addition_service';
+  static const tripDetails = '/trip_details';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trippy_customer/routes/app_routes.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
@@ -239,7 +240,7 @@ class MytripScreen extends StatelessWidget {
                                 AppColors.myTripScreenCancelledButtonforeground,
                           ),
                           onPressed: () {
-                            // getIt<AppRouter>().push(TripdetailsScreen());
+                            Navigator.pushNamed(context, AppRoutes.tripDetails);
                           },
                           child: Text(
                             loc.translate("view_details"),

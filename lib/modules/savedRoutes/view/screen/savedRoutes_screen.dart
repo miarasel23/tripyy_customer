@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/colors_code.dart';
 import '../../../../widgets/customAdd_button.dart';
 import '../../../../widgets/timeline_tile.dart';
 
@@ -12,14 +13,14 @@ class SavedroutesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.savedRoutesScreenBackground,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.savedRoutesScreenAppBarBackground,
         title: Text(
           loc.translate("saved_routes"),
           style: GoogleFonts.poppins(
             fontSize: 20,
-            color: Colors.black,
+            color: AppColors.savedRoutesScreenAppBarText,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -34,7 +35,7 @@ class SavedroutesScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: Color(0xffeef7fe),
+                color: AppColors.savedRoutesScreenContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Row(
@@ -48,7 +49,7 @@ class SavedroutesScreen extends StatelessWidget {
                       children: [
                         TimelineTile(
                           isLast: false,
-                          icon: Icon(Icons.star, size: 30, color: Colors.amber),
+                          icon: Icon(Icons.star, size: 30, color: AppColors.savedRoutesScreenTimelineIcon),
                           tiles: 4,
                           child: Text(
                             loc.translate("Narayanganj"),
@@ -61,7 +62,7 @@ class SavedroutesScreen extends StatelessWidget {
                         ),
                         TimelineTile(
                           isLast: true,
-                          icon: Icon(Icons.star, size: 30, color: Colors.amber),
+                          icon: Icon(Icons.star, size: 30, color: AppColors.savedRoutesScreenTimelineIcon),
                           tiles: 4,
                           child: Text(
                             loc.translate("Narayanganj"),
@@ -85,7 +86,7 @@ class SavedroutesScreen extends StatelessWidget {
                           child: Icon(
                             Icons.edit_outlined,
                             size: 30,
-                            color: Colors.blue,
+                            color: AppColors.savedRoutesScreenTimelineEditIcon,
                           ),
                         ),
                         SizedBox(width: 7),
@@ -94,7 +95,7 @@ class SavedroutesScreen extends StatelessWidget {
                           child: Icon(
                             Icons.delete_outlined,
                             size: 30,
-                            color: Colors.red,
+                            color: AppColors.savedRoutesScreenTimelineDeleteIcon,
                           ),
                         ),
                       ],
@@ -112,7 +113,7 @@ class SavedroutesScreen extends StatelessWidget {
                 icon: Icon(
                   Icons.add_circle_outline,
                   size: 20,
-                  color: Colors.blue,
+                  color: AppColors.savedRoutesScreenButton,
                 ),
               ),
             ),

@@ -97,5 +97,9 @@
   "rating_score": "5",
   "additional_service_name": "Tourist Bus",
   "additional_service_desc": " **Need a comfortable bus for your group tour?** Our tourist bus option is perfect for larger parties travelling together. Skip the hussle of finding transportation and enjoy a stress-free journey.\n\n- **Perfect for groups:** Be it is 15 people or 25 people, travel comfortably together.\n- **Perfect for groups:** Be it is 15 people or 25 people, travel comfortably together.\n\n**No bidding needed-** Travel without the hassle of checking bids. Relax and Enjoy.",
-  "call_message_and_number": "Call us for details: +8809678112234"
+  "call_message_and_number": "Call us for details: +8809678112234",
+  "trip_details_appBar_title": "Trip Details",
+  "trip_details_car_name": "Sedan",
+  "trip_details_seat_info": "6 seats",
+  "trip_details_trip_type": "One Way"
 }
