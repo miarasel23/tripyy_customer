@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_event.dart';
-import 'package:trippy_customer/controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_state.dart';
+
+import 'main_bottom_nav_bar_event.dart';
+import 'main_bottom_nav_bar_state.dart';
 
 class MainBottomNavBarBloc
     extends Bloc<MainBottomNavEvent, MainBottomNavBarState> {
