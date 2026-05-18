@@ -213,20 +213,34 @@ class _AppDrawerState extends State<AppDrawer> {
                     ),
                   ),
                   // Logout Button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
+                  SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 10,
+                        right: 10,
+                        bottom: 20,
+                      ),
                       child: TextButton.icon(
                         onPressed: () {
                           Navigator.pop(context);
                           Navigator.pushNamed(context, AppRoutes.numberInput);
                         },
-                        icon: const Icon(Icons.logout),
-                        label: Text(loc.translate("logout")),
+                        icon: const Icon(Icons.logout_rounded, size: 20),
+                        label: Text(
+                          loc.translate("logout"),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         style: TextButton.styleFrom(
-                          foregroundColor: AppColors.submitButton,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
