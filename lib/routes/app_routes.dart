@@ -11,4 +11,6 @@ class AppRoutes {
   static const viewDetails = '/view_details';
   static const additionalService = '/addition_service';
   static const tripDetails = '/trip_details';
+  static const points = '/points';
+  static const userLevel = '/user_level';
 }

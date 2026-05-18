@@ -259,4 +259,20 @@ class AppColors {
   static const Color tripDetailsScreenSeatInfoLogo = Color.fromRGBO(117, 117, 117, 1);
   static const Color tripDetailsScreenSeatInfoText = Color.fromRGBO(158, 158, 158, 1);
   static const Color tripDetailsScreenTypeBackground = Color(0xffeef7fe);
+  static const Color tripDetailsScreenOthersText = Color(0xffb3b3b3);
+  static const Color tripDetailsScreenAddressText = Colors.black;
+  static const Color tripDetailsScreenBookingIdInfoText = Colors.black;
+  static const Color tripDetailsScreenFareInfoText = Colors.blue;
+  static const Color tripDetailsScreenDateTimeInfoText = Colors.black;
+
+  //timeline tile with divider
+  static const Color timelineTileDividerContainer = Color.fromRGBO(224, 224, 224, 1);
+
+  //points
+  static const Color pointsScreenPointsInfoContainer = Color(0xfffdf2d6);
+  static const Color pointsScreenPointsIconContainer = Color(0xfffed201);
+  static const Color pointsScreenPointsIcon = Colors.white;
+  static const Color pointsScreenPointsButtonContainer = Colors.white;
+  static const Color pointsScreenPointsHistoryButtonsContainer = Color(0xffeaf4fe);
+  static const Color pointsScreenPointsHistoryButtonsText = Color(0xffa4a7ac);
 }

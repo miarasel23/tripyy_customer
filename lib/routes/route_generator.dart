@@ -8,10 +8,12 @@ import '../modules/helpCenter/view/screen/helpCenter_screen.dart';
 import '../modules/mainBottomNavBar/view/screen/main_bottom_nav_bar_screen.dart';
 import '../modules/offerDetails/view/screen/offerDetails_screen.dart';
 import '../modules/otp/view/screen/otp_signin_screen.dart';
+import '../modules/points/view/screen/points_screen.dart';
 import '../modules/savedLocation/view/screen/savedLocation_screen.dart';
 import '../modules/savedRoutes/view/screen/savedRoutes_screen.dart';
 import '../modules/splash/view/splash_screen.dart';
 import '../modules/tripDetails/view/screen/trip_details_screen.dart';
+import '../modules/userLevel/view/screen/user_level.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -49,6 +51,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const AdditionalserviceScreen());
       case AppRoutes.tripDetails:
         return MaterialPageRoute(builder: (_) => const TripDetailsScreen());
+      case AppRoutes.points:
+        return MaterialPageRoute(builder: (_) => const PointsScreen());
+      case AppRoutes.userLevel:
+        return MaterialPageRoute(builder: (_) => const UserLevel());
 
       default:
         return MaterialPageRoute(

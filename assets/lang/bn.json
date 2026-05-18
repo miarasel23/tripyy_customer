@@ -104,5 +104,22 @@
   "trip_details_appBar_title": "ভ্রমণের বিবরণ",
   "trip_details_car_name": "সেডান",
   "trip_details_seat_info": "৬ টি আসন",
-  "trip_details_trip_type": "একমুখী"
+  "trip_details_trip_type": "একমুখী",
+  "trip_detail_pickup_address": "নারায়ণগঞ্জ, ঢাকা",
+  "trip_detail_drop_off_address": "নটরডেম ইউনিভার্সিটি বাংলাদেশ, ঢাকা",
+  "trip_detail_fare_text": "মোট ভাড়া",
+  "trip_detail_fare_amount": "ভাড়ার তথ্য নেই",
+  "trip_detail_date_time_text": "পিক আপের তারিখ ও সময়",
+  "trip_detail_date_time_info": "২৮ এপ্রিল ২০২৬, বিকাল ০৫:৩০",
+  "trip_detail_booking_text": "বুকিং আইডি",
+  "trip_detail_booking_id_value": "১৫৯৭৮৯৬৪১২৩৫",
+  "points_available_point_text": "উপলব্ধ পয়েন্ট",
+  "points_available_point_value": "৫০",
+  "points_available_pts_text": "পয়েন্ট",
+  "points_button_text": "ব্রোঞ্জ",
+  "points_history_text": "পয়েন্ট ইতিহাস",
+  "points_history_earned_button": "অর্জিত",
+  "points_history_benefits_button": "সুবিধা",
+  "points_history_spent_button": "খরচ করেছে",
+  "user_level_screen_appbar_title": "ব্যবহারকারীর স্তর"
 }

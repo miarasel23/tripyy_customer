@@ -101,5 +101,22 @@
   "trip_details_appBar_title": "Trip Details",
   "trip_details_car_name": "Sedan",
   "trip_details_seat_info": "6 seats",
-  "trip_details_trip_type": "One Way"
+  "trip_details_trip_type": "One Way",
+  "trip_detail_pickup_address": "Narayanganj, Dhaka",
+  "trip_detail_drop_off_address": "Notre Dame University Bangladesh, Dhaka",
+  "trip_detail_fare_text": "Total fare",
+  "trip_detail_fare_amount": "Fare not available",
+  "trip_detail_date_time_text": "Pick Up Date & Time",
+  "trip_detail_date_time_info": "28 Apr 2026, 05:30 PM",
+  "trip_detail_booking_text": "Booking ID",
+  "trip_detail_booking_id_value": "159789641235",
+  "points_available_point_text": "Available Points",
+  "points_available_point_value": "50",
+  "points_available_pts_text": "pts",
+  "points_button_text": "BRONZE",
+  "points_history_text": "Point History",
+  "points_history_earned_button": "Earned",
+  "points_history_benefits_button": "Benefits",
+  "points_history_spent_button": "Spent",
+  "user_level_screen_appbar_title": "User Level"
 }

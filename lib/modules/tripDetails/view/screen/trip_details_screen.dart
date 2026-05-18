@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
+import '../../../../widgets/custom_app_bar.dart';
+import '../../../../widgets/timeline_tile_with_divider.dart';
 
 class TripDetailsScreen extends StatelessWidget {
   const TripDetailsScreen({super.key});
@@ -21,9 +22,87 @@ class TripDetailsScreen extends StatelessWidget {
             _buildAppBar(context, loc),
             SizedBox(height: 20),
             _buildVehicleInfoAndTripType(loc),
+            SizedBox(height: 15),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: AppColors.tripDetailsScreenContainer,
+              ),
+              padding: EdgeInsets.only(
+                left: 13,
+                top: 15,
+                right: 13,
+                bottom: 13,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TimelineTileWithDivider(
+                    pickupIcon: Icon(Icons.star),
+                    dropOffIcon: Icon(Icons.star),
+                    pickupTitle: 'pickup',
+                    pickupLocation: 'trip_detail_pickup_address',
+                    dropOffTitle: 'drop_off',
+                    dropOffLocation: 'trip_detail_drop_off_address',
+                  ),
+                  SizedBox(height: 12),
+                  tripDetailsOthersInfo(
+                    AppColors.tripDetailsScreenBookingIdInfoText,
+                    Icon(Icons.scanner, size: 25),
+                    loc.translate("trip_detail_booking_text"),
+                    loc.translate("trip_detail_booking_id_value"),
+                  ),
+                  SizedBox(height: 12),
+                  tripDetailsOthersInfo(
+                    AppColors.tripDetailsScreenFareInfoText,
+                    Icon(Icons.wallet, size: 25),
+                    loc.translate("trip_detail_fare_text"),
+                    loc.translate("trip_detail_fare_amount"),
+                  ),
+                  SizedBox(height: 12),
+                  tripDetailsOthersInfo(
+                    AppColors.tripDetailsScreenDateTimeInfoText,
+                    Icon(Icons.calendar_view_week_rounded, size: 25),
+                    loc.translate("trip_detail_date_time_text"),
+                    loc.translate("trip_detail_date_time_info"),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget tripDetailsOthersInfo(
+    Color value,
+    Icon icon,
+    String title,
+    String data,
+  ) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        icon,
+        SizedBox(width: 14),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                color: AppColors.tripDetailsScreenOthersText,
+              ),
+            ),
+            Text(data, style: GoogleFonts.poppins(fontSize: 18, color: value)),
+          ],
+        ),
+      ],
     );
   }
 
@@ -74,32 +153,46 @@ class TripDetailsScreen extends StatelessWidget {
               ),
             ],
           ),
+          Spacer(),
+          tripTypeInfo(loc),
         ],
       ),
     );
   }
 
-  Widget _buildAppBar(BuildContext context, AppLocalizations loc) {
-    return Column(
-      children: [
-        SizedBox(height: 15),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+  Widget tripTypeInfo(AppLocalizations loc) {
+    return IntrinsicWidth(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          minimumSize: Size.zero,
+          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          side: BorderSide(color: AppColors.customAddButtonBorder, width: 1.5),
+          elevation: 0,
+          disabledBackgroundColor: Color(0xffeef7fe),
+          disabledForegroundColor: AppColors.customAddButtonForeground,
+        ),
+        onPressed: null,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(Icons.arrow_back, size: 20, color: Colors.black),
-            ),
-            SizedBox(width: 7),
+            Icon(Icons.arrow_upward, size: 18),
+            SizedBox(width: 5),
             Text(
-              loc.translate("trip_details_appBar_title"),
-              style: GoogleFonts.poppins(fontSize: 20),
+              loc.translate("trip_details_trip_type"),
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: AppColors.customAddButtonText,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
-      ],
+      ),
     );
+  }
+
+  Widget _buildAppBar(BuildContext context, AppLocalizations loc) {
+    return CustomAppBar(loc: loc, title: 'trip_details_appBar_title',);
   }
 }

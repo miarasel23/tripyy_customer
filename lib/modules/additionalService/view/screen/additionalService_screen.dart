@@ -90,10 +90,23 @@ class AdditionalserviceScreen extends StatelessWidget {
                                 .additionalServiceScreenCallMessageButtonBackground,
                             foregroundColor: AppColors
                                 .additionalServiceScreenCallMessageButtonForeground,
+
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+
+                            minimumSize: const Size(double.infinity, 56),
                           ),
+
                           onPressed: () {},
+
                           child: Text(
                             loc.translate("call_message_and_number"),
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            maxLines: 2,
+
                             style: GoogleFonts.poppins(fontSize: 16),
                           ),
                         ),

@@ -44,7 +44,7 @@ class DashboardScreen extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                starPointsWidget(loc),
+                starPointsWidget(loc, context),
                 SizedBox(width: 8),
                 Container(
                   padding: EdgeInsets.all(7),
@@ -195,7 +195,10 @@ class DashboardScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: [additionalServicesWidget(loc, context), SizedBox(width: 10)],
+            children: [
+              additionalServicesWidget(loc, context),
+              SizedBox(width: 10),
+            ],
           );
         },
       ),
@@ -489,38 +492,43 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget starPointsWidget(AppLocalizations loc) {
-    return Container(
-      padding: EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: AppColors.dashboardStarPointsWidget,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: EdgeInsets.all(4),
-            decoration: BoxDecoration(
-              color: AppColors.dashboardStarPointsIconBackground,
-              shape: BoxShape.circle,
+  Widget starPointsWidget(AppLocalizations loc, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, AppRoutes.points);
+      },
+      child: Container(
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.dashboardStarPointsWidget,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              padding: EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: AppColors.dashboardStarPointsIconBackground,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.star,
+                color: AppColors.dashboardStarPointsIconForeground,
+                size: 15,
+              ),
             ),
-            child: Icon(
-              Icons.star,
-              color: AppColors.dashboardStarPointsIconForeground,
-              size: 15,
+            SizedBox(width: 8),
+            Text(
+              loc.translate("470"),
+              style: TextStyle(
+                color: AppColors.dashboardStarPointsWidgetText,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-          SizedBox(width: 8),
-          Text(
-            loc.translate("470"),
-            style: TextStyle(
-              color: AppColors.dashboardStarPointsWidgetText,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
