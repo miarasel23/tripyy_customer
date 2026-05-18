@@ -27,18 +27,20 @@ class _AppDrawerState extends State<AppDrawer> {
           // Background
           GestureDetector(
             onTap: () => Navigator.pop(context),
+            // ignore: deprecated_member_use
             child: Container(color: Colors.black.withOpacity(0.5)),
           ),
           // Half-width Drawer Panel
           Align(
             alignment: Alignment.centerLeft,
             child: Container(
-              width: MediaQuery.of(context).size.width * 0.7,
+              width: MediaQuery.of(context).size.width * 0.8,
               height: double.infinity,
               decoration: BoxDecoration(
                 color: AppColors.dashboardScreenDrawerBackground,
                 boxShadow: [
                   BoxShadow(
+                    // ignore: deprecated_member_use
                     color: Colors.black.withOpacity(0.3),
                     blurRadius: 20,
                     offset: Offset(-5, 0),
@@ -212,23 +214,19 @@ class _AppDrawerState extends State<AppDrawer> {
                   ),
                   // Logout Button
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
                         onPressed: () {
                           Navigator.pop(context);
                           Navigator.pushNamed(context, AppRoutes.numberInput);
                         },
-                        icon: Icon(Icons.logout),
+                        icon: const Icon(Icons.logout),
                         label: Text(loc.translate("logout")),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.submitButton,
-                          foregroundColor: AppColors.textHighlight,
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: AppColors.submitButton,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                       ),
                     ),
