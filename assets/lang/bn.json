@@ -69,6 +69,7 @@
   "help": "সাহায্য",
   "trip_terms_conditions": "ভ্রমণের শর্তাবলী",
   "privacy_policy": "গোপনীয়তা নীতি",
+  "logout": "লগ আউট",
   "get_started": "শুরু করুন",
   "terms_conditions": "শর্তাবলী",
   "boishak_400": "বৈশাখ ৪০০",
@@ -143,5 +144,11 @@
   "user_level_user_text": "ব্যবহারকারী",
   "user_level_user_score": "৫০/৩০০০",
   "notification_appbar_title": "নোটিফিকেশান",
-  "notification_clear_all": "সব সাফ করুন"
+  "notification_clear_all": "সব সাফ করুন",
+  "notification_empty_warning": "আপনি সবকিছু জেনে গেছেন",
+  "notification_saying_no_notification": "এই মুহূর্তে আর কোনো নতুন নোটিফিকেশান নেই",
+  "notification_come_back_message": "পরে আবার চেক করুন",
+  "voucher_appbar_title": "ভাউচার",
+  "voucher_empty_warning": "আপনার কাছে কোনো ভাউচার নেই,",
+  "voucher_come_back_message": "অফার পেতে ভাউচারটি রিডিম করুন।"
 }

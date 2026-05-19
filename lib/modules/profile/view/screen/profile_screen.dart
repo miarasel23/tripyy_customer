@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -117,7 +118,7 @@ class ProfileScreen extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     onPressed: () {
-                      print("clicked");
+                      Navigator.pushNamed(context, AppRoutes.editProfile);
                     },
                     child: Text(
                       loc.translate("view_profile"),
@@ -135,64 +136,74 @@ class ProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(6.0),
-                        decoration: BoxDecoration(
-                          color: AppColors.profileScreenPointsContainer,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              alignment: Alignment.center,
-                              padding: EdgeInsets.all(2.0),
-                              decoration: BoxDecoration(
-                                color:
-                                    AppColors.profileScreenPointsBadgeContainer,
-                                shape: BoxShape.circle,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.points);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: AppColors.profileScreenPointsContainer,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                padding: EdgeInsets.all(2.0),
+                                decoration: BoxDecoration(
+                                  color: AppColors
+                                      .profileScreenPointsBadgeContainer,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.star,
+                                  color: AppColors.profileScreenPointsBadgeIcon,
+                                  size: 14,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.star,
-                                color: AppColors.profileScreenPointsBadgeIcon,
-                                size: 14,
+                              SizedBox(width: 3),
+                              Text(
+                                loc.translate("points"),
+                                style: TextStyle(fontSize: 14),
                               ),
-                            ),
-                            SizedBox(width: 3),
-                            Text(
-                              loc.translate("points"),
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            SizedBox(width: 50),
-                            Icon(Icons.arrow_forward_ios_outlined, size: 15),
-                          ],
+                              SizedBox(width: 50),
+                              Icon(Icons.arrow_forward_ios_outlined, size: 15),
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(width: 8),
-                      Container(
-                        padding: EdgeInsets.all(6.0),
-                        decoration: BoxDecoration(
-                          color: AppColors.profileScreenVoucherContainer,
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Icon(
-                              Icons.countertops,
-                              color: AppColors.profileScreenVoucherIcon,
-                              size: 24,
-                            ),
-                            SizedBox(width: 3),
-                            Text(
-                              loc.translate("voucher"),
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            SizedBox(width: 50),
-                            Icon(Icons.arrow_forward_ios_outlined, size: 15),
-                          ],
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.voucher);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(6.0),
+                          decoration: BoxDecoration(
+                            color: AppColors.profileScreenVoucherContainer,
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.countertops,
+                                color: AppColors.profileScreenVoucherIcon,
+                                size: 24,
+                              ),
+                              SizedBox(width: 3),
+                              Text(
+                                loc.translate("voucher"),
+                                style: TextStyle(fontSize: 14),
+                              ),
+                              SizedBox(width: 50),
+                              Icon(Icons.arrow_forward_ios_outlined, size: 15),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -210,169 +221,186 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 5),
-                  Container(
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(12),
-                      color: AppColors.profileScreenPreferencesContainer,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors
-                                .profileScreenPreferencesOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color: AppColors
-                                        .profileScreenPreferencesOptionsIcon,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("language"),
-                                    style: TextStyle(
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.profileScreenPreferencesContainer,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(15.0),
+                            decoration: BoxDecoration(
+                              color: AppColors
+                                  .profileScreenPreferencesOptionsContainer,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.signal_wifi_connected_no_internet_4,
+                                      size: 20,
                                       color: AppColors
-                                          .profileScreenPreferencesOptionsText,
+                                          .profileScreenPreferencesOptionsIcon,
                                     ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      loc.translate("language"),
+                                      style: TextStyle(
+                                        color: AppColors
+                                            .profileScreenPreferencesOptionsText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        color: AppColors
+                                            .profileScreenPreferencesOptionsHighlighter,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        loc.translate("english"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenPreferencesOptionsHighlighterText,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 18),
+                                    Icon(
+                                      Icons.arrow_forward_ios_sharp,
+                                      size: 15,
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              padding: EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                color: AppColors
+                                    .profileScreenPreferencesOptionsContainer,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons
+                                            .signal_wifi_connected_no_internet_4,
+                                        size: 20,
+                                        color: AppColors
+                                            .profileScreenPreferencesOptionsIcon,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        loc.translate("notification"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenPreferencesOptionsText,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                        child: Transform.scale(
+                                          scale: 0.6,
+                                          child: Switch(
+                                            value: true,
+                                            onChanged: (val) {},
+                                            materialTapTargetSize:
+                                                MaterialTapTargetSize
+                                                    .shrinkWrap,
+                                            activeTrackColor: AppColors
+                                                .profileScreenPreferencesOptionsSwitchActiveTrackColor,
+                                            inactiveTrackColor: AppColors
+                                                .profileScreenPreferencesOptionsSwitchInactiveTrackColor,
+                                            thumbColor: WidgetStateProperty.all(
+                                              AppColors
+                                                  .profileScreenPreferencesOptionsSwitchThumbColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              padding: EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                color: AppColors
+                                    .profileScreenPreferencesOptionsContainer,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Container(
-                                    padding: EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      color: AppColors
-                                          .profileScreenPreferencesOptionsHighlighter,
-                                      shape: BoxShape.rectangle,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      loc.translate("english"),
-                                      style: TextStyle(
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons
+                                            .signal_wifi_connected_no_internet_4,
+                                        size: 20,
                                         color: AppColors
-                                            .profileScreenPreferencesOptionsHighlighterText,
+                                            .profileScreenPreferencesOptionsIcon,
                                       ),
-                                    ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        loc.translate("tutorial"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenPreferencesOptionsText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   SizedBox(width: 18),
                                   Icon(Icons.arrow_forward_ios_sharp, size: 15),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors
-                                .profileScreenPreferencesOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color: AppColors
-                                        .profileScreenPreferencesOptionsIcon,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("notification"),
-                                    style: TextStyle(
-                                      color: AppColors
-                                          .profileScreenPreferencesOptionsText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  SizedBox(
-                                    height: 20,
-                                    child: Transform.scale(
-                                      scale: 0.6,
-                                      child: Switch(
-                                        value: true,
-                                        onChanged: (val) {},
-                                        materialTapTargetSize:
-                                            MaterialTapTargetSize.shrinkWrap,
-                                        activeTrackColor: AppColors
-                                            .profileScreenPreferencesOptionsSwitchActiveTrackColor,
-                                        inactiveTrackColor: AppColors
-                                            .profileScreenPreferencesOptionsSwitchInactiveTrackColor,
-                                        thumbColor: WidgetStateProperty.all(
-                                          AppColors
-                                              .profileScreenPreferencesOptionsSwitchThumbColor,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors
-                                .profileScreenPreferencesOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color: AppColors
-                                        .profileScreenPreferencesOptionsIcon,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("tutorial"),
-                                    style: TextStyle(
-                                      color: AppColors
-                                          .profileScreenPreferencesOptionsText,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(width: 18),
-                              Icon(Icons.arrow_forward_ios_sharp, size: 15),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   SizedBox(height: 5),
@@ -388,157 +416,214 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 5),
-                  Container(
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(12),
-                      color: AppColors.profileScreenLegalContainer,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors.profileScreenLegalOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color:
-                                        AppColors.profileScreenLegalOptionsIcon,
-                                  ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("help"),
-                                    style: TextStyle(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.helpCenter);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(12),
+                        color: AppColors.profileScreenLegalContainer,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(15.0),
+                            decoration: BoxDecoration(
+                              color:
+                                  AppColors.profileScreenLegalOptionsContainer,
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.signal_wifi_connected_no_internet_4,
+                                      size: 20,
                                       color: AppColors
-                                          .profileScreenLegalOptionsText,
+                                          .profileScreenLegalOptionsIcon,
                                     ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      loc.translate("help"),
+                                      style: TextStyle(
+                                        color: AppColors
+                                            .profileScreenLegalOptionsText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(width: 18),
+                                Icon(Icons.arrow_forward_ios_sharp, size: 15),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Container(
+                              padding: EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.profileScreenLegalOptionsContainer,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.signal_wifi_connected_no_internet_4,
+                                        size: 20,
+                                        color: AppColors
+                                            .profileScreenLegalOptionsIcon,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        loc.translate("terms_conditions"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenLegalOptionsText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  SizedBox(width: 18),
+                                  Icon(Icons.arrow_forward_ios_sharp, size: 15),
                                 ],
                               ),
-                              SizedBox(width: 18),
-                              Icon(Icons.arrow_forward_ios_sharp, size: 15),
-                            ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors.profileScreenLegalOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Container(
+                              padding: EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.profileScreenLegalOptionsContainer,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color:
-                                        AppColors.profileScreenLegalOptionsIcon,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.signal_wifi_connected_no_internet_4,
+                                        size: 20,
+                                        color: AppColors
+                                            .profileScreenLegalOptionsIcon,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        loc.translate("trip_terms_conditions"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenLegalOptionsText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("terms_conditions"),
-                                    style: TextStyle(
-                                      color: AppColors
-                                          .profileScreenLegalOptionsText,
-                                    ),
-                                  ),
+                                  SizedBox(width: 18),
+                                  Icon(Icons.arrow_forward_ios_sharp, size: 15),
                                 ],
                               ),
-                              SizedBox(width: 18),
-                              Icon(Icons.arrow_forward_ios_sharp, size: 15),
-                            ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors.profileScreenLegalOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Container(
+                              padding: EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.profileScreenLegalOptionsContainer,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color:
-                                        AppColors.profileScreenLegalOptionsIcon,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.signal_wifi_connected_no_internet_4,
+                                        size: 20,
+                                        color: AppColors
+                                            .profileScreenLegalOptionsIcon,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        loc.translate("privacy_policy"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenLegalOptionsText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("trip_terms_conditions"),
-                                    style: TextStyle(
-                                      color: AppColors
-                                          .profileScreenLegalOptionsText,
-                                    ),
-                                  ),
+                                  SizedBox(width: 18),
+                                  Icon(Icons.arrow_forward_ios_sharp, size: 15),
                                 ],
                               ),
-                              SizedBox(width: 18),
-                              Icon(Icons.arrow_forward_ios_sharp, size: 15),
-                            ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 5),
-                        Container(
-                          padding: EdgeInsets.all(15.0),
-                          decoration: BoxDecoration(
-                            color: AppColors.profileScreenLegalOptionsContainer,
-                            shape: BoxShape.rectangle,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: (){},
+                            child: Container(
+                              padding: EdgeInsets.all(15.0),
+                              decoration: BoxDecoration(
+                                color:
+                                    AppColors.profileScreenLegalOptionsContainer,
+                                shape: BoxShape.rectangle,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.signal_wifi_connected_no_internet_4,
-                                    size: 20,
-                                    color:
-                                        AppColors.profileScreenLegalOptionsIcon,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        Icons.signal_wifi_connected_no_internet_4,
+                                        size: 20,
+                                        color: AppColors
+                                            .profileScreenLegalOptionsIcon,
+                                      ),
+                                      SizedBox(width: 5),
+                                      Text(
+                                        loc.translate("logout"),
+                                        style: TextStyle(
+                                          color: AppColors
+                                              .profileScreenLegalOptionsText,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(width: 5),
-                                  Text(
-                                    loc.translate("privacy_policy"),
-                                    style: TextStyle(
-                                      color: AppColors
-                                          .profileScreenLegalOptionsText,
-                                    ),
-                                  ),
+                                  SizedBox(width: 18),
+                                  Icon(Icons.arrow_forward_ios_sharp, size: 15),
                                 ],
                               ),
-                              SizedBox(width: 18),
-                              Icon(Icons.arrow_forward_ios_sharp, size: 15),
-                            ],
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],

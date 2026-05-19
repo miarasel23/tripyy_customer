@@ -14,4 +14,6 @@ class AppRoutes {
   static const points = '/points';
   static const userLevel = '/user_level';
   static const notification = '/notification';
+  static const voucher = '/voucher';
+  static const profile = '/profile';
 }

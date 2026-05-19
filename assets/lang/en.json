@@ -64,6 +64,7 @@
   "tutorial": "Tutorial",
   "legal": "Legal",
   "help": "Help",
+  "logout": "Logout",
   "terms_conditions": "Terms & Conditions",
   "trip_terms_conditions": "Trip Terms & Conditions",
   "privacy_policy": "Privacy Policy",
@@ -140,5 +141,11 @@
   "user_level_user_text": "User",
   "user_level_user_score": "50/3000",
   "notification_appbar_title": "Notification",
-  "notification_clear_all": "Clear All"
+  "notification_clear_all": "Clear All",
+  "notification_empty_warning": "You're All Caught Up",
+  "notification_saying_no_notification": "No new notifications right now.",
+  "notification_come_back_message": "Check back later!",
+  "voucher_appbar_title": "Voucher",
+  "voucher_empty_warning": "You do not have any voucher,",
+  "voucher_come_back_message": "Redeem voucher to get offers."
 }

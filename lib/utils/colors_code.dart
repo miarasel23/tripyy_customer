@@ -294,4 +294,11 @@ class AppColors {
   static const Color notificationScreenClearAllContainer = Colors.white;
   static const Color notificationScreenClearAllContainerBorder = Color(0xffc2c2c2);
   static const Color notificationScreenClearAllText = Color(0xffc2c2c2);
+  static const Color notificationScreenNoNotificationComeBackText = Color.fromRGBO(189, 189, 189, 1);
+
+  //voucher
+  static const Color voucherScreenBackground = Colors.white;
+  static const Color voucherScreenAppBarBackground = Colors.white;
+  static const Color voucherScreenNoVoucherComeBackText = Color.fromRGBO(189, 189, 189, 1);
+
 }

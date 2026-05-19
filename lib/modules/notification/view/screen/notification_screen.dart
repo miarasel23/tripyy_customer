@@ -22,7 +22,7 @@ class NotificationScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 17.0),
             child: Container(
-              padding: EdgeInsets.symmetric(vertical: 4,horizontal: 10),
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: AppColors.notificationScreenClearAllContainer,
@@ -54,11 +54,26 @@ class NotificationScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.notifications,size: 50,),
-            SizedBox(height: 4,),
-            Text("You're All Caught Up",style: GoogleFonts.poppins(fontSize: 16),),
-            Text("No new notifications right now",style: GoogleFonts.poppins(fontSize: 14,color: Colors.grey.shade400),),
-            Text("Check back later",style: GoogleFonts.poppins(fontSize: 14,color: Colors.grey.shade400),),
+            Icon(Icons.notifications, size: 50),
+            SizedBox(height: 4),
+            Text(
+              loc.translate("notification_empty_warning"),
+              style: GoogleFonts.poppins(fontSize: 16),
+            ),
+            Text(
+              loc.translate("notification_saying_no_notification"),
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: AppColors.notificationScreenNoNotificationComeBackText,
+              ),
+            ),
+            Text(
+              loc.translate("notification_come_back_message"),
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: AppColors.notificationScreenNoNotificationComeBackText,
+              ),
+            ),
           ],
         ),
       ),
