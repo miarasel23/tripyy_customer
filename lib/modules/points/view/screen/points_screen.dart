@@ -13,6 +13,7 @@ class PointsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.only(top: 20, left: 18, right: 20),
         child: Column(

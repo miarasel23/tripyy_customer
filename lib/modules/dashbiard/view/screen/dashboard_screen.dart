@@ -46,15 +46,20 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 starPointsWidget(loc, context),
                 SizedBox(width: 8),
-                Container(
-                  padding: EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: AppColors.dashboardNotificationIconBackground,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Icon(Icons.notifications_outlined, size: 24),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.notification);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: AppColors.dashboardNotificationIconBackground,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Icon(Icons.notifications_outlined, size: 24),
+                    ),
                   ),
                 ),
               ],

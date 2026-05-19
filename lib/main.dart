@@ -27,6 +27,15 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
         builder: (context, localizationState) {
           return MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.white,
+                surfaceTintColor: Colors.white,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+              )
+            ),
             debugShowCheckedModeBanner: false,
 
             // 🌍 Localization

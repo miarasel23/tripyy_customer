@@ -275,4 +275,23 @@ class AppColors {
   static const Color pointsScreenPointsButtonContainer = Colors.white;
   static const Color pointsScreenPointsHistoryButtonsContainer = Color(0xffeaf4fe);
   static const Color pointsScreenPointsHistoryButtonsText = Color(0xffa4a7ac);
+
+  //user level
+  static const Color userLevelScreenUserLevelInfoContainer = Color(0xfffdf2d6);
+  static const Color userLevelScreenBackground = Colors.white;
+  static const Color userLevelScreenAppBarBackground = Colors.white;
+  static const Color userLevelScreenFaqContainer = Color(0xffedf6ff);
+  static const Color userLevelScreenCompanyBriefContainer = Colors.white;
+  static const Color userLevelScreenCompanyBriefBorder = Color(0xffc2c2c2);
+  static const Color userLevelScreenCompanyBriefText = Color(0xff898989);
+  static const Color userLevelScreenLevelPointsInfo = Color(0xfffdf0db);
+  static const Color userLevelScreenLevelPointsText = Color(0xffbdbdbd);
+  static const Color userLevelScreenPointsInfoLevelColor = Color(0xfff5a9a4);
+
+  //notification
+  static const Color notificationScreenBackground = Colors.white;
+  static const Color notificationScreenAppBarBackground = Colors.white;
+  static const Color notificationScreenClearAllContainer = Colors.white;
+  static const Color notificationScreenClearAllContainerBorder = Color(0xffc2c2c2);
+  static const Color notificationScreenClearAllText = Color(0xffc2c2c2);
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trippy_customer/modules/notification/view/screen/notifiication_screen.dart';
 
 import '../modules/additionalService/view/screen/additionalService_screen.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
@@ -48,13 +49,17 @@ class RouteGenerator {
       case AppRoutes.viewDetails:
         return MaterialPageRoute(builder: (_) => const OfferdetailsScreen());
       case AppRoutes.additionalService:
-        return MaterialPageRoute(builder: (_) => const AdditionalserviceScreen());
+        return MaterialPageRoute(
+          builder: (_) => const AdditionalserviceScreen(),
+        );
       case AppRoutes.tripDetails:
         return MaterialPageRoute(builder: (_) => const TripDetailsScreen());
       case AppRoutes.points:
         return MaterialPageRoute(builder: (_) => const PointsScreen());
       case AppRoutes.userLevel:
         return MaterialPageRoute(builder: (_) => const UserLevel());
+      case AppRoutes.notification:
+        return MaterialPageRoute(builder: (_) => const NotificationScreen());
 
       default:
         return MaterialPageRoute(
