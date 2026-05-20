@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
+import '../../../customs/drawer.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -12,28 +13,7 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      drawer: Drawer(
-        backgroundColor: AppColors.dashboardScreenDrawerBackground,
-        child: Column(
-          children: [
-            SizedBox(height: 50),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text(loc.translate("edit_profile")),
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.editProfile);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.help_center),
-              title: Text(loc.translate("help_center")),
-              onTap: () {
-                Navigator.pushNamed(context, AppRoutes.helpCenter);
-              },
-            ),
-          ],
-        ),
-      ),
+      drawer: AppDrawer(),
       backgroundColor: AppColors.dashboardScreenBackground,
       appBar: AppBar(
         forceMaterialTransparency: true,
