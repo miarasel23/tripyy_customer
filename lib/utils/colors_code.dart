@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary
-  static const Color primary = Color.fromARGB(255, 111, 181, 238);
+  static const Color primary = Color.fromARGB(255, 34, 155, 253);
 
   // Buttons
   static const Color submitButton = Color.fromARGB(255, 1, 101, 214);
