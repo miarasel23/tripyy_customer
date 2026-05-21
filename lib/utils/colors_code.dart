@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // Primary
-  static const Color primary = Color.fromARGB(255, 111, 181, 238);
+  static const Color primary = Color.fromARGB(255, 34, 155, 253);
 
   // Buttons
   static const Color submitButton = Color.fromARGB(255, 1, 101, 214);
@@ -199,12 +199,18 @@ class AppColors {
   static const Color profileScreenPreferencesOptionsContainer = Colors.white;
   static const Color profileScreenPreferencesOptionsIcon = Colors.blue;
   static const Color profileScreenPreferencesOptionsText = Colors.black;
-  static const Color profileScreenPreferencesOptionsHighlighter = Color(0xfff2f2f2);
-  static const Color profileScreenPreferencesOptionsHighlighterText = Colors.black;
-  static const Color profileScreenPreferencesOptionsSwitchActiveTrackColor = Colors.blue;
-  static const Color profileScreenPreferencesOptionsSwitchInactiveTrackColor = Color.fromRGBO(224, 224, 224, 1);
-  static const Color profileScreenPreferencesOptionsSwitchThumbColor = Colors.white;
-  
+  static const Color profileScreenPreferencesOptionsHighlighter = Color(
+    0xfff2f2f2,
+  );
+  static const Color profileScreenPreferencesOptionsHighlighterText =
+      Colors.black;
+  static const Color profileScreenPreferencesOptionsSwitchActiveTrackColor =
+      Colors.blue;
+  static const Color profileScreenPreferencesOptionsSwitchInactiveTrackColor =
+      Color.fromRGBO(224, 224, 224, 1);
+  static const Color profileScreenPreferencesOptionsSwitchThumbColor =
+      Colors.white;
+
   static const Color profileScreenLegalText = Colors.black;
   static const Color profileScreenLegalContainer = Color(0xffedf6ff);
   static const Color profileScreenLegalOptionsContainer = Colors.white;
@@ -212,7 +218,9 @@ class AppColors {
   static const Color profileScreenLegalOptionsText = Colors.black;
   static const Color profileScreenLegalOptionsHighlighter = Color(0xfff2f2f2);
   static const Color profileScreenLegalOptionsHighlighterText = Colors.black;
-  static const Color profileScreenLegalOptionsSwitchActiveTrackColor = Colors.blue;
-  static const Color profileScreenLegalOptionsSwitchInactiveTrackColor = Color.fromRGBO(224, 224, 224, 1);
+  static const Color profileScreenLegalOptionsSwitchActiveTrackColor =
+      Colors.blue;
+  static const Color profileScreenLegalOptionsSwitchInactiveTrackColor =
+      Color.fromRGBO(224, 224, 224, 1);
   static const Color profileScreenLegalOptionsSwitchThumbColor = Colors.white;
 }
