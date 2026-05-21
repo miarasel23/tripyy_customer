@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
                 surfaceTintColor: Colors.white,
                 elevation: 0,
                 scrolledUnderElevation: 0,
-              )
+              ),
             ),
             debugShowCheckedModeBanner: false,
 
