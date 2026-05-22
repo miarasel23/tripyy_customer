@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../controller/bloc/user_level/faq_event.dart';
+import '../../../../controller/bloc/user_level/user_level_bloc.dart';
+import '../../../../controller/bloc/user_level/user_level_state.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../widgets/custom_progress_bar.dart';
@@ -43,21 +47,79 @@ class UserLevel extends StatelessWidget {
                     style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
                   ),
                   SizedBox(height: 13),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_1")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_2")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_3")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_4")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_5")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_6")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_7")),
-                  SizedBox(height: 8),
-                  _buildFaqQuestion(loc.translate("user_level_screen_faq_8")),
+                  BlocBuilder<UserLevelBloc, UserLevelState>(
+                    builder: (context, state) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_1"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            0,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_2"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            1,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_3"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            2,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_4"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            3,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_5"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            4,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_6"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            5,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_7"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            6,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                          SizedBox(height: 8),
+                          _buildFaqQuestion(
+                            loc.translate("user_level_screen_faq_8"),
+                            loc.translate("user_level_screen_faq_answer_1"),
+                            7,
+                            state.expandedFaqIndex,
+                            context,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -67,26 +129,48 @@ class UserLevel extends StatelessWidget {
     );
   }
 
-  Widget _buildFaqQuestion(String title) {
-    return Container(
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.userLevelScreenFaqContainer,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 240,
-            child: Text(
-              title,
-              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+  Widget _buildFaqQuestion(
+    String title,
+    String answer,
+    int index,
+    int expandedIndex,
+    BuildContext context,
+  ) {
+    final isOpen = index == expandedIndex;
+    return GestureDetector(
+      onTap: () {
+        context.read<UserLevelBloc>().add(ToggleFaqEvent(index));
+      },
+      child: Container(
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.userLevelScreenFaqContainer,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 240,
+                  child: Text(
+                    title,
+                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Icon(
+                  isOpen ? Icons.keyboard_arrow_up : Icons.arrow_downward,
+                  size: 18,
+                ),
+              ],
             ),
-          ),
-          Icon(Icons.arrow_downward, size: 18),
-        ],
+            SizedBox(height: 8),
+            if (isOpen) Text(answer, style: GoogleFonts.poppins(fontSize: 15)),
+          ],
+        ),
       ),
     );
   }

@@ -131,6 +131,7 @@
   "user_level_screen_faq_6": "৬. পয়েন্ট সিস্টেমের বিভিন্ন স্তরগুলো কী কী?",
   "user_level_screen_faq_7": "৭. আমি কীভাবে উচ্চতর স্তরে উন্নীত হতে পারি?",
   "user_level_screen_faq_8": "৮. আমি কি পুরস্কারের জন্য পয়েন্ট ভাঙাতে পারি?",
+  "user_level_screen_faq_answer_1": "গ্যারিবুক পয়েন্ট সিস্টেম হলো একটি লয়্যালটি প্রোগ্রাম, যা আমাদের মূল্যবান গ্রাহকদের পুরস্কৃত করার জন্য ডিজাইন করা হয়েছে।",
   "user_level_faq_text": "প্রায়শই জিজ্ঞাসিত প্রশ্ন",
   "user_level_bronze_text": "ব্রোঞ্জ",
   "user_level_bronze_points": "০ পয়েন্ট",
@@ -161,5 +162,6 @@
    "points_history_benefits_data_title": "রূপার জন্য চুক্তি",
    "points_history_benefits_data_description": "২০০ পয়েন্ট রিডিম করুন এবং ২০০ টাকা ছাড় উপভোগ করুন।",
    "points_history_benefits_data_points_score": "২০০",
-   "points_history_benefits_data_points_text": "পয়েন্ট"
+   "points_history_benefits_data_points_text": "পয়েন্ট",
+   "my_trip_wedding_car_message": "দেখানোর জন্য কোনো ট্রিপ নেই"
 }

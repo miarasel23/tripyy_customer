@@ -307,5 +307,6 @@ class AppColors {
   static const Color voucherScreenBackground = Colors.white;
   static const Color voucherScreenAppBarBackground = Colors.white;
   static const Color voucherScreenNoVoucherComeBackText = Color.fromRGBO(189, 189, 189, 1);
+  static const Color myTripWeddingCarText = Color.fromRGBO(189, 189, 189, 1);
 
 }

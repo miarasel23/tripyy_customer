@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_bloc.dart';
 import 'controller/bloc/myTrip/my_trip_bloc.dart';
 import 'controller/bloc/points/points_bloc.dart';
+import 'controller/bloc/user_level/user_level_bloc.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/localization/Controller/localization_controller.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => MainBottomNavBarBloc()),
         BlocProvider(create: (_) => PointsBloc()),
         BlocProvider(create: (_) => MyTripBloc()),
+        BlocProvider(create: (_) => UserLevelBloc()),
       ],
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
         builder: (context, localizationState) {

@@ -117,11 +117,76 @@ class MytripScreen extends StatelessWidget {
               },
             ),
             SizedBox(height: 5),
-            _buildHourlyTripWidget(loc, context),
-            _buildRoundWayTripWidget(loc, context),
+            BlocBuilder<MyTripBloc, MyTripState>(
+              builder: (context, state) {
+                return SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: switch (state.selectedIndex) {
+                    0 => SingleChildScrollView(
+                      child: _buildCarRentalWidget(loc, context),
+                    ),
+                    1 => _buildWeddingCarWidget(loc),
+                    _ => SizedBox.shrink(),
+                  },
+                );
+                // switch (state.selectedIndex) {
+                //   case 0:
+                //     return _buildCarRentalWidget(loc, context);
+                //   case 1:
+                //     return Center(
+                //       child: Column(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         crossAxisAlignment: CrossAxisAlignment.center,
+                //         children: [
+                //           Icon(Icons.notifications, size: 50),
+                //           SizedBox(height: 4),
+                //           Text(
+                //             loc.translate("my_trip_wedding_car_message"),
+                //             style: GoogleFonts.poppins(
+                //               fontSize: 14,
+                //               color: AppColors.myTripWeddingCarText,
+                //             ),
+                //           ),
+                //         ],
+                //       ),
+                //     );
+                //   default:
+                //     return SizedBox.shrink();
+                // }
+              },
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Center _buildWeddingCarWidget(AppLocalizations loc) {
+    return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Icon(Icons.notifications, size: 50),
+                        SizedBox(height: 4),
+                        Text(
+                          loc.translate("my_trip_wedding_car_message"),
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: AppColors.myTripWeddingCarText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+  }
+
+  Widget _buildCarRentalWidget(AppLocalizations loc, BuildContext context) {
+    return Column(
+      children: [
+        _buildHourlyTripWidget(loc, context),
+        _buildRoundWayTripWidget(loc, context),
+      ],
     );
   }
 
