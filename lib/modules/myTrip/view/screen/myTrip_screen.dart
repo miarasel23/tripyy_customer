@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/controller/bloc/myTrip/my_trip_bloc.dart';
-import 'package:trippy_customer/controller/bloc/myTrip/my_trip_event.dart';
-import 'package:trippy_customer/controller/bloc/myTrip/my_trip_state.dart';
 import 'package:trippy_customer/routes/app_routes.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../widgets/timeline_tile.dart';
+import '../../controller/my_trip_bloc.dart';
+import '../../controller/my_trip_event.dart';
+import '../../controller/my_trip_state.dart';
 
 class MytripScreen extends StatelessWidget {
   const MytripScreen({super.key});

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../../controller/bloc/points/points_bloc.dart';
-import '../../../../controller/bloc/points/points_event.dart';
-import '../../../../controller/bloc/points/points_state.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../widgets/custom_app_bar.dart';
 import '../../../../widgets/yellow_star_badge.dart';
+import '../../controller/points_bloc.dart';
+import '../../controller/points_event.dart';
+import '../../controller/points_state.dart';
 
 class PointsScreen extends StatelessWidget {
   const PointsScreen({super.key});

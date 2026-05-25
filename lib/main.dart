@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
-import 'controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_bloc.dart';
-import 'controller/bloc/myTrip/my_trip_bloc.dart';
-import 'controller/bloc/points/points_bloc.dart';
-import 'controller/bloc/user_level/user_level_bloc.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
+import 'modules/auth/controller/send_otp_bloc.dart';
+import 'modules/auth/repository/send_otp_repository.dart';
 import 'modules/localization/Controller/localization_controller.dart';
 
+import 'modules/mainBottomNavBar/controller/main_bottom_nav_bar_bloc.dart';
+import 'modules/myTrip/controller/my_trip_bloc.dart';
+import 'modules/points/controller/points_bloc.dart';
+import 'modules/userLevel/controller/user_level_bloc.dart';
 import 'routes/app_routes.dart';
 import 'routes/route_generator.dart';
 
@@ -29,6 +30,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => PointsBloc()),
         BlocProvider(create: (_) => MyTripBloc()),
         BlocProvider(create: (_) => UserLevelBloc()),
+        BlocProvider(
+          create: (_) => SendOtpBloc(repository: SendOtpRepository()),
+        ),
       ],
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
         builder: (context, localizationState) {

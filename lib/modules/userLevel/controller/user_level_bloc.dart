@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trippy_customer/controller/bloc/user_level/faq_event.dart';
-import 'package:trippy_customer/controller/bloc/user_level/user_level_state.dart';
+
+import 'faq_event.dart';
+import 'user_level_state.dart';
 
 class UserLevelBloc extends Bloc<FaqEvent, UserLevelState> {
   UserLevelBloc() : super(UserLevelState(expandedFaqIndex: -1)) {

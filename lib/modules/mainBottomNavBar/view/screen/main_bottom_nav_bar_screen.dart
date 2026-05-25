@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../../controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_bloc.dart';
-import '../../../../controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_event.dart';
-import '../../../../controller/bloc/main_bottom_nav_bar/main_bottom_nav_bar_state.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../dashbiard/view/screen/dashboard_screen.dart';
 import '../../../myTrip/view/screen/myTrip_screen.dart';
 import '../../../offer/view/screen/offer_screen.dart';
 import '../../../profile/view/screen/profile_screen.dart';
+import '../../controller/main_bottom_nav_bar_bloc.dart';
+import '../../controller/main_bottom_nav_bar_event.dart';
+import '../../controller/main_bottom_nav_bar_state.dart';
 
 class MainBottomNavBarScreen extends StatefulWidget {
   const MainBottomNavBarScreen({super.key});

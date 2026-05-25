@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trippy_customer/utils/enums.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../localization/Controller/localization_controller.dart';
+import '../../controller/send_otp_bloc.dart';
+import '../../controller/send_otp_event.dart';
+import '../../controller/send_otp_state.dart';
 
 class NumberInputScreen extends StatelessWidget {
   NumberInputScreen({super.key});
@@ -17,85 +21,131 @@ class NumberInputScreen extends StatelessWidget {
 
     return BlocBuilder<LocalizationBloc, LocalizationState>(
       builder: (context, localizationState) {
-        return Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    loc.translate("enter_your_phone_number"),
-                    style: GoogleFonts.poppins(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  numberBasedLoginField(loc, numberField),
-                  const SizedBox(height: 10),
-                  localizationState.locale.languageCode == "en"
-                      ? richTextEnglish(loc)
-                      : richTextBangle(loc),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.submitButton,
-                      foregroundColor: AppColors.submitButtonText,
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(
-                        context,
-                        AppRoutes.otp,
-                        arguments: numberField.text,
-                      );
-                    },
-                    child: Text(
-                      loc.translate("continue"),
+        return BlocListener<SendOtpBloc, SendOtpState>(
+          listener: (context, state) {
+            if (state.status == OtpStatus.failure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage ?? "OTP failed"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+            if (state.status == OtpStatus.success) {
+              Navigator.pushNamed(
+                context,
+                AppRoutes.otp,
+                arguments: numberField.text,
+              );
+            }
+          },
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(18.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.translate("enter_your_phone_number"),
                       style: GoogleFonts.poppins(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w500,
-                        color: AppColors.submitButtonText, // ✅ correct
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.submitButtonText,
-                          backgroundColor: AppColors.submitButton,
+                    const SizedBox(height: 20),
+                    numberBasedLoginField(loc, numberField),
+                    const SizedBox(height: 10),
+                    localizationState.locale.languageCode == "en"
+                        ? richTextEnglish(loc)
+                        : richTextBangle(loc),
+                    const SizedBox(height: 16),
+                    BlocBuilder<SendOtpBloc, SendOtpState>(
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.submitButton,
+                            foregroundColor: AppColors.submitButtonText,
+                            minimumSize: const Size(double.infinity, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          onPressed: state.status == OtpStatus.loading
+                              ? null
+                              : () {
+                                  context.read<SendOtpBloc>().add(
+                                    SendOtp(
+                                      numberField.text,
+                                      localizationState.locale.languageCode,
+                                    ),
+                                  );
+                                },
+                          child: switch (state.status) {
+                            OtpStatus.loading =>
+                              const CircularProgressIndicator(),
+                            OtpStatus.success => Text(
+                              loc.translate("continue"),
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.submitButtonText,
+                              ),
+                            ),
+                            OtpStatus.failure => Text(
+                              loc.translate("retry"),
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.submitButtonText,
+                              ),
+                            ),
+                            OtpStatus.initial => Text(
+                              loc.translate("continue"),
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.submitButtonText,
+                              ),
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: AppColors.submitButtonText,
+                            backgroundColor: AppColors.submitButton,
+                          ),
+                          onPressed: () {
+                            context.read<LocalizationBloc>().add(
+                              ChangeLanguageEvent('en'),
+                            );
+                          },
+                          child: Text(loc.translate("english")),
                         ),
-                        onPressed: () {
-                          context.read<LocalizationBloc>().add(
-                            ChangeLanguageEvent('en'),
-                          );
-                        },
-                        child: Text(loc.translate("english")),
-                      ),
-                      const SizedBox(width: 5),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          foregroundColor: AppColors.submitButtonText,
-                          backgroundColor: AppColors.submitButton,
+                        const SizedBox(width: 5),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: AppColors.submitButtonText,
+                            backgroundColor: AppColors.submitButton,
+                          ),
+                          onPressed: () {
+                            context.read<LocalizationBloc>().add(
+                              ChangeLanguageEvent('bn'),
+                            );
+                          },
+                          child: Text(loc.translate("bengal")),
                         ),
-                        onPressed: () {
-                          context.read<LocalizationBloc>().add(
-                            ChangeLanguageEvent('bn'),
-                          );
-                        },
-                        child: Text(loc.translate("bengal")),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

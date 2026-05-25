@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../../controller/bloc/user_level/faq_event.dart';
-import '../../../../controller/bloc/user_level/user_level_bloc.dart';
-import '../../../../controller/bloc/user_level/user_level_state.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../widgets/custom_progress_bar.dart';
+import '../../controller/faq_event.dart';
+import '../../controller/user_level_bloc.dart';
+import '../../controller/user_level_state.dart';
 
 class UserLevel extends StatelessWidget {
   const UserLevel({super.key});
