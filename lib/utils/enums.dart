@@ -4,3 +4,10 @@ enum OtpStatus {
   success,
   failure,
 }
+
+enum OtpReceiveStatus {
+  initial,
+  loading,
+  success,
+  failure,
+}

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:trippy_customer/modules/otp/controller/otp_receive_bloc.dart';
+import 'package:trippy_customer/modules/otp/repository/otp_receive_repository.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
@@ -30,6 +32,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => PointsBloc()),
         BlocProvider(create: (_) => MyTripBloc()),
         BlocProvider(create: (_) => UserLevelBloc()),
+        BlocProvider(create: (_) => OtpReceiveBloc(repository: OtpReceiveRepository())),
         BlocProvider(
           create: (_) => SendOtpBloc(repository: SendOtpRepository()),
         ),

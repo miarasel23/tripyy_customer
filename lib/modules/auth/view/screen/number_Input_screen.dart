@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/utils/enums.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
+import '../../../../utils/enums.dart';
 import '../../../localization/Controller/localization_controller.dart';
 import '../../controller/send_otp_bloc.dart';
 import '../../controller/send_otp_event.dart';
@@ -26,7 +26,7 @@ class NumberInputScreen extends StatelessWidget {
             if (state.status == OtpStatus.failure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.errorMessage ?? "OTP failed"),
+                  content: Text(state.errorMessage ?? "Something went wrong"),
                   backgroundColor: Colors.red,
                 ),
               );
