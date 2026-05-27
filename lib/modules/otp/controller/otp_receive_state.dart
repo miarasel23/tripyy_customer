@@ -1,4 +1,5 @@
-import 'package:trippy_customer/utils/enums.dart';
+
+import '../../../utils/enums.dart';
 
 class OtpReceiveState {
   final OtpReceiveStatus status;

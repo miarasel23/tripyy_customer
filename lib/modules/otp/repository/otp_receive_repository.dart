@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:trippy_customer/utils/app_urls.dart';
+
+import '../../../store/important_consts.dart';
+import '../../../utils/app_urls.dart';
+import '../models/otp_receive_model.dart';
 
 class OtpReceiveRepository {
   OtpReceiveRepository();
@@ -28,6 +32,16 @@ class OtpReceiveRepository {
       );
 
       if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        OtpReceiveModel otpReceiveModel = OtpReceiveModel.fromJson(jsonData);
+        await ImportantConsts.saveAccessToken(
+          otpReceiveModel.data!.accessToken!,
+        );
+        final token = await ImportantConsts.getAccessToken();
+        print("Access token is $token");
+        await ImportantConsts.saveUuid(otpReceiveModel.data!.user!.uuid!);
+        final uuid = await ImportantConsts.getUuid();
+        print("uuid is : $uuid");
         return null;
       } else {
         return "Server error: ${response.statusCode}";

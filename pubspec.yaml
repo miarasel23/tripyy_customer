@@ -45,6 +45,7 @@ dependencies:
   flutter_markdown_plus: ^1.0.7
   get: ^4.7.3
   http: ^1.6.0
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

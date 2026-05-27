@@ -1,8 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trippy_customer/modules/otp/controller/otp_receive_event.dart';
-import 'package:trippy_customer/modules/otp/controller/otp_receive_state.dart';
-import 'package:trippy_customer/modules/otp/repository/otp_receive_repository.dart';
-import 'package:trippy_customer/utils/enums.dart';
+
+import '../../../utils/enums.dart';
+import '../repository/otp_receive_repository.dart';
+import 'otp_receive_event.dart';
+import 'otp_receive_state.dart';
 
 class OtpReceiveBloc extends Bloc<OtpReceiveEvent, OtpReceiveState> {
   final OtpReceiveRepository repository;
