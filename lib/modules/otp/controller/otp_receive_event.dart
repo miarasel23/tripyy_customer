@@ -12,7 +12,11 @@ class OtpReceive extends OtpReceiveEvent {
   final String otp;
   final String languageCode;
 
-  OtpReceive({required this.number, required this.otp, required this.languageCode});
+  OtpReceive({
+    required this.number,
+    required this.otp,
+    required this.languageCode,
+  });
 
   @override
   List<Object> get props => [number, otp, languageCode];

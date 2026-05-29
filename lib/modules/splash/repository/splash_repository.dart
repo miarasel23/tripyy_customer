@@ -1,0 +1,50 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:http/http.dart';
+import 'package:trippy_customer/store/important_consts.dart';
+import 'package:trippy_customer/utils/app_urls.dart';
+
+import '../models/current_user_model.dart';
+
+class SplashRepository {
+  SplashRepository();
+
+  Future<String?> receivingUserData({
+    required String plaform,
+    required String languageCode,
+    required String actionWhen,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final response = await get(
+        Uri.parse(AppUrls.getCurrentCustomerUser).replace(
+          queryParameters: {
+            "platform": plaform,
+            "language_code": languageCode,
+            "action_when": actionWhen,
+            "email": "superadmin@gmail.com",
+            "password": "123456",
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
+        await ImportantConsts.saveUserData(currentUserModel);
+        return null;
+      } else {
+        return "Server error: ${response.statusCode}";
+      }
+    } on SocketException {
+      return "No Internet connection";
+    } on TimeoutException {
+      return "Request timeout";
+    } catch (e) {
+      return "Unexpected error: $e";
+    }
+  }
+}
