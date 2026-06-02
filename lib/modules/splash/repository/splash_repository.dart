@@ -17,6 +17,7 @@ class SplashRepository {
     required String actionWhen,
     required String email,
     required String password,
+    required String token
   }) async {
     try {
       final response = await get(
@@ -29,6 +30,11 @@ class SplashRepository {
             "password": "123456",
           },
         ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token'
+        }
       );
 
       if (response.statusCode == 200) {

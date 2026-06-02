@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:trippy_customer/modules/otp/controller/otp_receive_bloc.dart';
-import 'package:trippy_customer/modules/otp/repository/otp_receive_repository.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
@@ -10,7 +8,11 @@ import 'modules/localization/Controller/localization_controller.dart';
 
 import 'modules/mainBottomNavBar/controller/main_bottom_nav_bar_bloc.dart';
 import 'modules/myTrip/controller/my_trip_bloc.dart';
+import 'modules/otp/controller/otp_receive_bloc.dart';
+import 'modules/otp/repository/otp_receive_repository.dart';
 import 'modules/points/controller/points_bloc.dart';
+import 'modules/splash/controller/splash_bloc.dart';
+import 'modules/splash/repository/splash_repository.dart';
 import 'modules/userLevel/controller/user_level_bloc.dart';
 import 'routes/app_routes.dart';
 import 'routes/route_generator.dart';
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => OtpReceiveBloc(repository: OtpReceiveRepository())),
         BlocProvider(
           create: (_) => SendOtpBloc(repository: SendOtpRepository()),
+        ),
+        BlocProvider(
+          create: (_) => SplashBloc(repository: SplashRepository()),
         ),
       ],
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
