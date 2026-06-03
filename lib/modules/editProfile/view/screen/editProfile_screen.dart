@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:trippy_customer/modules/editProfile/controller/edit_profile_state.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
+import '../../controller/edit_profile_bloc.dart';
+import '../../controller/edit_profile_event.dart';
 
 class EditprofileScreen extends StatefulWidget {
   const EditprofileScreen({super.key});
@@ -14,6 +21,25 @@ class EditprofileScreen extends StatefulWidget {
 class _EditprofileScreenState extends State<EditprofileScreen> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _phoneNumber = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage(AppLocalizations loc) async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (image != null) {
+      context.read<EditProfilePictureBloc>().add(
+        EditProfilePicture(
+          imageFile: File(image.path),
+          languageCode: loc.locale.languageCode,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -52,43 +78,67 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                 Positioned(
                   top: 28,
                   left: 133,
-                  child: Container(
-                    padding: EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(width: 3, color: Colors.white),
-                      color: AppColors.editProfileScreenProfileIconContainer,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.person,
-                      color: AppColors.editProfileScreenProfileIcon,
-                      size: 35,
-                    ),
-                  ),
+                  child:
+                      BlocBuilder<
+                        EditProfilePictureBloc,
+                        EditProfilePictureState
+                      >(
+                        builder: (context, state) {
+                          if (state.avatar != null) {
+                            return ClipOval(
+                              child: Image.file(
+                                state.avatar!,
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          }
+                          return Container(
+                            padding: EdgeInsets.all(8.0),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              border: Border.all(width: 3, color: Colors.white),
+                              color: AppColors
+                                  .editProfileScreenProfileIconContainer,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.person,
+                              color: AppColors.editProfileScreenProfileIcon,
+                              size: 35,
+                            ),
+                          );
+                        },
+                      ),
                 ),
                 Positioned(
                   top: 53,
                   // left: 146,
                   right: 128,
-                  child: Container(
-                    padding: EdgeInsets.all(4.0),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppColors.editProfileScreenEditButtonContainer,
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color:
-                            AppColors.editProfileScreenEditButtonContainerSide,
-                        width: 2,
+                  child: GestureDetector(
+                    onTap: () {
+                      _pickImage(loc);
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(4.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: AppColors.editProfileScreenEditButtonContainer,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors
+                              .editProfileScreenEditButtonContainerSide,
+                          width: 2,
+                        ),
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(1.0),
-                      child: Icon(
-                        Icons.edit,
-                        color: AppColors.editProfileScreenEditButtonIcon,
-                        size: 15,
+                      child: Padding(
+                        padding: const EdgeInsets.all(1.0),
+                        child: Icon(
+                          Icons.edit,
+                          color: AppColors.editProfileScreenEditButtonIcon,
+                          size: 15,
+                        ),
                       ),
                     ),
                   ),
@@ -239,5 +289,12 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _phoneNumber.dispose();
+    super.dispose();
   }
 }
