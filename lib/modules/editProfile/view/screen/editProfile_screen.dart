@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:trippy_customer/modules/editProfile/controller/edit_profile_state.dart';
+import 'package:trippy_customer/utils/enums.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
@@ -35,6 +36,10 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
         EditProfilePicture(
           imageFile: File(image.path),
           languageCode: loc.locale.languageCode,
+          actionWhen: 'admin_login',
+          email: 'superadmin@gmail.com',
+          password: '123456',
+          platform: 'web',
         ),
       );
     }
@@ -84,7 +89,8 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                         EditProfilePictureState
                       >(
                         builder: (context, state) {
-                          if (state.avatar != null) {
+                          if (state.status ==
+                              EditProfilePictureStatus.success) {
                             return ClipOval(
                               child: Image.file(
                                 state.avatar!,
@@ -94,19 +100,47 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                               ),
                             );
                           }
-                          return Container(
-                            padding: EdgeInsets.all(8.0),
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              border: Border.all(width: 3, color: Colors.white),
-                              color: AppColors
-                                  .editProfileScreenProfileIconContainer,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.person,
-                              color: AppColors.editProfileScreenProfileIcon,
-                              size: 35,
+                          if (state.status ==
+                              EditProfilePictureStatus.loading) {
+                            return Container(
+                              padding: EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 3,
+                                  color: Colors.white,
+                                ),
+                                color: AppColors
+                                    .editProfileScreenProfileIconContainer,
+                                shape: BoxShape.circle,
+                              ),
+                              child: CircularProgressIndicator(
+                                color: AppColors
+                                    .editProfileScreenCircularProgressIndicator,
+                              ),
+                            );
+                          }
+                          return GestureDetector(
+                            onTap: () {
+                              _pickImage(loc);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: 3,
+                                  color: Colors.white,
+                                ),
+                                color: AppColors
+                                    .editProfileScreenProfileIconContainer,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.person,
+                                color: AppColors.editProfileScreenProfileIcon,
+                                size: 35,
+                              ),
                             ),
                           );
                         },

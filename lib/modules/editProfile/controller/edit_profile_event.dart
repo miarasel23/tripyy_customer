@@ -12,8 +12,19 @@ abstract class EditProfilePictureEvent extends Equatable {
 class EditProfilePicture extends EditProfilePictureEvent {
   final File imageFile;
   final String languageCode;
+  final String actionWhen;
+  final String email;
+  final String password;
+  final String platform;
 
-  EditProfilePicture({required this.imageFile, required this.languageCode});
+  EditProfilePicture({
+    required this.imageFile,
+    required this.languageCode,
+    required this.actionWhen,
+    required this.email,
+    required this.password,
+    required this.platform,
+  });
 
   @override
   List<Object?> get props => [imageFile, languageCode];

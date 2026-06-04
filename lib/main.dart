@@ -45,7 +45,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => SplashBloc(repository: SplashRepository())),
         BlocProvider(
           create: (_) => EditProfilePictureBloc(
-            repository: EditProfilePictureRepository(),
+            repository: EditProfilePictureRepository(
+              repository: SplashRepository(),
+            ),
           ),
         ),
       ],

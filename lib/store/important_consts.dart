@@ -19,10 +19,10 @@ class ImportantConsts {
     accessToken = token;
   }
 
-  static Future<void> saveUuid(String uuid) async {
+  static Future<void> saveUuid(String value) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setString(_uuid, uuid);
-    uuid = uuid;
+    await sharedPreferences.setString(_uuid, value);
+    uuid = value;
   }
   
   static Future<void> saveUserData(CurrentUserModel currentUserModel) async {

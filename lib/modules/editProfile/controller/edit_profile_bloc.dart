@@ -21,12 +21,21 @@ class EditProfilePictureBloc
     emit(state.copyWith(status: EditProfilePictureStatus.loading));
 
     final error = await repository.uploadProfilePicture(
-      event.imageFile,
-      event.languageCode,
+      imageFile: event.imageFile,
+      languageCode: event.languageCode,
+      plaform: event.platform,
+      actionWhen: event.actionWhen,
+      email: event.email,
+      password: event.password,
     );
 
     if (error == null) {
-      emit(state.copyWith(status: EditProfilePictureStatus.success));
+      emit(
+        state.copyWith(
+          status: EditProfilePictureStatus.success,
+          avatar: event.imageFile,
+        ),
+      );
     } else {
       emit(
         state.copyWith(

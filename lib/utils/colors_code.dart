@@ -110,6 +110,8 @@ class AppColors {
       Colors.blue;
   static const Color editProfileScreenUpdateButtonElevatedbuttonForeground =
       Colors.white;
+  static const Color editProfileScreenCircularProgressIndicator =
+      Colors.white;
 
   //Help Center
   static const Color helpCenterScreenBackground = Colors.white;
