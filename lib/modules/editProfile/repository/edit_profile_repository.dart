@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:path/path.dart';
-import 'package:trippy_customer/modules/splash/repository/splash_repository.dart';
 
 import '../../../store/important_consts.dart';
 import '../../../utils/app_urls.dart';
 import '../../../utils/custom_map_body_builder.dart';
+import '../../splash/repository/splash_repository.dart';
 
 class EditProfilePictureRepository {
   final SplashRepository repository;
@@ -61,7 +61,6 @@ class EditProfilePictureRepository {
       );
 
       final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
         print('Upload successful');
@@ -80,6 +79,65 @@ class EditProfilePictureRepository {
           print("error of splash repo $userInfoRespond");
         }
       } else {
+        return "Server error: ${response.statusCode}";
+      }
+    } on SocketException {
+      return "No Internet connection";
+    } on TimeoutException {
+      return "Request timeout";
+    } catch (e) {
+      return "Unexpected error: $e";
+    }
+  }
+
+  Future<String?> editingInfo({
+    required String languageCode,
+    required String number,
+    required String uuid,
+    required String fullName,
+    required String email,
+  }) async {
+    await ImportantConsts.getUuid();
+    await ImportantConsts.getAccessToken();
+    final Map<String, dynamic> data = CustomMapBodyBuilder.build(
+      actionWhen: "customer_profile_edit",
+      languageCode: languageCode,
+      data: {
+        "phone_number": number,
+        "country_code": "BD",
+        "uuid": ImportantConsts.uuid,
+        "full_name": fullName,
+        "email": email,
+        "nid_number": "23423423422",
+        "is_notification_enabled": "false",
+        "device_token_for_notification": "2523423431",
+        "is_active": "true",
+      },
+    );
+
+    try {
+      final response = await post(
+        Uri.parse(AppUrls.customerProfileUpdate),
+        body: data,
+      );
+
+      if (response.statusCode == 200) {
+        print("Updated successfully");
+        final userInfoRespond = await repository.receivingUserData(
+          plaform: "web",
+          languageCode: languageCode,
+          actionWhen: "customer_profile_edit",
+          email: email,
+          password: "123456",
+          token: ImportantConsts.accessToken!,
+        );
+        if (userInfoRespond == null) {
+          print("Info synced");
+        } else {
+          print("error in syncing info $userInfoRespond");
+        }
+      } else {
+        return "Server error: ${response.statusCode}";
       }
     } on SocketException {
       return "No Internet connection";
