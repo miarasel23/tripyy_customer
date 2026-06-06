@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:trippy_customer/modules/editProfile/controller/edit_profile_bloc.dart';
-import 'package:trippy_customer/modules/editProfile/repository/edit_profile_repository.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
+import 'modules/editProfile/controller/edit_profile_bloc.dart';
+import 'modules/editProfile/repository/edit_profile_repository.dart';
 import 'modules/localization/Controller/localization_controller.dart';
 
 import 'modules/mainBottomNavBar/controller/main_bottom_nav_bar_bloc.dart';

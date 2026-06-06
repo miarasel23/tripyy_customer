@@ -93,7 +93,6 @@ class EditProfilePictureRepository {
   Future<String?> editingInfo({
     required String languageCode,
     required String number,
-    required String uuid,
     required String fullName,
     required String email,
   }) async {

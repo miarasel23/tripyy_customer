@@ -39,19 +39,15 @@ class EditProfilePicture extends EditProfilePictureEvent {
 
 class UpdateProfileInfo extends EditProfilePictureEvent {
   final String languageCode;
-  final String actionWhen;
   final String phoneNumber;
   final String fullName;
   final String email;
   final String password;
-  final String platform;
 
   UpdateProfileInfo({
     required this.languageCode,
-    required this.actionWhen,
     required this.email,
     required this.password,
-    required this.platform,
     required this.phoneNumber,
     required this.fullName,
   });
@@ -59,10 +55,8 @@ class UpdateProfileInfo extends EditProfilePictureEvent {
   @override
   List<Object?> get props => [
     languageCode,
-    actionWhen,
     email,
     password,
-    platform,
     phoneNumber,
     fullName,
   ];

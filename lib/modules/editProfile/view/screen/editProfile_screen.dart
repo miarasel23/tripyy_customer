@@ -22,6 +22,7 @@ class EditprofileScreen extends StatefulWidget {
 class _EditprofileScreenState extends State<EditprofileScreen> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _phoneNumber = TextEditingController();
+  final TextEditingController _email = TextEditingController();
 
   final ImagePicker _picker = ImagePicker();
 
@@ -63,264 +64,280 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
           ),
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(18),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.editProfileScreenBackgroundContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  width: double.infinity,
-                  height: 65,
-                ),
-                Positioned(
-                  top: 28,
-                  left: 133,
-                  child:
-                      BlocBuilder<
-                        EditProfilePictureBloc,
-                        EditProfilePictureState
-                      >(
-                        builder: (context, state) {
-                          if (state.status ==
-                              EditProfilePictureStatus.success) {
-                            return ClipOval(
-                              child: Image.file(
-                                state.avatar!,
-                                width: 70,
-                                height: 70,
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          }
-                          if (state.status ==
-                              EditProfilePictureStatus.loading) {
-                            return Container(
-                              padding: EdgeInsets.all(8.0),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  width: 3,
-                                  color: Colors.white,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: EdgeInsets.all(18),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: AppColors
+                                  .editProfileScreenBackgroundContainer,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            width: double.infinity,
+                            height: 65,
+                          ),
+                          Positioned(
+                            top: 28,
+                            left: 133,
+                            child:
+                                BlocBuilder<
+                                  EditProfilePictureBloc,
+                                  EditProfilePictureState
+                                >(
+                                  builder: (context, state) {
+                                    if (state.status ==
+                                        EditProfilePictureStatus.success) {
+                                      return ClipOval(
+                                        child: Image.file(
+                                          state.avatar!,
+                                          width: 70,
+                                          height: 70,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    }
+                                    if (state.status ==
+                                        EditProfilePictureStatus.loading) {
+                                      return Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            width: 3,
+                                            color: Colors.white,
+                                          ),
+                                          color: AppColors
+                                              .editProfileScreenProfileIconContainer,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: CircularProgressIndicator(
+                                          color: AppColors
+                                              .editProfileScreenCircularProgressIndicator,
+                                        ),
+                                      );
+                                    }
+                                    return GestureDetector(
+                                      onTap: () {
+                                        _pickImage(loc);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            width: 3,
+                                            color: Colors.white,
+                                          ),
+                                          color: AppColors
+                                              .editProfileScreenProfileIconContainer,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.person,
+                                          color: AppColors
+                                              .editProfileScreenProfileIcon,
+                                          size: 35,
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                color: AppColors
-                                    .editProfileScreenProfileIconContainer,
-                                shape: BoxShape.circle,
-                              ),
-                              child: CircularProgressIndicator(
-                                color: AppColors
-                                    .editProfileScreenCircularProgressIndicator,
-                              ),
-                            );
-                          }
-                          return GestureDetector(
-                            onTap: () {
-                              _pickImage(loc);
-                            },
-                            child: Container(
-                              padding: EdgeInsets.all(8.0),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  width: 3,
-                                  color: Colors.white,
+                          ),
+                          Positioned(
+                            top: 53,
+                            // left: 146,
+                            right: 128,
+                            child: GestureDetector(
+                              onTap: () {
+                                _pickImage(loc);
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(4.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: AppColors
+                                      .editProfileScreenEditButtonContainer,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: AppColors
+                                        .editProfileScreenEditButtonContainerSide,
+                                    width: 2,
+                                  ),
                                 ),
-                                color: AppColors
-                                    .editProfileScreenProfileIconContainer,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.person,
-                                color: AppColors.editProfileScreenProfileIcon,
-                                size: 35,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(1.0),
+                                  child: Icon(
+                                    Icons.edit,
+                                    color: AppColors
+                                        .editProfileScreenEditButtonIcon,
+                                    size: 15,
+                                  ),
+                                ),
                               ),
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
-                ),
-                Positioned(
-                  top: 53,
-                  // left: 146,
-                  right: 128,
-                  child: GestureDetector(
-                    onTap: () {
-                      _pickImage(loc);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(4.0),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.editProfileScreenEditButtonContainer,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: AppColors
-                              .editProfileScreenEditButtonContainerSide,
-                          width: 2,
+                      SizedBox(height: 38),
+                      Text(
+                        loc.translate("name"),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.editProfileScreenNameText,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(1.0),
-                        child: Icon(
-                          Icons.edit,
-                          color: AppColors.editProfileScreenEditButtonIcon,
-                          size: 15,
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _name,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: AppColors.editProfileScreenNameTextfield,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(28),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 38),
-            Text(
-              loc.translate("name"),
-              style: GoogleFonts.poppins(
-                color: AppColors.editProfileScreenNameText,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 10),
-            TextFormField(
-              controller: _name,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.editProfileScreenNameTextfield,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              loc.translate("phone_number"),
-              style: GoogleFonts.poppins(
-                color: AppColors.editProfileScreenPhoneText,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 10),
-            TextFormField(
-              controller: _phoneNumber,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: AppColors.editProfileScreenPhoneTextfield,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(28),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              loc.translate("gender"),
-              style: GoogleFonts.poppins(
-                color: Colors.black,
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  width: 140,
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: AppColors.editProfileScreenMaleCheckboxContainer,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Checkbox(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
+                      SizedBox(height: 20),
+                      Text(
+                        loc.translate("phone_number"),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.editProfileScreenPhoneText,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
                         ),
-                        side: BorderSide(width: 1),
-                        value: true,
-                        onChanged: (value) {},
                       ),
-                      Text(loc.translate("male")),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _phoneNumber,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: AppColors.editProfileScreenPhoneTextfield,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(28),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        loc.translate("email"),
+                        style: GoogleFonts.poppins(
+                          color: AppColors.editProfileScreenPhoneText,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: _email,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: AppColors.editProfileScreenPhoneTextfield,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(28),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      const SizedBox(height: 40),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors
+                                    .editProfileScreenDeleteButtonElevatedbuttonBackground,
+                              ),
+                              onPressed: () {},
+                              child: Text(
+                                loc.translate("delete_account"),
+                                style: GoogleFonts.poppins(
+                                  color: AppColors
+                                      .editProfileScreenDeleteButtonElevatedbuttonForeground,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors
+                                    .editProfileScreenUpdateButtonElevatedbuttonBackground,
+                              ),
+                              onPressed: () async {
+                                context.read<EditProfilePictureBloc>().add(
+                                  UpdateProfileInfo(
+                                    languageCode: loc.locale.languageCode,
+                                    email: _email.text.trim(),
+                                    password: '123456',
+                                    phoneNumber: _phoneNumber.text.trim(),
+                                    fullName: _name.text.trim(),
+                                  ),
+                                );
+                              },
+                              child:
+                                  BlocBuilder<
+                                    EditProfilePictureBloc,
+                                    EditProfilePictureState
+                                  >(
+                                    builder: (context, state) {
+                                      switch (state.status) {
+                                        case EditProfilePictureStatus.loading:
+                                          return const CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                          );
+
+                                        case EditProfilePictureStatus.success:
+                                          return Text(
+                                            loc.translate("update"),
+                                            style: GoogleFonts.poppins(
+                                              color: AppColors
+                                                  .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                            ),
+                                          );
+                                        case EditProfilePictureStatus.initial:
+                                        case EditProfilePictureStatus.failure:
+                                          return Text(
+                                            loc.translate("failed"),
+                                            style: GoogleFonts.poppins(
+                                              color: AppColors
+                                                  .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                            ),
+                                          );
+                                        default:
+                                          return SizedBox();
+                                      }
+                                    },
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-                Container(
-                  width: 140,
-                  padding: EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: AppColors.editProfileScreenFemaleCheckboxContainer,
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Checkbox(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        side: BorderSide(width: 1),
-                        value: false,
-                        onChanged: (value) {},
-                      ),
-                      Text(loc.translate("female")),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
-            Spacer(),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors
-                          .editProfileScreenDeleteButtonElevatedbuttonBackground,
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      loc.translate("delete_account"),
-                      style: GoogleFonts.poppins(
-                        color: AppColors
-                            .editProfileScreenDeleteButtonElevatedbuttonForeground,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors
-                          .editProfileScreenUpdateButtonElevatedbuttonBackground,
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      loc.translate("update"),
-                      style: GoogleFonts.poppins(
-                        color: AppColors
-                            .editProfileScreenUpdateButtonElevatedbuttonForeground,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
