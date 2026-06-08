@@ -4,13 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:trippy_customer/modules/editProfile/controller/edit_profile_state.dart';
+import 'package:trippy_customer/modules/editProfile/controller/edit_profile_info_event.dart';
 import 'package:trippy_customer/utils/enums.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/colors_code.dart';
-import '../../controller/edit_profile_bloc.dart';
-import '../../controller/edit_profile_event.dart';
+import '../../controller/edit_profile_info_bloc.dart';
+import '../../controller/edit_profile_info_state.dart';
+import '../../controller/edit_profile_picture_bloc.dart';
+import '../../controller/edit_profile_picture_event.dart'
+    show EditProfilePicture;
+import '../../controller/edit_profile_picture_state.dart';
 
 class EditprofileScreen extends StatefulWidget {
   const EditprofileScreen({super.key});
@@ -92,69 +96,70 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                           Positioned(
                             top: 28,
                             left: 133,
-                            child:
-                                BlocBuilder<
-                                  EditProfilePictureBloc,
-                                  EditProfilePictureState
-                                >(
-                                  builder: (context, state) {
-                                    if (state.status ==
-                                        EditProfilePictureStatus.success) {
-                                      return ClipOval(
-                                        child: Image.file(
-                                          state.avatar!,
-                                          width: 70,
-                                          height: 70,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      );
-                                    }
-                                    if (state.status ==
-                                        EditProfilePictureStatus.loading) {
-                                      return Container(
-                                        padding: EdgeInsets.all(8.0),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 3,
-                                            color: Colors.white,
-                                          ),
-                                          color: AppColors
-                                              .editProfileScreenProfileIconContainer,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: CircularProgressIndicator(
-                                          color: AppColors
-                                              .editProfileScreenCircularProgressIndicator,
-                                        ),
-                                      );
-                                    }
-                                    return GestureDetector(
-                                      onTap: () {
-                                        _pickImage(loc);
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(8.0),
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            width: 3,
-                                            color: Colors.white,
-                                          ),
-                                          color: AppColors
-                                              .editProfileScreenProfileIconContainer,
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Icons.person,
-                                          color: AppColors
-                                              .editProfileScreenProfileIcon,
-                                          size: 35,
-                                        ),
+                            child: BlocBuilder<EditProfilePictureBloc, EditProfilePictureState>(
+                              builder: (context, state) {
+                                if (state.status ==
+                                        EditProfilePictureStatus.success &&
+                                    state.avatar != null) {
+                                  return ClipOval(
+                                    child: Image.file(
+                                      state.avatar!,
+                                      width: 70,
+                                      height: 70,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                }
+
+                                if (state.status ==
+                                    EditProfilePictureStatus.loading) {
+                                  return Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: 3,
+                                        color: Colors.white,
                                       ),
-                                    );
+                                      color: AppColors
+                                          .editProfileScreenProfileIconContainer,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: CircularProgressIndicator(
+                                      color: AppColors
+                                          .editProfileScreenCircularProgressIndicator,
+                                    ),
+                                  );
+                                }
+
+                                // Fallback / placeholder (covers initial, failure,
+                                // or success without an avatar)
+                                return GestureDetector(
+                                  onTap: () {
+                                    _pickImage(loc);
                                   },
-                                ),
+                                  child: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    alignment: Alignment.center,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        width: 3,
+                                        color: Colors.white,
+                                      ),
+                                      color: AppColors
+                                          .editProfileScreenProfileIconContainer,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.person,
+                                      color: AppColors
+                                          .editProfileScreenProfileIcon,
+                                      size: 35,
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           Positioned(
                             top: 53,
@@ -283,8 +288,8 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                     .editProfileScreenUpdateButtonElevatedbuttonBackground,
                               ),
                               onPressed: () async {
-                                context.read<EditProfilePictureBloc>().add(
-                                  UpdateProfileInfo(
+                                context.read<EditProfileInfoBloc>().add(
+                                  EditProfileInfo(
                                     languageCode: loc.locale.languageCode,
                                     email: _email.text.trim(),
                                     password: '123456',
@@ -295,17 +300,17 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                               },
                               child:
                                   BlocBuilder<
-                                    EditProfilePictureBloc,
-                                    EditProfilePictureState
+                                    EditProfileInfoBloc,
+                                    EditProfileUpdateState
                                   >(
                                     builder: (context, state) {
                                       switch (state.status) {
-                                        case EditProfilePictureStatus.loading:
+                                        case EditProfileUpdateStatus.loading:
                                           return const CircularProgressIndicator(
                                             strokeWidth: 2,
                                           );
 
-                                        case EditProfilePictureStatus.success:
+                                        case EditProfileUpdateStatus.success:
                                           return Text(
                                             loc.translate("update"),
                                             style: GoogleFonts.poppins(
@@ -313,8 +318,15 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                                   .editProfileScreenUpdateButtonElevatedbuttonForeground,
                                             ),
                                           );
-                                        case EditProfilePictureStatus.initial:
-                                        case EditProfilePictureStatus.failure:
+                                        case EditProfileUpdateStatus.initial:
+                                          return Text(
+                                            loc.translate("update"),
+                                            style: GoogleFonts.poppins(
+                                              color: AppColors
+                                                  .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                            ),
+                                          );
+                                        case EditProfileUpdateStatus.failure:
                                           return Text(
                                             loc.translate("failed"),
                                             style: GoogleFonts.poppins(

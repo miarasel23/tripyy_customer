@@ -9,10 +9,10 @@ import '../../../utils/app_urls.dart';
 import '../../../utils/custom_map_body_builder.dart';
 import '../../splash/repository/splash_repository.dart';
 
-class EditProfilePictureRepository {
+class EditProfileRepository {
   final SplashRepository repository;
 
-  EditProfilePictureRepository({required this.repository});
+  EditProfileRepository({required this.repository});
   Future<String?> uploadProfilePicture({
     required File imageFile,
     required String languageCode,
@@ -98,6 +98,7 @@ class EditProfilePictureRepository {
   }) async {
     await ImportantConsts.getUuid();
     await ImportantConsts.getAccessToken();
+    print("The uuid is : ${ImportantConsts.uuid}");
     final Map<String, dynamic> data = CustomMapBodyBuilder.build(
       actionWhen: "customer_profile_edit",
       languageCode: languageCode,
@@ -118,6 +119,7 @@ class EditProfilePictureRepository {
       final response = await post(
         Uri.parse(AppUrls.customerProfileUpdate),
         body: data,
+        headers: {'Authorization': 'Bearer ${ImportantConsts.accessToken}'},
       );
 
       if (response.statusCode == 200) {

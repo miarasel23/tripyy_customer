@@ -4,7 +4,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
-import 'modules/editProfile/controller/edit_profile_bloc.dart';
+import 'modules/editProfile/controller/edit_profile_info_bloc.dart';
+import 'modules/editProfile/controller/edit_profile_picture_bloc.dart';
 import 'modules/editProfile/repository/edit_profile_repository.dart';
 import 'modules/localization/Controller/localization_controller.dart';
 
@@ -45,9 +46,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => SplashBloc(repository: SplashRepository())),
         BlocProvider(
           create: (_) => EditProfilePictureBloc(
-            repository: EditProfilePictureRepository(
-              repository: SplashRepository(),
-            ),
+            repository: EditProfileRepository(repository: SplashRepository()),
+          ),
+        ),
+        BlocProvider(
+          create: (_) => EditProfileInfoBloc(
+            repository: EditProfileRepository(repository: SplashRepository()),
           ),
         ),
       ],
