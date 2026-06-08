@@ -24,11 +24,28 @@ class ImportantConsts {
     await sharedPreferences.setString(_uuid, value);
     uuid = value;
   }
-  
+
   static Future<void> saveUserData(CurrentUserModel currentUserModel) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    await sharedPreferences.setString(_userDataKey, jsonEncode(currentUserModel.toJson()));
+    await sharedPreferences.setString(
+      _userDataKey,
+      jsonEncode(currentUserModel.toJson()),
+    );
     userData = currentUserModel;
+  }
+
+  static Future<CurrentUserModel?> getUserData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? currentUserString = sharedPreferences.getString(_userDataKey);
+    if (currentUserString == null) {
+      return null;
+    }
+    CurrentUserModel currentUserModel = CurrentUserModel.fromJson(
+      jsonDecode(currentUserString),
+    );
+    userData = currentUserModel;
+
+    return currentUserModel;
   }
 
   static Future<String?> getAccessToken() async {

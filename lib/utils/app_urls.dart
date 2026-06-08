@@ -1,3 +1,7 @@
+import 'package:trippy_customer/modules/splash/models/current_user_model.dart';
+
+import '../store/important_consts.dart';
+
 class AppUrls {
   static const String baseUrl = "http://3.209.161.158/api";
   // customer
@@ -11,4 +15,13 @@ class AppUrls {
       "$baseUrl/v1/customer/profile-update";
   static const String customerProfilePictureUpdate =
       "$baseUrl/v1/customer/customer-profile-picture-update";
+  static String? get profileImageUrl {
+    final image = ImportantConsts.userData?.data?.user?.profilePicture;
+
+    if (image == null || image.isEmpty) {
+      return null;
+    }
+
+    return "$baseUrl/assets/uploads/images/$image";
+  }
 }

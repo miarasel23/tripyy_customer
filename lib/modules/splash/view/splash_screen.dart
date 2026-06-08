@@ -29,6 +29,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final token = await ImportantConsts.getAccessToken();
       print(token);
       final loc = AppLocalizations.of(context);
+      await ImportantConsts.getUserData();
 
       if (token != null) {
         context.read<SplashBloc>().add(
