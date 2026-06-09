@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../utils/app_urls.dart';
 import '../../../../utils/colors_code.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -11,6 +12,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = AppUrls.profileImageUrl;
     final loc = AppLocalizations.of(context);
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.white),
@@ -43,21 +45,59 @@ class ProfileScreen extends StatelessWidget {
                         top: 28,
                         left: 133,
                         child: Container(
-                          padding: EdgeInsets.all(8.0),
+                          // padding: EdgeInsets.all(8.0),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 3,
-                              color: AppColors
-                                  .profileScreenProfileBackgroundBorder,
-                            ),
                             color: AppColors.profileScreenProfileBackground,
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(
-                            Icons.person,
-                            color: AppColors.profileScreenProfileIcon,
-                            size: 35,
+                          child: Builder(
+                            builder: (context) {
+                              if (imageUrl != null && imageUrl.isNotEmpty) {
+                                return ClipOval(
+                                  child: SizedBox(
+                                    width: 55,
+                                    height: 55,
+                                    child: Image.network(
+                                      imageUrl,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          },
+                                      errorBuilder: (_, _, __) {
+                                        return const Icon(Icons.person);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                              return Container(
+                                padding: EdgeInsets.all(8.0),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    width: 3,
+                                    color: AppColors
+                                        .profileScreenProfileBackgroundBorder,
+                                  ),
+                                  color:
+                                      AppColors.profileScreenProfileBackground,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.person,
+                                  color: AppColors.profileScreenProfileIcon,
+                                  size: 35,
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -468,23 +508,25 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 5),
                           GestureDetector(
-                            onTap: (){},
+                            onTap: () {},
                             child: Container(
                               padding: EdgeInsets.all(15.0),
                               decoration: BoxDecoration(
-                                color:
-                                    AppColors.profileScreenLegalOptionsContainer,
+                                color: AppColors
+                                    .profileScreenLegalOptionsContainer,
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.signal_wifi_connected_no_internet_4,
+                                        Icons
+                                            .signal_wifi_connected_no_internet_4,
                                         size: 20,
                                         color: AppColors
                                             .profileScreenLegalOptionsIcon,
@@ -507,23 +549,25 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 5),
                           GestureDetector(
-                            onTap: (){},
+                            onTap: () {},
                             child: Container(
                               padding: EdgeInsets.all(15.0),
                               decoration: BoxDecoration(
-                                color:
-                                    AppColors.profileScreenLegalOptionsContainer,
+                                color: AppColors
+                                    .profileScreenLegalOptionsContainer,
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.signal_wifi_connected_no_internet_4,
+                                        Icons
+                                            .signal_wifi_connected_no_internet_4,
                                         size: 20,
                                         color: AppColors
                                             .profileScreenLegalOptionsIcon,
@@ -546,23 +590,25 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 5),
                           GestureDetector(
-                            onTap: (){},
+                            onTap: () {},
                             child: Container(
                               padding: EdgeInsets.all(15.0),
                               decoration: BoxDecoration(
-                                color:
-                                    AppColors.profileScreenLegalOptionsContainer,
+                                color: AppColors
+                                    .profileScreenLegalOptionsContainer,
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.signal_wifi_connected_no_internet_4,
+                                        Icons
+                                            .signal_wifi_connected_no_internet_4,
                                         size: 20,
                                         color: AppColors
                                             .profileScreenLegalOptionsIcon,
@@ -585,23 +631,25 @@ class ProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 5),
                           GestureDetector(
-                            onTap: (){},
+                            onTap: () {},
                             child: Container(
                               padding: EdgeInsets.all(15.0),
                               decoration: BoxDecoration(
-                                color:
-                                    AppColors.profileScreenLegalOptionsContainer,
+                                color: AppColors
+                                    .profileScreenLegalOptionsContainer,
                                 shape: BoxShape.rectangle,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Icon(
-                                        Icons.signal_wifi_connected_no_internet_4,
+                                        Icons
+                                            .signal_wifi_connected_no_internet_4,
                                         size: 20,
                                         color: AppColors
                                             .profileScreenLegalOptionsIcon,
