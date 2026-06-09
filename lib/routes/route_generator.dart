@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../modules/additionalService/view/screen/additionalService_screen.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
 import '../modules/dashbiard/view/screen/dashboard_screen.dart';
-import '../modules/editProfile/view/screen/editProfile_screen.dart';
+import '../modules/editProfile/view/screen/edit_profile_screen.dart';
 import '../modules/helpCenter/view/screen/helpCenter_screen.dart';
 import '../modules/mainBottomNavBar/view/screen/main_bottom_nav_bar_screen.dart';
 import '../modules/notification/view/screen/notification_screen.dart';

@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../store/important_consts.dart';
+import '../../utils/app_urls.dart';
 import '../../utils/colors_code.dart';
+import '../../utils/to_title_case.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = AppUrls.profileImageUrl;
+    final name = toTiTleCase(ImportantConsts.userData?.data?.user?.fullName ?? 'John Doe');
     return Drawer(
       child: Container(
         color: Colors.white,
@@ -39,14 +44,44 @@ class AppDrawer extends StatelessWidget {
                     children: [
                       Stack(
                         children: [
-                          CircleAvatar(
-                            radius: 45,
-                            backgroundColor: AppColors.pageBackground,
-                            child: Icon(
-                              Icons.person,
-                              size: 45,
-                              color: AppColors.primary,
-                            ),
+                          Builder(
+                            builder: (context) {
+                              if (imageUrl != null && imageUrl.isNotEmpty) {
+                                return ClipOval(
+                                  child: SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: Image.network(
+                                      imageUrl,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+
+                                            return const Center(
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            );
+                                          },
+                                      errorBuilder: (_, __, ___) {
+                                        return const Icon(Icons.person);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                              return CircleAvatar(
+                                radius: 45,
+                                backgroundColor: AppColors.pageBackground,
+                                child: Icon(
+                                  Icons.person,
+                                  size: 45,
+                                  color: AppColors.primary,
+                                ),
+                              );
+                            },
                           ),
                           Positioned(
                             bottom: 0,
@@ -71,7 +106,7 @@ class AppDrawer extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'John Doe',
+                              name,
                               style: GoogleFonts.poppins(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
