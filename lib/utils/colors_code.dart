@@ -83,6 +83,13 @@ class AppColors {
   static const Color dashboardStarPointsIconForeground = Colors.white;
   static const Color dashboardStarPointsWidgetText = Colors.black;
 
+  //Dashboard screen bottom sheet
+  static const Color dashboardBottomSheetBackground = Colors.white;
+  static const Color dashboardBottomSheetChooseCarColor = Colors.black;
+  static const Color dashboardBottomSheetChooseCarNameColor = Colors.black87;
+  static const Color dashboardBottomSheetChooseCarSeatsLogo = Colors.grey;
+  static const Color dashboardBottomSheetChooseCarSeatsInfo = Colors.grey;
+
   //Edit Profile
   static const Color editProfileScreenBackground = Colors.white;
   static const Color editProfileScreenBackgroundContainer = Colors.black;

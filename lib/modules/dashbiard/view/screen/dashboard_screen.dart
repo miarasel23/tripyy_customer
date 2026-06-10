@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:trippy_customer/utils/choose_car_bottom_sheet.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
@@ -68,7 +68,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 13),
-              servicesSection(loc),
+              servicesSection(loc, context),
               SizedBox(height: 13),
               imagePlaceHolderContainer(),
               SizedBox(height: 13),
@@ -118,7 +118,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget servicesSection(AppLocalizations loc) {
+  Widget servicesSection(AppLocalizations loc, BuildContext context) {
     return GridView.count(
       padding: EdgeInsets.symmetric(horizontal: 0),
       crossAxisCount: 3,
@@ -134,6 +134,7 @@ class DashboardScreen extends StatelessWidget {
             color: AppColors.dashboardServiceIcon,
           ),
           label: loc.translate('intercity'),
+          context: context,
         ),
         serviceWidget(
           icon: Icon(
@@ -142,6 +143,7 @@ class DashboardScreen extends StatelessWidget {
             color: AppColors.dashboardServiceIcon,
           ),
           label: loc.translate('hourly'),
+          context: context,
         ),
         serviceWidget(
           icon: Icon(
@@ -150,6 +152,7 @@ class DashboardScreen extends StatelessWidget {
             color: AppColors.dashboardServiceIcon,
           ),
           label: loc.translate('airport_rental'),
+          context: context,
         ),
         serviceWidget(
           icon: Icon(
@@ -158,6 +161,7 @@ class DashboardScreen extends StatelessWidget {
             color: AppColors.dashboardServiceIcon,
           ),
           label: loc.translate('return_trip'),
+          context: context,
         ),
         serviceWidget(
           icon: Icon(
@@ -166,6 +170,7 @@ class DashboardScreen extends StatelessWidget {
             color: AppColors.dashboardServiceIcon,
           ),
           label: loc.translate('ride_share'),
+          context: context,
         ),
       ],
     );
@@ -320,19 +325,37 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget serviceWidget({required Widget icon, required String label}) {
-    return Column(
-      children: [
-        icon,
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: AppColors.dashboardServiceLabel,
-            fontSize: 11,
-            fontWeight: FontWeight.w500,
+  Widget serviceWidget({
+    required BuildContext context,
+    required Widget icon,
+    required String label,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder: (BuildContext context) {
+            return FractionallySizedBox(
+              heightFactor: 0.845,
+              child: const ChooseCarBottomSheet(),
+            );
+          },
+        );
+      },
+      child: Column(
+        children: [
+          icon,
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              color: AppColors.dashboardServiceLabel,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
