@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:trippy_customer/utils/choose_car_bottom_sheet_controller/choose_car_bottom_sheet_bloc.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
@@ -53,6 +54,9 @@ class MyApp extends StatelessWidget {
           create: (_) => EditProfileInfoBloc(
             repository: EditProfileRepository(repository: SplashRepository()),
           ),
+        ),
+        BlocProvider(
+          create: (_) => ChooseCarBottomSheetBloc(),
         ),
       ],
       child: BlocBuilder<LocalizationBloc, LocalizationState>(

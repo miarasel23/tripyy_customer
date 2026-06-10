@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:trippy_customer/utils/choose_car_bottom_sheet_controller/choose_car_bottom_sheet_bloc.dart';
+import 'package:trippy_customer/utils/choose_car_bottom_sheet_controller/choose_car_bottom_sheet_events.dart';
+import 'package:trippy_customer/utils/choose_car_bottom_sheet_controller/choose_car_bottom_sheet_state.dart';
 
 import '../core/utils/localization/app_localization.dart';
 import 'colors_code.dart';
@@ -36,107 +40,118 @@ class ChooseCarBottomSheet extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(24, 20, 16, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    loc.translate("choose_car"),
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.dashboardBottomSheetChooseCarColor,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.close, color: Colors.black87, size: 26),
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              child: ListView.separated(
-                physics: ClampingScrollPhysics(),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                itemCount: options.length,
-                itemBuilder: (context, index) {
-                  final car = options[index];
-                  return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Color(0xFFEDF4FC),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 80,
-                          height: 55,
-                          child: Image.asset(
-                            car.imagePath,
-                            fit: BoxFit.contain,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                              Icons.directions_car,
-                              size: 40,
-                              color: Colors.blueGrey,
-                            ),
-                          ),
+        child: BlocBuilder<ChooseCarBottomSheetBloc, ChooseCarBottomSheetState>(
+          builder: (context, state) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(24, 20, 16, 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        loc.translate("choose_car"),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.dashboardBottomSheetChooseCarColor,
                         ),
-                        SizedBox(width: 16),
-                        //Text Details
-                        Flexible(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.close, color: Colors.black87, size: 26),
+                      ),
+                    ],
+                  ),
+                ),
+                Flexible(
+                  child: ListView.separated(
+                    physics: ClampingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    itemCount: options.length,
+                    itemBuilder: (context, index) {
+                      final car = options[index];
+                      return GestureDetector(
+                        onTap: (){
+                          context.read<ChooseCarBottomSheetBloc>().add(ChooseCar(selectedCarIndex: index.toString()));
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFEDF4FC),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Row(
                             children: [
-                              Text(
-                                car.name,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors
-                                      .dashboardBottomSheetChooseCarNameColor,
+                              SizedBox(
+                                width: 80,
+                                height: 55,
+                                child: Image.asset(
+                                  car.imagePath,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) => Icon(
+                                    Icons.directions_car,
+                                    size: 40,
+                                    color: Colors.blueGrey,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.people,
-                                    size: 16,
-                                    color: AppColors
-                                        .dashboardBottomSheetChooseCarSeatsLogo,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${car.seats} Seats',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: AppColors
-                                          .dashboardBottomSheetChooseCarSeatsInfo,
+                              SizedBox(width: 16),
+                              //Text Details
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      car.name,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors
+                                            .dashboardBottomSheetChooseCarNameColor,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.people,
+                                          size: 16,
+                                          color: AppColors
+                                              .dashboardBottomSheetChooseCarSeatsLogo,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '${car.seats} Seats',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: AppColors
+                                                .dashboardBottomSheetChooseCarSeatsInfo,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                },
-                separatorBuilder: (BuildContext context, int index) {
-                  return SizedBox(height: 12);
-                },
-              ),
-            ),
-          ],
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return SizedBox(height: 12);
+                    },
+                  ),
+                ),
+                
+                (state.clicked == true) ? ElevatedButton(onPressed: (){}, child: Text("continue")) : SizedBox()
+              ],
+            );
+          }
         ),
       ),
     );
