@@ -15,3 +15,11 @@ class ChooseCar extends ChooseCarBottomSheetEvents {
   @override
   List<Object?> get props => [selectedCarIndex];
 }
+
+class FetchRides extends ChooseCarBottomSheetEvents {
+  final String languageCode;
+  FetchRides({required this.languageCode});
+
+  @override
+  List<Object?> get props => [languageCode];
+}

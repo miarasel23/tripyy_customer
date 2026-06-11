@@ -21,4 +21,13 @@ class SplashAuthCheck extends SplashEvent {
     required this.email,
     required this.password,
   });
+
+  @override
+  List<Object> get props => [
+    platform,
+    languageCode,
+    actionWhen,
+    email,
+    password,
+  ];
 }

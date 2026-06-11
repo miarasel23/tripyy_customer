@@ -1,5 +1,3 @@
-import 'package:trippy_customer/modules/splash/models/current_user_model.dart';
-
 import '../store/important_consts.dart';
 
 class AppUrls {
@@ -15,6 +13,8 @@ class AppUrls {
       "$baseUrl/v1/customer/profile-update";
   static const String customerProfilePictureUpdate =
       "$baseUrl/v1/customer/customer-profile-picture-update";
+  static const String rentalInfo =
+      "$baseUrl/v1/rental-trip/rental-info";
   static String? get profileImageUrl {
     final image = ImportantConsts.userData?.data?.user?.profilePicture;
 

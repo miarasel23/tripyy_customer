@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:trippy_customer/utils/choose_car_bottom_sheet_controller/choose_car_bottom_sheet_bloc.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
@@ -20,6 +19,8 @@ import 'modules/splash/repository/splash_repository.dart';
 import 'modules/userLevel/controller/user_level_bloc.dart';
 import 'routes/app_routes.dart';
 import 'routes/route_generator.dart';
+import 'utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
+import 'utils/choose_car_bottom_sheet/repository/choose_car_bottom_sheet_repository.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,7 +57,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (_) => ChooseCarBottomSheetBloc(),
+          create: (_) => ChooseCarBottomSheetBloc(repository: ChooseCarBottomSheetRepository()),
         ),
       ],
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
