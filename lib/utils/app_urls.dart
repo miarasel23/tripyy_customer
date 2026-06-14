@@ -13,8 +13,7 @@ class AppUrls {
       "$baseUrl/v1/customer/profile-update";
   static const String customerProfilePictureUpdate =
       "$baseUrl/v1/customer/customer-profile-picture-update";
-  static const String rentalInfo =
-      "$baseUrl/v1/rental-trip/rental-info";
+  static const String rentalInfo = "$baseUrl/v1/rental-trip/rental-info";
   static String? get profileImageUrl {
     final image = ImportantConsts.userData?.data?.user?.profilePicture;
 
@@ -23,5 +22,13 @@ class AppUrls {
     }
 
     return "$baseUrl/assets/uploads/images/$image";
+  }
+
+  static String? getImageUrl(String? avatar) {
+    if (avatar == null || avatar.isEmpty) {
+      return null;
+    }
+
+    return "$baseUrl/assets/uploads/images/$avatar";
   }
 }

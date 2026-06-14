@@ -1,13 +1,13 @@
 import 'package:equatable/equatable.dart';
 
 import '../../enums.dart';
-import '../models/car_list_model.dart';
+import '../models/choose_car_model.dart';
 
 class ChooseCarBottomSheetState extends Equatable {
   final String? currentCarIndex;
   final bool? clicked;
   final ChooseCarBottomSheetStatus? status;
-  final CarListModel? cars;
+  final Map<String, ServiceGroup>? groups;
   final String? error;
 
   ChooseCarBottomSheetState({
@@ -15,25 +15,25 @@ class ChooseCarBottomSheetState extends Equatable {
     this.currentCarIndex,
     this.clicked,
     this.status = ChooseCarBottomSheetStatus.initial,
-    this.cars,
+    this.groups,
   });
 
   ChooseCarBottomSheetState copyWith({
     String? selectedCarIndex,
     bool? clicked,
     ChooseCarBottomSheetStatus? status,
-    CarListModel? cars,
+    Map<String, ServiceGroup>? groups,
     final String? error,
   }) {
     return ChooseCarBottomSheetState(
       currentCarIndex: selectedCarIndex ?? currentCarIndex,
       clicked: clicked ?? this.clicked,
       status: status ?? this.status,
-      cars: cars ?? this.cars,
+      groups: groups ?? this.groups,
       error: error ?? this.error,
     );
   }
 
   @override
-  List<Object?> get props => [currentCarIndex, clicked, status, cars, error];
+  List<Object?> get props => [currentCarIndex, clicked, status, groups, error];
 }

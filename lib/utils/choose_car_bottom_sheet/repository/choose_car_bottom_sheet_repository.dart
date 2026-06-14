@@ -4,13 +4,13 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:trippy_customer/utils/app_urls.dart';
-import 'package:trippy_customer/utils/choose_car_bottom_sheet/models/car_list_model.dart';
+import 'package:trippy_customer/utils/choose_car_bottom_sheet/models/choose_car_model.dart';
 import 'package:trippy_customer/utils/custom_map_body_builder.dart';
 
 class ChooseCarBottomSheetRepository {
   ChooseCarBottomSheetRepository();
 
-  Future<CarListModel?> receivingCarList({
+  Future<ServiceResponse?> receivingCarList({
     required String languageCode,
   }) async {
     try {
@@ -25,7 +25,7 @@ class ChooseCarBottomSheetRepository {
 
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
-        return CarListModel.fromJson(jsonData);
+        return ServiceResponse.fromJson(jsonData);
       } else {
         throw Exception("Server error: ${response.statusCode}");
       }

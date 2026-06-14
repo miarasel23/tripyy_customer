@@ -89,6 +89,8 @@ class AppColors {
   static const Color dashboardBottomSheetChooseCarNameColor = Colors.black87;
   static const Color dashboardBottomSheetChooseCarSeatsLogo = Colors.grey;
   static const Color dashboardBottomSheetChooseCarSeatsInfo = Colors.grey;
+  static const Color dashboardBottomSheetCarShowingContainer = Color(0xFFEDF4FC);
+  static const Color dashboardBottomSheetCarShowingContainerBorder = Color(0xff0e52ff);
 
   //Edit Profile
   static const Color editProfileScreenBackground = Colors.white;

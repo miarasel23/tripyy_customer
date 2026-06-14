@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/utils/choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
+import 'package:trippy_customer/utils/app_urls.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
+import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_events.dart';
+import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
+import '../../../../utils/choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../customs/drawer.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final loc = AppLocalizations.of(context);
+      context.read<ChooseCarBottomSheetBloc>().add(
+        LoadServices(languageCode: loc.locale.languageCode),
+      );
+      print("clicked 1");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +90,11 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 13),
-              servicesSection(loc, context),
+              BlocBuilder<ChooseCarBottomSheetBloc, ChooseCarBottomSheetState>(
+                builder: (context, state) {
+                  return servicesSection(loc, context, state);
+                },
+              ),
               SizedBox(height: 13),
               imagePlaceHolderContainer(),
               SizedBox(height: 13),
@@ -118,87 +144,83 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget servicesSection(AppLocalizations loc, BuildContext context) {
-    return GridView.count(
+  Widget servicesSection(
+    AppLocalizations loc,
+    BuildContext context,
+    ChooseCarBottomSheetState state,
+  ) {
+    final keys = state.groups?.keys.toList();
+    return GridView.builder(
       padding: EdgeInsets.symmetric(horizontal: 0),
-      crossAxisCount: 3,
-      crossAxisSpacing: 30,
-      mainAxisSpacing: 45,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 1.0,
+      ),
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      children: [
-        GestureDetector(
+      itemCount: keys?.length ?? 0,
+      itemBuilder: (context, index) {
+        var key = keys?[index];
+        final serviceGroup = state.groups?[key];
+        final avatar = serviceGroup?.avatar;
+        return GestureDetector(
           onTap: () {
+            final cars = state.groups?[key]?.cars ?? [];
+
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
               builder: (BuildContext context) {
                 return FractionallySizedBox(
                   heightFactor: 0.845,
-                  child: const ChooseCarBottomSheet(),
+                  child: ChooseCarBottomSheet(
+                    cars: cars,
+                    serviceName: key ?? '',
+                  ),
                 );
               },
             );
+            print("clicked 2");
           },
           child: serviceWidget(
-            icon: Icon(
-              Icons.car_crash,
-              size: 70,
-              color: AppColors.dashboardServiceIcon,
+            icon: Builder(
+              builder: (context) {
+                final imageUrl = AppUrls.getImageUrl(avatar);
+                if (avatar != null && avatar.isNotEmpty) {
+                  return SizedBox(
+                    height: 70,
+                    width: 70,
+                    child: Image.network(
+                      imageUrl!,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          return child;
+                        }
+                        return const Center(
+                          child: CircularProgressIndicator(color: Colors.blue),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(Icons.cancel);
+                      },
+                    ),
+                  );
+                }
+                return Icon(
+                  Icons.car_crash,
+                  size: 70,
+                  color: AppColors.dashboardServiceIcon,
+                );
+              },
             ),
-            label: loc.translate('intercity'),
+            label: (key == "INTER_CITY_RENTER") ? "INTERCITY " : (key ?? ""),
             context: context,
           ),
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: serviceWidget(
-            icon: Icon(
-              Icons.car_crash,
-              size: 70,
-              color: AppColors.dashboardServiceIcon,
-            ),
-            label: loc.translate('hourly'),
-            context: context,
-          ),
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: serviceWidget(
-            icon: Icon(
-              Icons.car_crash,
-              size: 70,
-              color: AppColors.dashboardServiceIcon,
-            ),
-            label: loc.translate('airport_rental'),
-            context: context,
-          ),
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: serviceWidget(
-            icon: Icon(
-              Icons.car_crash,
-              size: 70,
-              color: AppColors.dashboardServiceIcon,
-            ),
-            label: loc.translate('return_trip'),
-            context: context,
-          ),
-        ),
-        GestureDetector(
-          onTap: () {},
-          child: serviceWidget(
-            icon: Icon(
-              Icons.car_crash,
-              size: 70,
-              color: AppColors.dashboardServiceIcon,
-            ),
-            label: loc.translate('ride_share'),
-            context: context,
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -366,6 +388,8 @@ class DashboardScreen extends StatelessWidget {
             fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
       ],
     );
@@ -553,3 +577,13 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
+
+/*serviceWidget(
+            icon: Icon(
+              Icons.car_crash,
+              size: 70,
+              color: AppColors.dashboardServiceIcon,
+            ),
+            label: loc.translate('ride_share'),
+            context: context,
+          ),*/

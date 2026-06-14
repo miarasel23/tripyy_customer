@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/utils/enums.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
+import '../../app_urls.dart';
+import '../../enums.dart';
 import '../controller/choose_car_bottom_sheet_bloc.dart';
 import '../controller/choose_car_bottom_sheet_events.dart';
 import '../controller/choose_car_bottom_sheet_state.dart';
 import '../../colors_code.dart';
-import '../../images.dart';
+import '../models/choose_car_model.dart';
 
 class CarOption {
   final String name;
@@ -19,24 +20,19 @@ class CarOption {
 }
 
 class ChooseCarBottomSheet extends StatefulWidget {
-  const ChooseCarBottomSheet({super.key});
+  const ChooseCarBottomSheet({
+    super.key,
+    required this.cars,
+    required this.serviceName,
+  });
 
+  final List<Car> cars;
+  final String serviceName;
   @override
   State<ChooseCarBottomSheet> createState() => _ChooseCarBottomSheetState();
 }
 
 class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final loc = AppLocalizations.of(context);
-      context.read<ChooseCarBottomSheetBloc>().add(
-        FetchRides(languageCode: loc.locale.languageCode),
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -97,9 +93,9 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                         horizontal: 20,
                         vertical: 8,
                       ),
-                      itemCount: state.cars?.data?.first.cars?.length ?? 0,
+                      itemCount: widget.cars.length,
                       itemBuilder: (context, index) {
-                        final car = state.cars?.data?.first.cars?[index];
+                        final car = widget.cars[index];
                         return GestureDetector(
                           onTap: () {
                             context.read<ChooseCarBottomSheetBloc>().add(
@@ -112,11 +108,13 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: Color(0xFFEDF4FC),
+                              color: AppColors
+                                  .dashboardBottomSheetCarShowingContainer,
                               border:
                                   (state.currentCarIndex == index.toString())
                                   ? Border.all(
-                                      color: Color(0xff0e52ff),
+                                      color: AppColors
+                                          .dashboardBottomSheetCarShowingContainerBorder,
                                       width: 2,
                                     )
                                   : null,
@@ -129,16 +127,36 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                   height: 55,
                                   child: Builder(
                                     builder: (context) {
-                                      final avatar = car?.carAvatar;
-                                      if (avatar == null || avatar.isEmpty) {
+                                      final avatar = car.carAvatar;
+                                      final imageUrl = AppUrls.getImageUrl(
+                                        avatar,
+                                      );
+                                      if (imageUrl == null ||
+                                          imageUrl.isEmpty) {
                                         return Icon(Icons.directions_car);
                                       }
 
                                       return Image.network(
-                                        avatar,
+                                        imageUrl,
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                         height: double.infinity,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      color: Colors.blue,
+                                                    ),
+                                              );
+                                            },
+                                        errorBuilder: (_, _, _) {
+                                          return Icon(Icons.directions_car);
+                                        },
                                       );
                                     },
                                   ),
@@ -151,7 +169,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        car?.carType ?? "No name",
+                                        car.carType,
                                         style: GoogleFonts.poppins(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -170,7 +188,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
-                                            '${car?.setCapacity ?? "No"} Seats',
+                                            '${car.setCapacity} Seats',
                                             style: GoogleFonts.poppins(
                                               fontSize: 14,
                                               color: AppColors
@@ -231,7 +249,9 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
               );
             }
             if (state.status == ChooseCarBottomSheetStatus.failure) {
-              return Center(child: Text("Failed and ${state.error.toString()}"));
+              return Center(
+                child: Text("Failed and ${state.error.toString()}"),
+              );
             }
             return Icon(Icons.directions_car);
           },

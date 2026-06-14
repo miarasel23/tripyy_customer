@@ -71,7 +71,7 @@ class ProfileScreen extends StatelessWidget {
                                                   CircularProgressIndicator(),
                                             );
                                           },
-                                      errorBuilder: (_, _, __) {
+                                      errorBuilder: (_, _, _) {
                                         return const Icon(Icons.person);
                                       },
                                     ),

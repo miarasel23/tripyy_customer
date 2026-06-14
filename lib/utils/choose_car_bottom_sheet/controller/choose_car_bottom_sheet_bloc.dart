@@ -11,7 +11,7 @@ class ChooseCarBottomSheetBloc
   ChooseCarBottomSheetBloc({required this.repository})
     : super(ChooseCarBottomSheetState(clicked: false)) {
     on<ChooseCar>(_choosingCar);
-    on<FetchRides>(_fetchingRides);
+    on<LoadServices>(_fetchingRides);
   }
 
   void _choosingCar(
@@ -24,18 +24,18 @@ class ChooseCarBottomSheetBloc
   }
 
   void _fetchingRides(
-    FetchRides event,
+    LoadServices event,
     Emitter<ChooseCarBottomSheetState> emit,
   ) async {
     emit(state.copyWith(status: ChooseCarBottomSheetStatus.loading));
 
     try {
-      final rides = await repository.receivingCarList(
+      final response = await repository.receivingCarList(
         languageCode: event.languageCode,
       );
 
       emit(
-        state.copyWith(status: ChooseCarBottomSheetStatus.success, cars: rides),
+        state.copyWith(status: ChooseCarBottomSheetStatus.success, groups: response?.groups),
       );
     } catch (e) {
       emit(

@@ -171,15 +171,16 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                                           loadingProgress,
                                                         ) {
                                                           if (loadingProgress ==
-                                                              null)
+                                                              null) {
                                                             return child;
+                                                          }
         
                                                           return const Center(
                                                             child:
                                                                 CircularProgressIndicator(),
                                                           );
                                                         },
-                                                    errorBuilder: (_, __, ___) {
+                                                    errorBuilder: (_, _, _) {
                                                       return const Icon(
                                                         Icons.person,
                                                       );
