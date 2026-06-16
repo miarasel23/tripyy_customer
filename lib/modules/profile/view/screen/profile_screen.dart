@@ -334,6 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     TextEditingController nameController = TextEditingController(text: initialName);
     TextEditingController emailController = TextEditingController(text: initialEmail);
     TextEditingController phoneController = TextEditingController(text: initialPhone);
+    TextEditingController nidController = TextEditingController();
     bool isLoading = false;
 
     showDialog(
@@ -368,6 +369,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       controller: emailController,
                       decoration: const InputDecoration(labelText: 'Email'),
                     ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: nidController,
+                      decoration: const InputDecoration(labelText: 'NID Number *'),
+                    ),
                   ],
                 ),
               ),
@@ -392,6 +398,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 else
                   TextButton(
                     onPressed: () async {
+                      if (nidController.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(this.context).showSnackBar(
+                          const SnackBar(content: Text('NID Number is required')),
+                        );
+                        return;
+                      }
+
                       setDialogState(() => isLoading = true);
                       
                       final Map<String, dynamic> data = CustomMapBodyBuilder.build(
@@ -403,7 +416,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           "uuid": ImportantConsts.uuid,
                           "full_name": nameController.text,
                           "email": emailController.text,
-                          "nid_number": "",
+                          "nid_number": nidController.text.trim(),
                           "is_notification_enabled": "false",
                           "device_token_for_notification": "",
                         },
