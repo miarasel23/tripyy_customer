@@ -122,6 +122,10 @@ class EditProfileRepository {
         headers: {'Authorization': 'Bearer ${ImportantConsts.accessToken}'},
       );
 
+
+
+      print("The response is: ${response.body}");
+
       if (response.statusCode == 200) {
         print("Updated successfully");
         final userInfoRespond = await repository.receivingUserData(

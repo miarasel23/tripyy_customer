@@ -357,11 +357,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Full Name'),
+                      decoration: const InputDecoration(labelText: 'Full Name *'),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: phoneController,
+                      readOnly: true,
                       decoration: const InputDecoration(labelText: 'Phone Number'),
                     ),
                     const SizedBox(height: 16),
@@ -372,7 +373,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 16),
                     TextField(
                       controller: nidController,
-                      decoration: const InputDecoration(labelText: 'NID Number *'),
+                      decoration: const InputDecoration(labelText: 'NID Number'),
                     ),
                   ],
                 ),
@@ -398,9 +399,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 else
                   TextButton(
                     onPressed: () async {
-                      if (nidController.text.trim().isEmpty) {
+                      if (nameController.text.trim().isEmpty) {
                         ScaffoldMessenger.of(this.context).showSnackBar(
-                          const SnackBar(content: Text('NID Number is required')),
+                          const SnackBar(content: Text('Full Name is required')),
                         );
                         return;
                       }
@@ -460,10 +461,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             }
                           } else {
-                            throw Exception("Failed to fetch user");
+                            print("GET ERROR: ${getResponse.statusCode} - ${getResponse.body}");
+                            throw Exception("Failed to fetch user: ${getResponse.body}");
                           }
                         } else {
-                           throw Exception("Failed to update profile");
+                           print("POST ERROR: ${response.statusCode} - ${response.body}");
+                           throw Exception("Failed to update profile: ${response.body}");
                         }
                       } catch (e) {
                          if (mounted) {
