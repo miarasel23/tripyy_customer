@@ -16,4 +16,5 @@ class AppRoutes {
   static const notification = '/notification';
   static const voucher = '/voucher';
   static const profile = '/profile';
+  static const tripRequest = '/trip_request';
 }

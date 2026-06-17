@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trippy_customer/utils/choose_car_args.dart';
 
 import '../modules/additionalService/view/screen/additionalService_screen.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
@@ -15,6 +16,7 @@ import '../modules/savedLocation/view/screen/savedLocation_screen.dart';
 import '../modules/savedRoutes/view/screen/savedRoutes_screen.dart';
 import '../modules/splash/view/splash_screen.dart';
 import '../modules/tripDetails/view/screen/trip_details_screen.dart';
+import '../modules/trip_request/view/trip_request_screen.dart';
 import '../modules/userLevel/view/screen/user_level.dart';
 import '../modules/voucher/view/screen/voucher_screen.dart';
 import 'app_routes.dart';
@@ -66,6 +68,17 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const VoucherScreen());
       case AppRoutes.profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+      case AppRoutes.tripRequest:
+        final result = settings.arguments as ChooseCarArgs;
+        return MaterialPageRoute(
+          builder: (_) => TripRequestScreen(
+            args: ChooseCarArgs(
+              serviceName: result.serviceName,
+              car: result.car,
+              index: result.index,
+            ),
+          ),
+        );
 
       default:
         return MaterialPageRoute(

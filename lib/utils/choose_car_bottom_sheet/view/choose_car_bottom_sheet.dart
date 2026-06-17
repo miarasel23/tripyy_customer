@@ -3,21 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
+import '../../../routes/app_routes.dart';
 import '../../app_urls.dart';
+import '../../choose_car_args.dart';
 import '../../enums.dart';
 import '../controller/choose_car_bottom_sheet_bloc.dart';
 import '../controller/choose_car_bottom_sheet_events.dart';
 import '../controller/choose_car_bottom_sheet_state.dart';
 import '../../colors_code.dart';
 import '../models/choose_car_model.dart';
-
-class CarOption {
-  final String name;
-  final int seats;
-  final String imagePath;
-
-  CarOption({required this.name, required this.seats, required this.imagePath});
-}
 
 class ChooseCarBottomSheet extends StatefulWidget {
   const ChooseCarBottomSheet({
@@ -36,15 +30,6 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    // final List<CarOption> options = [
-    //   CarOption(name: 'Sedan 1', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 2', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 3', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 4', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 5', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 6', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 7', seats: 4, imagePath: Images.carPicture),
-    // ];
     return Container(
       decoration: BoxDecoration(
         color: AppColors.dashboardBottomSheetBackground,
@@ -225,9 +210,22 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                final selectedIndex = int.parse(
+                                  state.currentCarIndex!,
+                                );
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.tripRequest,
+                                  arguments: ChooseCarArgs(
+                                    serviceName: widget.serviceName,
+                                    car: widget.cars,
+                                    index: selectedIndex,
+                                  ),
+                                );
+                              },
                               child: Text(
-                                "Continue",
+                                loc.translate("continue"),
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontSize: 18,

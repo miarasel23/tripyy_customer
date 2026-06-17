@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trippy_customer/utils/app_urls.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
+import '../../../../utils/app_urls.dart';
 import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
 import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_events.dart';
 import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
 import '../../../../utils/choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 import '../../../../utils/colors_code.dart';
+import '../../../../utils/enums.dart';
 import '../../../customs/drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -149,6 +151,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
     BuildContext context,
     ChooseCarBottomSheetState state,
   ) {
+    if (state.status == ChooseCarBottomSheetStatus.loading) {
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 6,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+          childAspectRatio: 1.0,
+        ),
+        itemBuilder: (context, index) {
+          return Shimmer.fromColors(
+            baseColor: AppColors.shimmerBase,
+            highlightColor: AppColors.shimmerHighlight,
+            child: Column(
+              children: [
+                Container(
+                  height: 70,
+                  width: 70,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(height: 12, width: 60, color: Colors.white),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+    if (state.status == ChooseCarBottomSheetStatus.failure) {
+      return Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          state.error ?? 'Failed to load services',
+          style: GoogleFonts.poppins(color: Colors.red, fontSize: 14),
+        ),
+      );
+    }
     final keys = state.groups?.keys.toList();
     return GridView.builder(
       padding: EdgeInsets.symmetric(horizontal: 0),
