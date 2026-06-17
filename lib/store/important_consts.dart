@@ -61,4 +61,12 @@ class ImportantConsts {
     uuid = user_uuid;
     return user_uuid;
   }
+
+  static Future<void> clearAllData() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.clear();
+    accessToken = null;
+    uuid = null;
+    userData = null;
+  }
 }

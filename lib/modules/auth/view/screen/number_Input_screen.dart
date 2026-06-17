@@ -28,6 +28,7 @@ class NumberInputScreen extends StatelessWidget {
                 SnackBar(
                   content: Text(state.errorMessage ?? "Something went wrong"),
                   backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
                 ),
               );
             }
@@ -40,24 +41,31 @@ class NumberInputScreen extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(18.0),
+            backgroundColor: const Color(0xFFF8F9FA), // Slight off-white background for contrast against card
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                _buildLanguageSwitcher(context, loc, localizationState.locale.languageCode),
+                const SizedBox(width: 8),
+              ],
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    )
+                  ],
+                ),
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 16),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      loc.translate("enter_your_phone_number"),
-                      style: GoogleFonts.poppins(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    numberBasedLoginField(loc, numberField),
-                    const SizedBox(height: 10),
                     localizationState.locale.languageCode == "en"
                         ? richTextEnglish(loc)
                         : richTextBangle(loc),
@@ -66,16 +74,18 @@ class NumberInputScreen extends StatelessWidget {
                       builder: (context, state) {
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.submitButton,
+                            backgroundColor: AppColors.submitButton, // Pathao/inDrive vibrant color
                             foregroundColor: AppColors.submitButtonText,
-                            minimumSize: const Size(double.infinity, 50),
+                            minimumSize: const Size(double.infinity, 54),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                             ),
+                            elevation: 0,
                           ),
                           onPressed: state.status == OtpStatus.loading
                               ? null
                               : () {
+                                  if (numberField.text.isEmpty) return;
                                   context.read<SendOtpBloc>().add(
                                     SendOtp(
                                       numberField.text,
@@ -85,64 +95,85 @@ class NumberInputScreen extends StatelessWidget {
                                 },
                           child: switch (state.status) {
                             OtpStatus.loading =>
-                              const CircularProgressIndicator(),
-                            OtpStatus.success => Text(
-                              loc.translate("continue"),
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.submitButtonText,
+                              const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                               ),
-                            ),
                             OtpStatus.failure => Text(
-                              loc.translate("retry"),
+                              loc.translate("retry") ?? "Retry",
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.submitButtonText,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            OtpStatus.initial => Text(
-                              loc.translate("continue"),
+                            _ => Text(
+                              loc.translate("continue") ?? "Continue",
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.submitButtonText,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           },
                         );
                       },
                     ),
+                  ],
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.translate("enter_your_phone_number") ?? "Enter your phone number",
+                      style: GoogleFonts.poppins(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold, // Uber's bold header
+                        color: Colors.black87,
+                      ),
+                    ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: AppColors.submitButtonText,
-                            backgroundColor: AppColors.submitButton,
+                    Text(
+                      "We will send you a verification code",
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    // inDrive style elevated card for the input
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
                           ),
-                          onPressed: () {
-                            context.read<LocalizationBloc>().add(
-                              ChangeLanguageEvent('en'),
-                            );
-                          },
-                          child: Text(loc.translate("english")),
-                        ),
-                        const SizedBox(width: 5),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: AppColors.submitButtonText,
-                            backgroundColor: AppColors.submitButton,
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Mobile Number",
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
                           ),
-                          onPressed: () {
-                            context.read<LocalizationBloc>().add(
-                              ChangeLanguageEvent('bn'),
-                            );
-                          },
-                          child: Text(loc.translate("bengal")),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          numberBasedLoginField(loc, numberField),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -154,18 +185,68 @@ class NumberInputScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildLanguageSwitcher(BuildContext context, AppLocalizations loc, String currentLang) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _langButton(context, 'en', loc.translate("english") ?? "EN", currentLang == 'en'),
+          _langButton(context, 'bn', loc.translate("bengal") ?? "BN", currentLang == 'bn'),
+        ],
+      ),
+    );
+  }
+
+  Widget _langButton(BuildContext context, String code, String label, bool isSelected) {
+    return GestureDetector(
+      onTap: () {
+        context.read<LocalizationBloc>().add(ChangeLanguageEvent(code));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.black : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? Colors.white : Colors.grey.shade700,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget richTextEnglish(AppLocalizations loc) {
     return RichText(
+      textAlign: TextAlign.center,
       text: TextSpan(
-        text: "By proceeding, you consent to agree with our ",
-        style: const TextStyle(fontSize: 14, color: Color(0xffb3b3b3)),
+        text: "By proceeding, you consent to agree with our\n",
+        style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey.shade600),
         children: [
           TextSpan(
             text: "Terms and Conditions",
-            style: TextStyle(
-              fontSize: 14,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
               color: Colors.black,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
             ),
           ),
         ],
@@ -175,92 +256,86 @@ class NumberInputScreen extends StatelessWidget {
 
   Widget richTextBangle(AppLocalizations loc) {
     return RichText(
+      textAlign: TextAlign.center,
       text: TextSpan(
-        text: "এগিয়ে যাওয়ার মাধ্যমে, আপনি আমাদের ",
-        style: const TextStyle(fontSize: 13, color: Color(0xffb3b3b3)),
+        text: "এগিয়ে যাওয়ার মাধ্যমে, আপনি আমাদের\n",
+        style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey.shade600),
         children: [
           TextSpan(
             text: "শর্তাবলী ও নিয়মাবলীর ",
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColors.textPrimary,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.black,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
             ),
           ),
           TextSpan(
             text: "সাথে সম্মত হতে রাজি হচ্ছেন।",
-            style: const TextStyle(fontSize: 16, color: Color(0xffb3b3b3)),
+            style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey.shade600),
           ),
         ],
       ),
     );
   }
 
-  Column numberBasedLoginField(
-    AppLocalizations loc,
-    TextEditingController controller,
-  ) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(18),
-            color: const Color(0xffedf6ff),
+  Widget numberBasedLoginField(AppLocalizations loc, TextEditingController controller) {
+    return Container(
+      height: 56,
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F3F5), // Pathao style light grey fill
+        borderRadius: BorderRadius.circular(16), // Softer, rounder edges
+      ),
+      child: Row(
+        children: [
+          const SizedBox(width: 16),
+          const Text(
+            "🇧🇩",
+            style: TextStyle(fontSize: 22),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 8,
-                      horizontal: 14,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Icon(Icons.phone, size: 25),
-                        const SizedBox(width: 16),
-                        Text(
-                          loc.translate("+880"),
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: TextFormField(
-                      controller: controller,
-                      decoration: InputDecoration(
-                        hintText: loc.translate("enter_your_number"),
-                        hintStyle: GoogleFonts.poppins(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.hintText.withOpacity(0.5),
-                        ),
-                        border: InputBorder.none,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+          const SizedBox(width: 8),
+          Text(
+            "+880",
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 12),
+          Container(
+            width: 1,
+            height: 24,
+            color: Colors.grey.shade400,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.phone,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+                letterSpacing: 1.5,
+              ),
+              decoration: InputDecoration(
+                hintText: loc.translate("enter_your_number") ?? "000 000 0000",
+                hintStyle: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade400,
+                  letterSpacing: 0,
+                ),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+        ],
+      ),
     );
   }
 }

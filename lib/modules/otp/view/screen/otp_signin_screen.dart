@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,16 +12,82 @@ import '../../../localization/Controller/localization_controller.dart';
 import '../../controller/otp_receive_bloc.dart';
 import '../../controller/otp_receive_event.dart';
 import '../../controller/otp_receive_state.dart';
+import '../../../auth/controller/send_otp_bloc.dart';
+import '../../../auth/controller/send_otp_event.dart';
 
-class OtpSignIn extends StatelessWidget {
+class OtpSignIn extends StatefulWidget {
   final String number;
 
   const OtpSignIn({super.key, required this.number});
 
   @override
+  State<OtpSignIn> createState() => _OtpSignInState();
+}
+
+class _OtpSignInState extends State<OtpSignIn> {
+  final PinInputController _otpController = PinInputController();
+  Timer? _timer;
+  int _secondsRemaining = 300; // 5 minutes
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _secondsRemaining = 300;
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsRemaining > 0) {
+        setState(() {
+          _secondsRemaining--;
+        });
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _otpController.dispose();
+    super.dispose();
+  }
+
+  String get _formattedTime {
+    int minutes = _secondsRemaining ~/ 60;
+    int seconds = _secondsRemaining % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  void _resendCode(BuildContext context, String langCode) {
+    if (_secondsRemaining > 0) return;
+
+    // Try to dispatch SendOtp if the bloc is available
+    try {
+      context.read<SendOtpBloc>().add(SendOtp(widget.number, langCode));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context).translate("otp_resent") ?? "OTP has been resent.")),
+      );
+    } catch (e) {
+      print("SendOtpBloc not available here. OTP resent log triggered.");
+    }
+
+    setState(() {
+      _startTimer();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    final PinInputController otpField = PinInputController();
+    final screenWidth = MediaQuery.of(context).size.width;
+    // Padding outside card = 48, Padding inside card = 48, Estimated gaps between 6 cells = 40. Total = 136
+    final availableWidth = screenWidth - 136;
+    final double cellWidth = (availableWidth / 6).clamp(35.0, 50.0);
+    final double cellHeight = (cellWidth * 1.2).clamp(45.0, 60.0);
 
     return BlocBuilder<LocalizationBloc, LocalizationState>(
       builder: (context, localizationState) {
@@ -31,6 +98,7 @@ class OtpSignIn extends StatelessWidget {
                 SnackBar(
                   content: Text(state.errorMessage ?? "Otp failed"),
                   backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
                 ),
               );
             }
@@ -43,211 +111,230 @@ class OtpSignIn extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 13.0, top: 5),
-                    child: InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.arrow_back),
-                    ),
-                  ),
-                  const SizedBox(height: 7),
-                  Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            backgroundColor: const Color(0xFFF8F9FA),
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            bottomNavigationBar: SafeArea(
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -5),
+                    )
+                  ],
+                ),
+                padding: const EdgeInsets.only(left: 24, right: 24, bottom: 24, top: 16),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Timer & Resend
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          loc.translate("enter_the_otp_sent_to_you_at"),
+                          (loc.translate("resend_code_in") ?? "Resend code in ").replaceAll("{time}", "").trimRight(),
                           style: GoogleFonts.poppins(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            color: Colors.grey.shade600,
                           ),
                         ),
-                        Text(
-                          number,
-                          style: GoogleFonts.poppins(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        otpBasedField(context, otpField),
-                        const SizedBox(height: 10),
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(
-                            loc.translate("change_number"),
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              decoration: TextDecoration.underline,
-                              decorationColor: AppColors.primary,
-                              decorationThickness: 2,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        BlocBuilder<OtpReceiveBloc, OtpReceiveState>(
-                          builder: (context, state) {
-                            return ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.submitButton,
-                                foregroundColor: AppColors.submitButtonText,
-                                minimumSize: const Size(double.infinity, 50),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
+                        const SizedBox(width: 8),
+                        _secondsRemaining > 0
+                            ? Text(
+                                _formattedTime,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: AppColors.resendCodeTime ?? Colors.red,
+                                  fontWeight: FontWeight.w600,
                                 ),
-                              ),
-                              onPressed:
-                                  state.status == OtpReceiveStatus.loading
-                                  ? null
-                                  : () {
-                                      context.read<OtpReceiveBloc>().add(
-                                        OtpReceive(
-                                          otp: otpField.text,
-                                          number: number,
-                                          languageCode: localizationState
-                                              .locale
-                                              .languageCode,
-                                        ),
-                                      );
-                                    },
-                              child: switch (state.status) {
-                                OtpReceiveStatus.loading =>
-                                  CircularProgressIndicator(),
-                                OtpReceiveStatus.failure => Text(
-                                  loc.translate("retry"),
+                              )
+                            : GestureDetector(
+                                onTap: () => _resendCode(context, localizationState.locale.languageCode),
+                                child: Text(
+                                  loc.translate("resend") ?? "Resend OTP",
                                   style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.submitButtonText,
-                                  ),
-                                ),
-                                OtpReceiveStatus.success => Text(
-                                  loc.translate("continue"),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.submitButtonText,
-                                  ),
-                                ),
-                                OtpReceiveStatus.initial => Text(
-                                  loc.translate("continue"),
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.submitButtonText,
-                                  ),
-                                ),
-                              },
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 15),
-                        Align(
-                          alignment: Alignment.center,
-                          child: RichText(
-                            text: TextSpan(
-                              text: loc.translate("resend_code_in"),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xffb3b3b3),
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: " 02:00",
-                                  style: TextStyle(
                                     fontSize: 14,
-                                    color: AppColors.resendCodeTime,
-                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.submitButton,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ],
+                              ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    BlocBuilder<OtpReceiveBloc, OtpReceiveState>(
+                      builder: (context, state) {
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.submitButton,
+                            foregroundColor: AppColors.submitButtonText,
+                            minimumSize: const Size(double.infinity, 54),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
+                            elevation: 0,
+                          ),
+                          onPressed: state.status == OtpReceiveStatus.loading
+                              ? null
+                              : () {
+                                  if (_otpController.text.length < 6) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Please enter the full OTP"),
+                                        backgroundColor: Colors.red,
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  context.read<OtpReceiveBloc>().add(
+                                    OtpReceive(
+                                      otp: _otpController.text,
+                                      number: widget.number,
+                                      languageCode: localizationState.locale.languageCode,
+                                    ),
+                                  );
+                                },
+                          child: switch (state.status) {
+                            OtpReceiveStatus.loading =>
+                              const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                              ),
+                            OtpReceiveStatus.failure => Text(
+                              loc.translate("retry") ?? "Retry",
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            _ => Text(
+                              loc.translate("continue") ?? "Verify & Continue",
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.translate("enter_the_otp_sent_to_you_at") ?? "Enter the OTP sent to",
+                      style: GoogleFonts.poppins(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Text(
+                          widget.number,
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: AppColors.submitButtonText,
-                                backgroundColor: AppColors.submitButton,
-                              ),
-                              onPressed: () {
-                                context.read<LocalizationBloc>().add(
-                                  ChangeLanguageEvent('en'),
-                                );
-                              },
-                              child: Text(loc.translate("english")),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Text(
+                            loc.translate("change_number") ?? "Change",
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              color: AppColors.submitButton,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: AppColors.submitButton,
                             ),
-                            const SizedBox(width: 5),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                foregroundColor: AppColors.submitButtonText,
-                                backgroundColor: AppColors.submitButton,
-                              ),
-                              onPressed: () {
-                                context.read<LocalizationBloc>().add(
-                                  ChangeLanguageEvent('bn'),
-                                );
-                              },
-                              child: Text(loc.translate("bengal")),
-                            ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 40),
+                    // inDrive style elevated card for the OTP input
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Secure Code",
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          MaterialPinField(
+                            length: 6,
+                            pinController: _otpController,
+                            keyboardType: TextInputType.number,
+                            enableAutofill: true,
+                            autofillHints: const [AutofillHints.oneTimeCode],
+                            autoFocus: true,
+                            theme: MaterialPinTheme(
+                              shape: MaterialPinShape.outlined,
+                              cellSize: Size(cellWidth, cellHeight),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            onCompleted: (v) {
+                              // Automatically trigger verify when 6 digits are entered
+                              context.read<OtpReceiveBloc>().add(
+                                OtpReceive(
+                                  otp: _otpController.text,
+                                  number: widget.number,
+                                  languageCode: localizationState.locale.languageCode,
+                                ),
+                              );
+                            },
+                            onChanged: (value) {},
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Column otpBasedField(BuildContext context, PinInputController controller) {
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(18),
-            color: const Color(0xffedf6ff),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: MaterialPinField(
-                  pinController: controller,
-                  length: 6,
-                  onCompleted: (pin) => print('PIN: $pin'),
-                  onChanged: (value) => print('Changed: $value'),
-                  theme: MaterialPinTheme(
-                    shape: MaterialPinShape.outlined,
-                    cellSize: Size(46, 64),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

@@ -261,7 +261,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildListItem(
                 icon: Icons.logout,
                 title: loc.translate("logout"),
-                onTap: () {},
+                onTap: () async {
+                  await ImportantConsts.clearAllData();
+                  if (context.mounted) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      AppRoutes.numberInput,
+                      (route) => false,
+                    );
+                  }
+                },
                 isDestructive: true,
               ),
               const SizedBox(height: 40),
