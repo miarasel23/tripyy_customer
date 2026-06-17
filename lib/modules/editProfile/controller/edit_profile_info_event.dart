@@ -14,6 +14,9 @@ class EditProfileInfo extends EditProfileEvent {
   final String fullName;
   final String email;
   final String? nidNumber;
+  final String? isNotificationEnabled;
+  final String? deviceTokenForNotification;
+  final String? isActive;
 
   EditProfileInfo({
     required this.languageCode,
@@ -21,6 +24,9 @@ class EditProfileInfo extends EditProfileEvent {
     required this.phoneNumber,
     required this.fullName,
     this.nidNumber,
+    this.isNotificationEnabled,
+    this.deviceTokenForNotification,
+    this.isActive,
   });
 
   @override
@@ -30,5 +36,8 @@ class EditProfileInfo extends EditProfileEvent {
     phoneNumber,
     fullName,
     nidNumber,
+    isNotificationEnabled,
+    deviceTokenForNotification,
+    isActive,
   ];
 }

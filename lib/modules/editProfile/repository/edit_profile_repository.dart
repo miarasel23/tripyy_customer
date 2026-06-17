@@ -99,23 +99,33 @@ class EditProfileRepository {
     required String fullName,
     required String email,
     String? nidNumber,
+    String? isNotificationEnabled,
+    String? deviceTokenForNotification,
+    String? isActive,
   }) async {
     await ImportantConsts.getUuid();
     await ImportantConsts.getAccessToken();
     print("The uuid is : ${ImportantConsts.uuid}");
+    String platform = "web";
+        if (Platform.isAndroid) {
+          platform = "android";
+        } else if (Platform.isIOS) {
+          platform = "ios";
+        }
     final Map<String, dynamic> data = CustomMapBodyBuilder.build(
       actionWhen: "customer_profile_edit",
       languageCode: languageCode,
       data: {
         "phone_number": phone_number,
         "country_code": "BD",
+        "platform": platform,
         "uuid": ImportantConsts.uuid,
         "full_name": fullName,
         "email": email,
-        "nid_number": nidNumber ?? "23423423422",
-        "is_notification_enabled": "false",
-        "device_token_for_notification": "234322343",
-        "is_active": "true",
+        "nid_number": nidNumber,
+        "is_notification_enabled": isNotificationEnabled,
+        "device_token_for_notification": deviceTokenForNotification,
+        "is_active": isActive,
       },
     );
     try {
@@ -124,7 +134,11 @@ class EditProfileRepository {
         Uri.parse(AppUrls.customerProfileUpdate),
       );
       request.fields.addAll(
-        data.map((key, value) => MapEntry(key, value.toString())),
+        Map.fromEntries(
+          data.entries
+              .where((entry) => entry.value != null)
+              .map((entry) => MapEntry(entry.key, entry.value.toString())),
+        ),
       );
       request.headers.addAll({
         'Authorization': 'Bearer ${ImportantConsts.accessToken}',
@@ -132,12 +146,7 @@ class EditProfileRepository {
       final streamedResponse = await request.send();
       final response = await Response.fromStream(streamedResponse);
       if (response.statusCode == 200) {
-        String platform = "web";
-        if (Platform.isAndroid) {
-          platform = "android";
-        } else if (Platform.isIOS) {
-          platform = "ios";
-        }
+       
 
         final uri = Uri.parse(AppUrls.getCurrentCustomerUser).replace(
           queryParameters: {

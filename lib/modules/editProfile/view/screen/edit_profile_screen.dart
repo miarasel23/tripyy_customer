@@ -70,332 +70,354 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
         ),
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                child: IntrinsicHeight(
-                  child: Padding(
-                    padding: EdgeInsets.all(18),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: AppColors
-                                    .editProfileScreenBackgroundContainer,
-                                borderRadius: BorderRadius.circular(12),
+        child: BlocListener<EditProfileInfoBloc, EditProfileUpdateState>(
+          listener: (context, state) {
+            if (state.status == EditProfileUpdateStatus.success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(loc.translate("profile_updated_successfully")),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            } else if (state.status == EditProfileUpdateStatus.failure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage ?? loc.translate("failed")),
+                  backgroundColor: Colors.red,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          },
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: IntrinsicHeight(
+                    child: Padding(
+                      padding: EdgeInsets.all(18),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors
+                                      .editProfileScreenBackgroundContainer,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                width: double.infinity,
+                                height: 65,
                               ),
-                              width: double.infinity,
-                              height: 65,
-                            ),
-                            Positioned(
-                              top: 28,
-                              left: 0,
-                              right: 0,
-                              child: Center(
-                                child: Stack(
-                                  clipBehavior: Clip.none,
-                                  children: [
-                                    BlocBuilder<
-                                      EditProfilePictureBloc,
-                                      EditProfilePictureState
-                                    >(
-                                      builder: (context, state) {
-                                        if (state.status ==
-                                                EditProfilePictureStatus.success &&
-                                            state.avatar != null) {
-                                          return ClipOval(
-                                            child: Image.file(
-                                              state.avatar!,
-                                              width: 70,
-                                              height: 70,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          );
-                                        }
-          
-                                        if (state.status ==
-                                            EditProfilePictureStatus.loading) {
-                                          return Container(
-                                            padding: EdgeInsets.all(8.0),
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                width: 3,
-                                                color: Colors.white,
+                              Positioned(
+                                top: 28,
+                                left: 0,
+                                right: 0,
+                                child: Center(
+                                  child: Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      BlocBuilder<
+                                        EditProfilePictureBloc,
+                                        EditProfilePictureState
+                                      >(
+                                        builder: (context, state) {
+                                          if (state.status ==
+                                                  EditProfilePictureStatus.success &&
+                                              state.avatar != null) {
+                                            return ClipOval(
+                                              child: Image.file(
+                                                state.avatar!,
+                                                width: 70,
+                                                height: 70,
+                                                fit: BoxFit.cover,
                                               ),
-                                              color: AppColors
-                                                  .editProfileScreenProfileIconContainer,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: CircularProgressIndicator(
-                                              color: AppColors
-                                                  .editProfileScreenCircularProgressIndicator,
+                                            );
+                                          }
+            
+                                          if (state.status ==
+                                              EditProfilePictureStatus.loading) {
+                                            return Container(
+                                              padding: EdgeInsets.all(8.0),
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  width: 3,
+                                                  color: Colors.white,
+                                                ),
+                                                color: AppColors
+                                                    .editProfileScreenProfileIconContainer,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: CircularProgressIndicator(
+                                                color: AppColors
+                                                    .editProfileScreenCircularProgressIndicator,
+                                              ),
+                                            );
+                                          }
+            
+                                          final imageUrl = AppUrls.profileImageUrl;
+            
+                                          return GestureDetector(
+                                            onTap: () {
+                                              _pickImage(loc);
+                                            },
+                                            child: ClipOval(
+                                              child: SizedBox(
+                                                width: 70,
+                                                height: 70,
+                                                child: Builder(
+                                                  builder: (context) {
+                                                    // 1. Local image (highest priority)
+                                                    if (state.avatar != null) {
+                                                      return Image.file(
+                                                        state.avatar!,
+                                                        fit: BoxFit.cover,
+                                                      );
+                                                    }
+            
+                                                    // 2. Network image
+                                                    if (imageUrl != null &&
+                                                        imageUrl.isNotEmpty) {
+                                                      return Image.network(
+                                                        imageUrl,
+                                                        fit: BoxFit.cover,
+                                                        loadingBuilder:
+                                                            (
+                                                              context,
+                                                              child,
+                                                              loadingProgress,
+                                                            ) {
+                                                              if (loadingProgress ==
+                                                                  null) {
+                                                                return child;
+                                                              }
+            
+                                                              return const Center(
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              );
+                                                            },
+                                                        errorBuilder: (_, _, _) {
+                                                          return const Icon(
+                                                            Icons.person,
+                                                          );
+                                                        },
+                                                      );
+                                                    }
+            
+                                                    // 3. Fallback icon
+                                                    return const Icon(
+                                                      Icons.person,
+                                                      size: 35,
+                                                    );
+                                                  },
+                                                ),
+                                              ),
                                             ),
                                           );
-                                        }
-          
-                                        final imageUrl = AppUrls.profileImageUrl;
-          
-                                        return GestureDetector(
+                                        },
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: GestureDetector(
                                           onTap: () {
                                             _pickImage(loc);
                                           },
-                                          child: ClipOval(
-                                            child: SizedBox(
-                                              width: 70,
-                                              height: 70,
-                                              child: Builder(
-                                                builder: (context) {
-                                                  // 1. Local image (highest priority)
-                                                  if (state.avatar != null) {
-                                                    return Image.file(
-                                                      state.avatar!,
-                                                      fit: BoxFit.cover,
-                                                    );
-                                                  }
-          
-                                                  // 2. Network image
-                                                  if (imageUrl != null &&
-                                                      imageUrl.isNotEmpty) {
-                                                    return Image.network(
-                                                      imageUrl,
-                                                      fit: BoxFit.cover,
-                                                      loadingBuilder:
-                                                          (
-                                                            context,
-                                                            child,
-                                                            loadingProgress,
-                                                          ) {
-                                                            if (loadingProgress ==
-                                                                null) {
-                                                              return child;
-                                                            }
-          
-                                                            return const Center(
-                                                              child:
-                                                                  CircularProgressIndicator(),
-                                                            );
-                                                          },
-                                                      errorBuilder: (_, _, _) {
-                                                        return const Icon(
-                                                          Icons.person,
-                                                        );
-                                                      },
-                                                    );
-                                                  }
-          
-                                                  // 3. Fallback icon
-                                                  return const Icon(
-                                                    Icons.person,
-                                                    size: 35,
-                                                  );
-                                                },
+                                          child: Container(
+                                            padding: EdgeInsets.all(4.0),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: AppColors
+                                                  .editProfileScreenEditButtonContainer,
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: AppColors
+                                                    .editProfileScreenEditButtonContainerSide,
+                                                width: 2,
                                               ),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    Positioned(
-                                      bottom: 0,
-                                      right: 0,
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          _pickImage(loc);
-                                        },
-                                        child: Container(
-                                          padding: EdgeInsets.all(4.0),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            color: AppColors
-                                                .editProfileScreenEditButtonContainer,
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: AppColors
-                                                  .editProfileScreenEditButtonContainerSide,
-                                              width: 2,
-                                            ),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(1.0),
-                                            child: Icon(
-                                              Icons.edit,
-                                              color: AppColors
-                                                  .editProfileScreenEditButtonIcon,
-                                              size: 15,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(1.0),
+                                              child: Icon(
+                                                Icons.edit,
+                                                color: AppColors
+                                                    .editProfileScreenEditButtonIcon,
+                                                size: 15,
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 38),
-                        Text(
-                          loc.translate("name"),
-                          style: GoogleFonts.poppins(
-                            color: AppColors.editProfileScreenNameText,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        TextFormField(
-                          controller: _name,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.editProfileScreenNameTextfield,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(28),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          loc.translate("phone_number"),
-                          style: GoogleFonts.poppins(
-                            color: AppColors.editProfileScreenPhoneText,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        TextFormField(
-                          controller: _phoneNumber,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.editProfileScreenPhoneTextfield,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(28),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          loc.translate("email"),
-                          style: GoogleFonts.poppins(
-                            color: AppColors.editProfileScreenPhoneText,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        TextFormField(
-                          controller: _email,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.editProfileScreenPhoneTextfield,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(28),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        const SizedBox(height: 40),
-                        const Spacer(),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors
-                                      .editProfileScreenDeleteButtonElevatedbuttonBackground,
-                                ),
-                                onPressed: () {},
-                                child: Text(
-                                  loc.translate("delete_account"),
-                                  style: GoogleFonts.poppins(
-                                    color: AppColors
-                                        .editProfileScreenDeleteButtonElevatedbuttonForeground,
+                                    ],
                                   ),
                                 ),
                               ),
+                            ],
+                          ),
+                          SizedBox(height: 38),
+                          Text(
+                            loc.translate("name"),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.editProfileScreenNameText,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
                             ),
-                            SizedBox(width: 8),
-                            Expanded(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors
-                                      .editProfileScreenUpdateButtonElevatedbuttonBackground,
-                                ),
-                                onPressed: () async {
-                                  context.read<EditProfileInfoBloc>().add(
-                                    EditProfileInfo(
-                                      languageCode: loc.locale.languageCode,
-                                      email: _email.text.trim(),
-                                      phoneNumber: _phoneNumber.text.trim(),
-                                      fullName: _name.text.trim(),
-                                    ),
-                                  );
-                                },
-                                child:
-                                    BlocBuilder<
-                                      EditProfileInfoBloc,
-                                      EditProfileUpdateState
-                                    >(
-                                      builder: (context, state) {
-                                        switch (state.status) {
-                                          case EditProfileUpdateStatus.loading:
-                                            return const CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                            );
-        
-                                          case EditProfileUpdateStatus.success:
-                                            return Text(
-                                              loc.translate("update"),
-                                              style: GoogleFonts.poppins(
-                                                color: AppColors
-                                                    .editProfileScreenUpdateButtonElevatedbuttonForeground,
-                                              ),
-                                            );
-                                          case EditProfileUpdateStatus.initial:
-                                            return Text(
-                                              loc.translate("update"),
-                                              style: GoogleFonts.poppins(
-                                                color: AppColors
-                                                    .editProfileScreenUpdateButtonElevatedbuttonForeground,
-                                              ),
-                                            );
-                                          case EditProfileUpdateStatus.failure:
-                                            return Text(
-                                              loc.translate("failed"),
-                                              style: GoogleFonts.poppins(
-                                                color: AppColors
-                                                    .editProfileScreenUpdateButtonElevatedbuttonForeground,
-                                              ),
-                                            );
-                                          default:
-                                            return SizedBox();
-                                        }
-                                      },
-                                    ),
+                          ),
+                          SizedBox(height: 10),
+                          TextFormField(
+                            controller: _name,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColors.editProfileScreenNameTextfield,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(28),
+                                borderSide: BorderSide.none,
                               ),
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            loc.translate("phone_number"),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.editProfileScreenPhoneText,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          TextFormField(
+                            controller: _phoneNumber,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColors.editProfileScreenPhoneTextfield,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(28),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            loc.translate("email"),
+                            style: GoogleFonts.poppins(
+                              color: AppColors.editProfileScreenPhoneText,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          TextFormField(
+                            controller: _email,
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: AppColors.editProfileScreenPhoneTextfield,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(28),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          const SizedBox(height: 40),
+                          const Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors
+                                        .editProfileScreenDeleteButtonElevatedbuttonBackground,
+                                  ),
+                                  onPressed: () {},
+                                  child: Text(
+                                    loc.translate("delete_account"),
+                                    style: GoogleFonts.poppins(
+                                      color: AppColors
+                                          .editProfileScreenDeleteButtonElevatedbuttonForeground,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors
+                                        .editProfileScreenUpdateButtonElevatedbuttonBackground,
+                                  ),
+                                  onPressed: () async {
+                                    context.read<EditProfileInfoBloc>().add(
+                                      EditProfileInfo(
+                                        languageCode: loc.locale.languageCode,
+                                        email: _email.text.trim(),
+                                        phoneNumber: _phoneNumber.text.trim(),
+                                        fullName: _name.text.trim(),
+                                      ),
+                                    );
+                                  },
+                                  child:
+                                      BlocBuilder<
+                                        EditProfileInfoBloc,
+                                        EditProfileUpdateState
+                                      >(
+                                        builder: (context, state) {
+                                          switch (state.status) {
+                                            case EditProfileUpdateStatus.loading:
+                                              return const CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              );
+          
+                                            case EditProfileUpdateStatus.success:
+                                              return Text(
+                                                loc.translate("update"),
+                                                style: GoogleFonts.poppins(
+                                                  color: AppColors
+                                                      .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                                ),
+                                              );
+                                            case EditProfileUpdateStatus.initial:
+                                              return Text(
+                                                loc.translate("update"),
+                                                style: GoogleFonts.poppins(
+                                                  color: AppColors
+                                                      .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                                ),
+                                              );
+                                            case EditProfileUpdateStatus.failure:
+                                              return Text(
+                                                loc.translate("failed"),
+                                                style: GoogleFonts.poppins(
+                                                  color: AppColors
+                                                      .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                                ),
+                                              );
+                                            default:
+                                              return SizedBox();
+                                          }
+                                        },
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

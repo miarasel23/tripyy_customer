@@ -26,6 +26,9 @@ class EditProfileInfoBloc
       fullName: event.fullName,
       email: event.email,
       nidNumber: event.nidNumber,
+      isNotificationEnabled: event.isNotificationEnabled,
+      deviceTokenForNotification: event.deviceTokenForNotification,
+      isActive: event.isActive,
     );
 
     if (error == null) {
