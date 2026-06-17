@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/utils/localization/app_localization_delegate.dart';
+import 'core/utils/localization/app_localization.dart';
 import 'modules/auth/controller/send_otp_bloc.dart';
 import 'modules/auth/repository/send_otp_repository.dart';
 import 'modules/editProfile/controller/edit_profile_info_bloc.dart';
@@ -29,8 +32,70 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+final GlobalKey<ScaffoldMessengerState> globalScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  bool _isFirstCheck = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  void _updateConnectionStatus(List<ConnectivityResult> results) {
+    final hasInternet = results.isNotEmpty && !results.contains(ConnectivityResult.none);
+    
+    if (_isFirstCheck && hasInternet) {
+      _isFirstCheck = false;
+      return;
+    }
+    _isFirstCheck = false;
+
+    String noInternetStr = "No Internet Connection";
+    String backOnlineStr = "Back Online";
+    final context = globalScaffoldMessengerKey.currentContext;
+    if (context != null) {
+      final loc = AppLocalizations.of(context);
+      noInternetStr = loc.translate("no_internet") ?? noInternetStr;
+      backOnlineStr = loc.translate("back_online") ?? backOnlineStr;
+    }
+
+    if (!hasInternet) {
+      globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+      globalScaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(noInternetStr),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(days: 1),
+        ),
+      );
+    } else {
+      globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+      globalScaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(backOnlineStr),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +130,7 @@ class MyApp extends StatelessWidget {
       child: BlocBuilder<LocalizationBloc, LocalizationState>(
         builder: (context, localizationState) {
           return MaterialApp(
+            scaffoldMessengerKey: globalScaffoldMessengerKey,
             theme: ThemeData(
               useMaterial3: true,
               appBarTheme: AppBarTheme(

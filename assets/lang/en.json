@@ -88,6 +88,8 @@
   "470": "470",
   "bengal": "Bengal",
   "enter_the_otp_sent_to_you_at": "Enter the OTP sent to you at",
+  "no_internet": "No Internet Connection",
+  "back_online": "Back Online",
   "resend_code_in": "Resend code in {time}",
   "otp_resent": "OTP sent successfully",
   "user_name": "arif",
