@@ -23,10 +23,6 @@ class EditProfilePictureBloc
     final error = await repository.uploadProfilePicture(
       imageFile: event.imageFile,
       languageCode: event.languageCode,
-      plaform: event.platform,
-      actionWhen: event.actionWhen,
-      email: event.email,
-      password: event.password,
     );
 
     if (error == null) {

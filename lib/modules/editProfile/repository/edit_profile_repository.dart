@@ -11,6 +11,7 @@ import '../../../utils/app_urls.dart';
 import '../../../utils/custom_map_body_builder.dart';
 import '../../splash/repository/splash_repository.dart';
 import '../../splash/models/current_user_model.dart';
+import '../../../store/app_globals.dart';
 
 class EditProfileRepository {
   final SplashRepository repository;
@@ -19,10 +20,6 @@ class EditProfileRepository {
   Future<String?> uploadProfilePicture({
     required File imageFile,
     required String languageCode,
-    required String plaform,
-    required String actionWhen,
-    required String email,
-    required String password,
   }) async {
     await UserDataStore.getUuid();
     await UserDataStore.getAccessToken();
@@ -66,23 +63,23 @@ class EditProfileRepository {
       final response = await request.send();
 
       if (response.statusCode == 200) {
-        print('Upload successful');
-        final userInfoRespond = await repository.receivingUserData(
-          plaform: plaform,
-          languageCode: languageCode,
-          actionWhen: actionWhen,
-          email: email,
-          password: password,
-          token: UserDataStore.accessToken!,
-        );
-        if (userInfoRespond == null) {
-          print("Info synced");
-          return null;
-        } else {
-          print("error of splash repo $userInfoRespond");
-        }
-      } else {
-        return "Server error: ${response.statusCode}";
+      //   print('Upload successful');
+      //   final userInfoRespond = await repository.receivingUserData(
+      //     plaform: AppGlobals.platform,
+      //     languageCode: languageCode,
+      //     actionWhen: 'customer_profile_picture_upload',
+      //     email: 'superadmin@gmail.com',
+      //     password: '123456',
+      //     token: UserDataStore.accessToken!,
+      //   );
+      //   if (userInfoRespond == null) {
+      //     print("Info synced");
+      //     return null;
+      //   } else {
+      //     print("error of splash repo $userInfoRespond");
+      //   }
+      // } else {
+      //   return "Server error: ${response.statusCode}";
       }
     } on SocketException {
       return "No Internet connection";

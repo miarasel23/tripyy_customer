@@ -42,10 +42,6 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
         EditProfilePicture(
           imageFile: File(image.path),
           languageCode: loc.locale.languageCode,
-          actionWhen: 'admin_login',
-          email: 'superadmin@gmail.com',
-          password: '123456',
-          platform: 'web',
         ),
       );
     }
