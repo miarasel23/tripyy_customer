@@ -4,9 +4,12 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 
-import '../../../store/important_consts.dart';
+import '../../../store/user_data_store.dart';
 import '../../../utils/app_urls.dart';
+import '../../splash/models/current_user_model.dart';
 import '../models/otp_receive_model.dart';
+
+import '../../../store/app_globals.dart';
 
 class OtpReceiveRepository {
   OtpReceiveRepository();
@@ -16,19 +19,12 @@ class OtpReceiveRepository {
     required String languageCode,
     required String number,
   }) async {
-    String platform = "web";
-    if (Platform.isAndroid) {
-      platform = "android";
-    } else if (Platform.isIOS) {
-      platform = "ios";
-    }
-
     final Map<String, dynamic> data = {
-      "platform": platform,
+      "platform": AppGlobals.platform,
       "language_code": languageCode,
       "action_when": "customer_login",
       "phone_number": number,
-      "country_code": "BD",
+      "country_code": AppGlobals.countryCode,
       "otp": otp,
     };
 
@@ -41,14 +37,16 @@ class OtpReceiveRepository {
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         OtpReceiveModel otpReceiveModel = OtpReceiveModel.fromJson(jsonData);
-        await ImportantConsts.saveAccessToken(
+        await UserDataStore.saveAccessToken(
           otpReceiveModel.data!.accessToken!,
         );
-        final token = await ImportantConsts.getAccessToken();
-        print("Access token is $token");
-        await ImportantConsts.saveUuid(otpReceiveModel.data!.user!.uuid!);
-        final uuid = await ImportantConsts.getUuid();
-        print("uuid is : $uuid");
+        final token = await UserDataStore.getAccessToken();
+        await UserDataStore.saveUuid(otpReceiveModel.data!.user!.uuid!);
+        final uuid = await UserDataStore.getUuid();
+        // Save full user data to UserDataStore
+        CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
+        await UserDataStore.saveUserData(currentUserModel);
+
         return null;
       } else {
         return "Server error: ${response.statusCode}";

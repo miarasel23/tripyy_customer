@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
 import '../../../routes/app_routes.dart';
-import '../../../store/important_consts.dart';
+import '../../../store/user_data_store.dart';
 import '../../../utils/colors_code.dart';
 import '../../../utils/enums.dart';
 import '../../../utils/images.dart';
@@ -28,10 +28,10 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final token = await ImportantConsts.getAccessToken();
+      final token = await UserDataStore.getAccessToken();
       print(token);
       final loc = AppLocalizations.of(context);
-      await ImportantConsts.getUserData();
+      await UserDataStore.getUserData();
 
       if (token != null) {
         String platform = "web";

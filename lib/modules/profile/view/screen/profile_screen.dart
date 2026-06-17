@@ -11,7 +11,7 @@ import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../utils/colors_code.dart';
-import '../../../../store/important_consts.dart';
+import '../../../../store/user_data_store.dart';
 import '../../../../utils/to_title_case.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -27,7 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     final imageUrl = AppUrls.profileImageUrl;
     final loc = AppLocalizations.of(context);
-    final user = ImportantConsts.userData?.data?.user;
+    final user = UserDataStore.userData?.data?.user;
     final name = toTiTleCase(user?.fullName ?? loc.translate("user_name"));
     final phone = user?.phoneNumber ?? 'N/A';
     final email = user?.email ?? 'N/A';
@@ -262,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 icon: Icons.logout,
                 title: loc.translate("logout"),
                 onTap: () async {
-                  await ImportantConsts.clearAllData();
+                  await UserDataStore.clearAllData();
                   if (context.mounted) {
                     Navigator.pushNamedAndRemoveUntil(
                       context,
@@ -423,7 +423,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         data: {
                           "phone_number": phoneController.text,
                           "country_code": "BD",
-                          "uuid": ImportantConsts.uuid,
+                          "uuid": UserDataStore.uuid,
                           "full_name": nameController.text,
                           "email": emailController.text,
                           "nid_number": nidController.text.trim(),
@@ -436,7 +436,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         final response = await http.post(
                           Uri.parse(AppUrls.customerProfileUpdate),
                           body: data,
-                          headers: {'Authorization': 'Bearer ${ImportantConsts.accessToken}'},
+                          headers: {'Authorization': 'Bearer ${UserDataStore.accessToken}'},
                         );
 
                         if (response.statusCode == 200) {
@@ -452,14 +452,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             headers: {
                               'Content-Type': 'application/json',
                               'Accept': 'application/json',
-                              'Authorization': 'Bearer ${ImportantConsts.accessToken}'
+                              'Authorization': 'Bearer ${UserDataStore.accessToken}'
                             }
                           );
 
                           if (getResponse.statusCode == 200) {
                             final jsonData = jsonDecode(getResponse.body);
                             CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
-                            await ImportantConsts.saveUserData(currentUserModel);
+                            await UserDataStore.saveUserData(currentUserModel);
                             
                             // Rebuild profile screen
                             setState(() {});

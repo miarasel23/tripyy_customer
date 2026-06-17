@@ -6,7 +6,7 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
 
-import '../../../store/important_consts.dart';
+import '../../../store/user_data_store.dart';
 import '../../../utils/app_urls.dart';
 import '../../../utils/custom_map_body_builder.dart';
 import '../../splash/repository/splash_repository.dart';
@@ -24,8 +24,8 @@ class EditProfileRepository {
     required String email,
     required String password,
   }) async {
-    await ImportantConsts.getUuid();
-    await ImportantConsts.getAccessToken();
+    await UserDataStore.getUuid();
+    await UserDataStore.getAccessToken();
     try {
       var request = MultipartRequest(
         'POST',
@@ -36,12 +36,12 @@ class EditProfileRepository {
         CustomMapBodyBuilder.build(
           actionWhen: 'customer_profile_picture_upload',
           languageCode: languageCode,
-          data: {'customer_uuid': ImportantConsts.uuid},
+          data: {'customer_uuid': UserDataStore.uuid},
         ).map((key, value) => MapEntry(key, value.toString())),
       );
 
       request.headers.addAll({
-        'Authorization': 'Bearer ${ImportantConsts.accessToken}',
+        'Authorization': 'Bearer ${UserDataStore.accessToken}',
       });
 
       final ext = extension(imageFile.path).toLowerCase();
@@ -73,7 +73,7 @@ class EditProfileRepository {
           actionWhen: actionWhen,
           email: email,
           password: password,
-          token: ImportantConsts.accessToken!,
+          token: UserDataStore.accessToken!,
         );
         if (userInfoRespond == null) {
           print("Info synced");
@@ -103,9 +103,9 @@ class EditProfileRepository {
     String? deviceTokenForNotification,
     String? isActive,
   }) async {
-    await ImportantConsts.getUuid();
-    await ImportantConsts.getAccessToken();
-    print("The uuid is : ${ImportantConsts.uuid}");
+    await UserDataStore.getUuid();
+    await UserDataStore.getAccessToken();
+    print("The uuid is : ${UserDataStore.uuid}");
     String platform = "web";
         if (Platform.isAndroid) {
           platform = "android";
@@ -119,7 +119,7 @@ class EditProfileRepository {
         "phone_number": phone_number,
         "country_code": "BD",
         "platform": platform,
-        "uuid": ImportantConsts.uuid,
+        "uuid": UserDataStore.uuid,
         "full_name": fullName,
         "email": email,
         "nid_number": nidNumber,
@@ -141,7 +141,7 @@ class EditProfileRepository {
         ),
       );
       request.headers.addAll({
-        'Authorization': 'Bearer ${ImportantConsts.accessToken}',
+        'Authorization': 'Bearer ${UserDataStore.accessToken}',
       });
       final streamedResponse = await request.send();
       final response = await Response.fromStream(streamedResponse);
@@ -159,14 +159,14 @@ class EditProfileRepository {
         final responseCurrentData = await get(
           uri,
           headers: {
-            'Authorization': 'Bearer ${ImportantConsts.accessToken}',
+            'Authorization': 'Bearer ${UserDataStore.accessToken}',
           },
         );
 
         if (responseCurrentData.statusCode == 200) {
           final jsonData = jsonDecode(responseCurrentData.body);
           CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
-          await ImportantConsts.saveUserData(currentUserModel);
+          await UserDataStore.saveUserData(currentUserModel);
           return null;
         } else {
           return "Failed to sync user info: ${responseCurrentData.statusCode}";

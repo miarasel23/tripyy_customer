@@ -1,4 +1,4 @@
-import '../store/important_consts.dart';
+import '../store/user_data_store.dart';
 
 class AppUrls {
   static const String baseUrl = "http://3.209.161.158/api";
@@ -15,7 +15,7 @@ class AppUrls {
       "$baseUrl/v1/customer/customer-profile-picture-update";
   static const String rentalInfo = "$baseUrl/v1/rental-trip/rental-info";
   static String? get profileImageUrl {
-    final image = ImportantConsts.userData?.data?.user?.profilePicture;
+    final image = UserDataStore.userData?.data?.user?.profilePicture;
 
     if (image == null || image.isEmpty) {
       return null;

@@ -14,6 +14,7 @@ import '../../controller/otp_receive_event.dart';
 import '../../controller/otp_receive_state.dart';
 import '../../../auth/controller/send_otp_bloc.dart';
 import '../../../auth/controller/send_otp_event.dart';
+import '../../../auth/controller/send_otp_state.dart';
 
 class OtpSignIn extends StatefulWidget {
   final String number;
@@ -27,7 +28,7 @@ class OtpSignIn extends StatefulWidget {
 class _OtpSignInState extends State<OtpSignIn> {
   final PinInputController _otpController = PinInputController();
   Timer? _timer;
-  int _secondsRemaining = 300; // 5 minutes
+  int _secondsRemaining = 120; // 2 minutes
 
   @override
   void initState() {
@@ -36,7 +37,7 @@ class _OtpSignInState extends State<OtpSignIn> {
   }
 
   void _startTimer() {
-    _secondsRemaining = 300;
+    _secondsRemaining = 120;
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsRemaining > 0) {
@@ -62,22 +63,15 @@ class _OtpSignInState extends State<OtpSignIn> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  void _resendCode(BuildContext context, String langCode) {
+  void _resendCode(BuildContext context, String langCode, AppLocalizations loc) {
     if (_secondsRemaining > 0) return;
 
-    // Try to dispatch SendOtp if the bloc is available
+    // Dispatch SendOtp to actually request a new code
     try {
       context.read<SendOtpBloc>().add(SendOtp(widget.number, langCode));
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).translate("otp_resent") ?? "OTP has been resent.")),
-      );
     } catch (e) {
-      print("SendOtpBloc not available here. OTP resent log triggered.");
+      print("SendOtpBloc not available here.");
     }
-
-    setState(() {
-      _startTimer();
-    });
   }
 
   @override
@@ -91,25 +85,54 @@ class _OtpSignInState extends State<OtpSignIn> {
 
     return BlocBuilder<LocalizationBloc, LocalizationState>(
       builder: (context, localizationState) {
-        return BlocListener<OtpReceiveBloc, OtpReceiveState>(
-          listener: (context, state) {
-            if (state.status == OtpReceiveStatus.failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ?? "Otp failed"),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-            if (state.status == OtpReceiveStatus.success) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                AppRoutes.bottomNav,
-                (route) => false,
-              );
-            }
-          },
+        return MultiBlocListener(
+          listeners: [
+            BlocListener<OtpReceiveBloc, OtpReceiveState>(
+              listener: (context, state) {
+                if (state.status == OtpReceiveStatus.failure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.errorMessage ?? "Otp failed"),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+                if (state.status == OtpReceiveStatus.success) {
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.bottomNav,
+                    (route) => false,
+                  );
+                }
+              },
+            ),
+            // Listen for Resend OTP API response
+            BlocListener<SendOtpBloc, SendOtpState>(
+              listener: (context, state) {
+                if (state.status == OtpStatus.success) {
+                  setState(() {
+                    _startTimer();
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(loc.translate("otp_resent") ?? "OTP sent successfully"),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                } else if (state.status == OtpStatus.failure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.errorMessage ?? "Failed to resend OTP"),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
           child: Scaffold(
             backgroundColor: const Color(0xFFF8F9FA),
             appBar: AppBar(
@@ -158,7 +181,7 @@ class _OtpSignInState extends State<OtpSignIn> {
                                 ),
                               )
                             : GestureDetector(
-                                onTap: () => _resendCode(context, localizationState.locale.languageCode),
+                                onTap: () => _resendCode(context, localizationState.locale.languageCode, loc),
                                 child: Text(
                                   loc.translate("resend") ?? "Resend OTP",
                                   style: GoogleFonts.poppins(

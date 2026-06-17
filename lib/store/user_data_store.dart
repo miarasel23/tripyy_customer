@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../modules/splash/models/current_user_model.dart';
 
-class ImportantConsts {
+class UserDataStore {
   static const String _accessTokenKey = 'access-token';
   static const String _userDataKey = 'user-data';
   static const String _uuid = 'uuid';

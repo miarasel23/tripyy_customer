@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trippy_customer/store/important_consts.dart';
+import 'package:trippy_customer/store/user_data_store.dart';
 
 import '../../../utils/enums.dart';
 import '../repository/splash_repository.dart';
@@ -23,7 +23,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       actionWhen: event.actionWhen,
       email: event.email,
       password: event.password,
-      token: ImportantConsts.accessToken!,
+      token: UserDataStore.accessToken!,
     );
 
     if (error == null) {

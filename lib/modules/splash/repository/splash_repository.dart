@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:trippy_customer/store/important_consts.dart';
+import 'package:trippy_customer/store/user_data_store.dart';
 import 'package:trippy_customer/utils/app_urls.dart';
 
 import '../models/current_user_model.dart';
@@ -40,7 +40,7 @@ class SplashRepository {
       if (response.statusCode == 200) {
         final jsonData = jsonDecode(response.body);
         CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
-        await ImportantConsts.saveUserData(currentUserModel);
+        await UserDataStore.saveUserData(currentUserModel);
         return null;
       } else {
         return "Server error: ${response.statusCode}";
