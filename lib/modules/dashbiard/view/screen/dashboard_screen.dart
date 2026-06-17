@@ -9,7 +9,7 @@ import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_s
 import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
 import '../../../../utils/choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 import '../../../../utils/colors_code.dart';
-import '../../../customs/drawer.dart';
+
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -35,7 +35,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      drawer: AppDrawer(),
       backgroundColor: AppColors.dashboardScreenBackground,
       appBar: AppBar(
         forceMaterialTransparency: true,

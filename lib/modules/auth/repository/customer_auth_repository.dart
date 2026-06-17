@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get/get.dart';
 
 import '../../../utils/app_urls.dart';
@@ -10,8 +11,15 @@ class AuthRepository {
     required String languageCode,
   }) async {
     try {
+      String platform = "web";
+      if (Platform.isAndroid) {
+        platform = "android";
+      } else if (Platform.isIOS) {
+        platform = "ios";
+      }
+
       final body = {
-        "platform": "web",
+        "platform": platform,
         "language_code": languageCode,
         "action_when": "admin_login",
         "phone_number": phoneNumber,

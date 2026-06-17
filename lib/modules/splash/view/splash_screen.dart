@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -32,9 +34,15 @@ class _SplashScreenState extends State<SplashScreen> {
       await ImportantConsts.getUserData();
 
       if (token != null) {
+        String platform = "web";
+        if (Platform.isAndroid) {
+          platform = "android";
+        } else if (Platform.isIOS) {
+          platform = "ios";
+        }
         context.read<SplashBloc>().add(
           SplashAuthCheck(
-            platform: "web",
+            platform: platform,
             languageCode: loc.locale.languageCode,
             actionWhen: "admin_login",
             email: "superadmin@gmail.com",

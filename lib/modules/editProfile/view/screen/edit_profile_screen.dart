@@ -57,7 +57,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
     _name.text = loc.translate("user_name");
     _phoneNumber.text = loc.translate("user_phone_number");
     return Scaffold(
-      backgroundColor: AppColors.editProfileScreenBackground,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: AppColors.editProfileScreenAppBarBackground,
         title: Text(
@@ -97,140 +97,146 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                             ),
                             Positioned(
                               top: 28,
-                              left: 133,
-                              child:
-                                  BlocBuilder<
-                                    EditProfilePictureBloc,
-                                    EditProfilePictureState
-                                  >(
-                                    builder: (context, state) {
-                                      if (state.status ==
-                                              EditProfilePictureStatus.success &&
-                                          state.avatar != null) {
-                                        return ClipOval(
-                                          child: Image.file(
-                                            state.avatar!,
-                                            width: 70,
-                                            height: 70,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        );
-                                      }
-        
-                                      if (state.status ==
-                                          EditProfilePictureStatus.loading) {
-                                        return Container(
-                                          padding: EdgeInsets.all(8.0),
-                                          alignment: Alignment.center,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                              width: 3,
-                                              color: Colors.white,
+                              left: 0,
+                              right: 0,
+                              child: Center(
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    BlocBuilder<
+                                      EditProfilePictureBloc,
+                                      EditProfilePictureState
+                                    >(
+                                      builder: (context, state) {
+                                        if (state.status ==
+                                                EditProfilePictureStatus.success &&
+                                            state.avatar != null) {
+                                          return ClipOval(
+                                            child: Image.file(
+                                              state.avatar!,
+                                              width: 70,
+                                              height: 70,
+                                              fit: BoxFit.cover,
                                             ),
-                                            color: AppColors
-                                                .editProfileScreenProfileIconContainer,
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: CircularProgressIndicator(
-                                            color: AppColors
-                                                .editProfileScreenCircularProgressIndicator,
+                                          );
+                                        }
+          
+                                        if (state.status ==
+                                            EditProfilePictureStatus.loading) {
+                                          return Container(
+                                            padding: EdgeInsets.all(8.0),
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                width: 3,
+                                                color: Colors.white,
+                                              ),
+                                              color: AppColors
+                                                  .editProfileScreenProfileIconContainer,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: CircularProgressIndicator(
+                                              color: AppColors
+                                                  .editProfileScreenCircularProgressIndicator,
+                                            ),
+                                          );
+                                        }
+          
+                                        final imageUrl = AppUrls.profileImageUrl;
+          
+                                        return GestureDetector(
+                                          onTap: () {
+                                            _pickImage(loc);
+                                          },
+                                          child: ClipOval(
+                                            child: SizedBox(
+                                              width: 70,
+                                              height: 70,
+                                              child: Builder(
+                                                builder: (context) {
+                                                  // 1. Local image (highest priority)
+                                                  if (state.avatar != null) {
+                                                    return Image.file(
+                                                      state.avatar!,
+                                                      fit: BoxFit.cover,
+                                                    );
+                                                  }
+          
+                                                  // 2. Network image
+                                                  if (imageUrl != null &&
+                                                      imageUrl.isNotEmpty) {
+                                                    return Image.network(
+                                                      imageUrl,
+                                                      fit: BoxFit.cover,
+                                                      loadingBuilder:
+                                                          (
+                                                            context,
+                                                            child,
+                                                            loadingProgress,
+                                                          ) {
+                                                            if (loadingProgress ==
+                                                                null) {
+                                                              return child;
+                                                            }
+          
+                                                            return const Center(
+                                                              child:
+                                                                  CircularProgressIndicator(),
+                                                            );
+                                                          },
+                                                      errorBuilder: (_, _, _) {
+                                                        return const Icon(
+                                                          Icons.person,
+                                                        );
+                                                      },
+                                                    );
+                                                  }
+          
+                                                  // 3. Fallback icon
+                                                  return const Icon(
+                                                    Icons.person,
+                                                    size: 35,
+                                                  );
+                                                },
+                                              ),
+                                            ),
                                           ),
                                         );
-                                      }
-        
-                                      final imageUrl = AppUrls.profileImageUrl;
-        
-                                      return GestureDetector(
+                                      },
+                                    ),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: GestureDetector(
                                         onTap: () {
                                           _pickImage(loc);
                                         },
-                                        child: ClipOval(
-                                          child: SizedBox(
-                                            width: 70,
-                                            height: 70,
-                                            child: Builder(
-                                              builder: (context) {
-                                                // 1. Local image (highest priority)
-                                                if (state.avatar != null) {
-                                                  return Image.file(
-                                                    state.avatar!,
-                                                    fit: BoxFit.cover,
-                                                  );
-                                                }
-        
-                                                // 2. Network image
-                                                if (imageUrl != null &&
-                                                    imageUrl.isNotEmpty) {
-                                                  return Image.network(
-                                                    imageUrl,
-                                                    fit: BoxFit.cover,
-                                                    loadingBuilder:
-                                                        (
-                                                          context,
-                                                          child,
-                                                          loadingProgress,
-                                                        ) {
-                                                          if (loadingProgress ==
-                                                              null) {
-                                                            return child;
-                                                          }
-        
-                                                          return const Center(
-                                                            child:
-                                                                CircularProgressIndicator(),
-                                                          );
-                                                        },
-                                                    errorBuilder: (_, _, _) {
-                                                      return const Icon(
-                                                        Icons.person,
-                                                      );
-                                                    },
-                                                  );
-                                                }
-        
-                                                // 3. Fallback icon
-                                                return const Icon(
-                                                  Icons.person,
-                                                  size: 35,
-                                                );
-                                              },
+                                        child: Container(
+                                          padding: EdgeInsets.all(4.0),
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: AppColors
+                                                .editProfileScreenEditButtonContainer,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: AppColors
+                                                  .editProfileScreenEditButtonContainerSide,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(1.0),
+                                            child: Icon(
+                                              Icons.edit,
+                                              color: AppColors
+                                                  .editProfileScreenEditButtonIcon,
+                                              size: 15,
                                             ),
                                           ),
                                         ),
-                                      );
-                                    },
-                                  ),
-                            ),
-                            Positioned(
-                              top: 53,
-                              // left: 146,
-                              right: 128,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _pickImage(loc);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(4.0),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: AppColors
-                                        .editProfileScreenEditButtonContainer,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: AppColors
-                                          .editProfileScreenEditButtonContainerSide,
-                                      width: 2,
+                                      ),
                                     ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(1.0),
-                                    child: Icon(
-                                      Icons.edit,
-                                      color: AppColors
-                                          .editProfileScreenEditButtonIcon,
-                                      size: 15,
-                                    ),
-                                  ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -333,7 +339,6 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                     EditProfileInfo(
                                       languageCode: loc.locale.languageCode,
                                       email: _email.text.trim(),
-                                      password: '123456',
                                       phoneNumber: _phoneNumber.text.trim(),
                                       fullName: _name.text.trim(),
                                     ),

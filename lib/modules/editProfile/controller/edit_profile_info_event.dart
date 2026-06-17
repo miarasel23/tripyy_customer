@@ -13,22 +13,22 @@ class EditProfileInfo extends EditProfileEvent {
   final String phoneNumber;
   final String fullName;
   final String email;
-  final String password;
+  final String? nidNumber;
 
   EditProfileInfo({
     required this.languageCode,
     required this.email,
-    required this.password,
     required this.phoneNumber,
     required this.fullName,
+    this.nidNumber,
   });
 
   @override
   List<Object?> get props => [
     languageCode,
     email,
-    password,
     phoneNumber,
     fullName,
+    nidNumber,
   ];
 }

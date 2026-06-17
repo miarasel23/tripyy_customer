@@ -47,6 +47,7 @@ class User {
   String? phoneNumber;
   String? profilePicture;
   bool? isActive;
+  String? nidNumber;
   Role? role;
   List<Permissions>? permissions;
 
@@ -57,6 +58,7 @@ class User {
       this.phoneNumber,
       this.profilePicture,
       this.isActive,
+      this.nidNumber,
       this.role,
       this.permissions});
 
@@ -67,6 +69,7 @@ class User {
     phoneNumber = json['phone_number'];
     profilePicture = json['profile_picture'];
     isActive = json['is_active'];
+    nidNumber = json['nid_number'];
     role = json['role'] != null ? Role.fromJson(json['role']) : null;
     if (json['permissions'] != null) {
       permissions = <Permissions>[];
@@ -84,6 +87,7 @@ class User {
     data['phone_number'] = phoneNumber;
     data['profile_picture'] = profilePicture;
     data['is_active'] = isActive;
+    data['nid_number'] = nidNumber;
     if (role != null) {
       data['role'] = role!.toJson();
     }

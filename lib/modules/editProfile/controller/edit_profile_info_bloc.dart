@@ -22,9 +22,10 @@ class EditProfileInfoBloc
 
     final error = await repository.editingInfo(
       languageCode: event.languageCode,
-      number: event.phoneNumber,
+      phone_number: event.phoneNumber,
       fullName: event.fullName,
       email: event.email,
+      nidNumber: event.nidNumber,
     );
 
     if (error == null) {

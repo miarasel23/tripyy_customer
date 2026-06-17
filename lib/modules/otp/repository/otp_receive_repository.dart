@@ -16,8 +16,15 @@ class OtpReceiveRepository {
     required String languageCode,
     required String number,
   }) async {
+    String platform = "web";
+    if (Platform.isAndroid) {
+      platform = "android";
+    } else if (Platform.isIOS) {
+      platform = "ios";
+    }
+
     final Map<String, dynamic> data = {
-      "platform": "web",
+      "platform": platform,
       "language_code": languageCode,
       "action_when": "customer_login",
       "phone_number": number,
