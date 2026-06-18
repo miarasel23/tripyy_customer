@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:trippy_customer/modules/trip_request/widgets/choose_car_bottom_sheet_trip_request.dart';
 import '../../../core/utils/localization/app_localization.dart';
 import '../../../utils/app_urls.dart';
 import '../../../utils/choose_car_args.dart';
@@ -17,16 +17,42 @@ class TripRequestScreen extends StatefulWidget {
 
 class _TripRequestScreenState extends State<TripRequestScreen> {
   late Car selectedCar;
+  late int selectedCarIndex;
 
   @override
   void initState() {
     super.initState();
+
     selectedCar = widget.args.car![widget.args.index!];
+    selectedCarIndex = widget.args.index!;
+  }
+
+  Future<void> _showCarSelector() async {
+    final Car? car = await showModalBottomSheet<Car>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return FractionallySizedBox(
+          heightFactor: 0.845,
+          child: ChooseCarBottomSheetTripRequest(
+            cars: widget.args.car!,
+            selectedIndex: selectedCarIndex,
+          ),
+        );
+      },
+    );
+
+    if (car != null) {
+      setState(() {
+        selectedCar = car;
+        selectedCarIndex = widget.args.car!.indexOf(car);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Car currentRide = widget.args.car![widget.args.index!];
+    // Car currentRide = widget.args.car![widget.args.index!];
     final loc = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: AppColors.tripRequestScreenBackground,
@@ -61,65 +87,16 @@ class _TripRequestScreenState extends State<TripRequestScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _buildcarImage(currentRide),
+                    _buildcarImage(selectedCar),
 
                     const SizedBox(width: 16),
 
-                    _buildRideName_Seats(currentRide),
-                    PopupMenuButton<Car>(
-                      icon: Icon(Icons.keyboard_arrow_down),
-                      itemBuilder: (context) {
-                        return widget.args.car!.map((car) {
-                          return PopupMenuItem(
-                            value: car,
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 80,
-                                  height: 55,
-                                  child: Builder(
-                                    builder: (context) {
-                                      final avatar = car.carAvatar;
-                                      final imageUrl = AppUrls.getImageUrl(
-                                        avatar,
-                                      );
-                                      if (imageUrl == null ||
-                                          imageUrl.isEmpty) {
-                                        return Icon(Icons.directions_car);
-                                      }
-                                      return Image.network(
-                                        AppUrls.getImageUrl(car.carAvatar) ??
-                                            "",
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      color: Colors.blue,
-                                                    ),
-                                              );
-                                            },
-                                        errorBuilder: (_, _, _) {
-                                          return Icon(Icons.directions_car);
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Text(car.carType),
-                              ],
-                            ),
-                          );
-                        }).toList();
+                    _buildRideName_Seats(selectedCar),
+                    GestureDetector(
+                      onTap: () {
+                        _showCarSelector();
                       },
+                      child: Icon(Icons.keyboard_arrow_down),
                     ),
                   ],
                 ),
@@ -137,7 +114,7 @@ class _TripRequestScreenState extends State<TripRequestScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(currentRide.carType, style: GoogleFonts.poppins(fontSize: 14)),
+          Text(currentRide.carType, style: GoogleFonts.poppins(fontSize: 14,fontWeight: FontWeight.w500)),
           const SizedBox(height: 4),
           Row(
             children: [
