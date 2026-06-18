@@ -135,7 +135,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                               return Center(
                                                 child:
                                                     CircularProgressIndicator(
-                                                      color: Colors.blue,
+                                                      color: AppColors.dashboardBottomSheetCircularIndicator,
                                                     ),
                                               );
                                             },

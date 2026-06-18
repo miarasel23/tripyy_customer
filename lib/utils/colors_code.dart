@@ -89,6 +89,7 @@ class AppColors {
   static const Color dashboardBottomSheetChooseCarNameColor = Colors.black87;
   static const Color dashboardBottomSheetChooseCarSeatsLogo = Colors.grey;
   static const Color dashboardBottomSheetChooseCarSeatsInfo = Colors.grey;
+  static const Color dashboardBottomSheetCircularIndicator = Colors.blue;
   static const Color dashboardBottomSheetCarShowingContainer = Color(0xFFEDF4FC);
   static const Color dashboardBottomSheetCarShowingContainerBorder = Color(0xff0e52ff);
 
@@ -324,4 +325,6 @@ class AppColors {
   static const Color tripRequestScreenBackground = Colors.white;
   static const Color tripRequestScreenAppBarBackground = Colors.white;
   static const Color tripRequestScreenAppBarText = Colors.black;
+  static const Color tripRequestScreenCarContainer = Color(0xffedf6ff);
+  static const Color tripRequestScreenCircularIndicator = Color(0xffedf6ff);
 }
