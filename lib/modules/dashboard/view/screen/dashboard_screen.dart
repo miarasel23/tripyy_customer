@@ -33,20 +33,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   LatLng _cameraCenter = const LatLng(23.8103, 90.4125);
   bool _isCameraMoving = false;
 
-  /// Pickup & drop locations set from the search card
-  LatLng? _pickupLatLng;
+  /// Drop location set from the search card
   LatLng? _dropLatLng;
 
   /// Reverse geocoded address for center pin
   String? _centerAddress;
-  Timer? _reverseGeocodeDebounce;
+  Timer? _mapIdleDebounce;
 
   /// Map display items
   Set<Marker> _markers = {};
   Set<Polyline> _polylines = {};
-
-  /// Whether to show the center pin cursor (only when no pickup yet or actively dragging)
-  bool _showCenterPin = true;
 
   final GlobalKey<SearchAndSavedCardWidgetState> _searchCardKey = GlobalKey<SearchAndSavedCardWidgetState>();
 
@@ -64,7 +60,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   void dispose() {
-    _reverseGeocodeDebounce?.cancel();
+    _mapIdleDebounce?.cancel();
     super.dispose();
   }
 
@@ -92,13 +88,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       CameraPosition(target: latLng, zoom: 15.0),
     ));
 
-    _reverseGeocodeCenter(latLng);
+    _handleCameraIdle(latLng);
   }
 
-  /// Debounced reverse geocoding for the map center pin
-  void _reverseGeocodeCenter(LatLng position) {
-    _reverseGeocodeDebounce?.cancel();
-    _reverseGeocodeDebounce = Timer(const Duration(milliseconds: 600), () async {
+  /// Debounced reverse geocoding & route redrawing
+  void _handleCameraIdle(LatLng position) {
+    _mapIdleDebounce?.cancel();
+    _mapIdleDebounce = Timer(const Duration(milliseconds: 600), () async {
       try {
         final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
         if (placemarks.isNotEmpty && mounted) {
@@ -110,12 +106,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
             _centerAddress = address;
           });
 
-          // If no pickup locked yet, update the pickup field text live
-          if (_pickupLatLng == null) {
-            _searchCardKey.currentState?.updatePickupText(address);
-          }
+          // Always update the pickup text from the center pin
+          _searchCardKey.currentState?.updatePickupText(address);
         }
       } catch (_) {}
+
+      // If a destination is set, continuously redraw the route from the new camera center
+      if (_dropLatLng != null) {
+        _drawRoute(position, _dropLatLng!);
+      }
     });
   }
 
@@ -124,12 +123,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (location.latitude == null || location.longitude == null) return;
     final latLng = LatLng(location.latitude!, location.longitude!);
 
-    setState(() {
-      _pickupLatLng = latLng;
-      _showCenterPin = false;
-      _rebuildMarkers();
-    });
-
+    // Simply pan the camera to the selected pickup location.
+    // The center pin remains, and onCameraIdle will trigger update & route redraw.
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(target: latLng, zoom: 15.0),
     ));
@@ -142,45 +137,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     setState(() {
       _dropLatLng = latLng;
-      _showCenterPin = false;
       _rebuildMarkers();
     });
 
-    if (_pickupLatLng != null) {
-      _drawRoute(_pickupLatLng!, latLng);
-    }
+    _drawRoute(_cameraCenter, latLng);
 
-    // Zoom to fit both markers
-    if (_pickupLatLng != null) {
-      final bounds = LatLngBounds(
-        southwest: LatLng(
-          _pickupLatLng!.latitude < latLng.latitude ? _pickupLatLng!.latitude : latLng.latitude,
-          _pickupLatLng!.longitude < latLng.longitude ? _pickupLatLng!.longitude : latLng.longitude,
-        ),
-        northeast: LatLng(
-          _pickupLatLng!.latitude > latLng.latitude ? _pickupLatLng!.latitude : latLng.latitude,
-          _pickupLatLng!.longitude > latLng.longitude ? _pickupLatLng!.longitude : latLng.longitude,
-        ),
-      );
-      _mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
-    } else {
-      _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: latLng, zoom: 15.0),
-      ));
-    }
+    // Zoom out to show the route, but strictly keep the camera target on the pickup location!
+    // Otherwise, the map center (pickup) would change.
+    _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: _cameraCenter, zoom: 11.0),
+    ));
   }
 
   void _rebuildMarkers() {
     final markers = <Marker>{};
-
-    if (_pickupLatLng != null) {
-      markers.add(Marker(
-        markerId: const MarkerId('pickup'),
-        position: _pickupLatLng!,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        infoWindow: const InfoWindow(title: 'Pickup'),
-      ));
-    }
 
     if (_dropLatLng != null) {
       markers.add(Marker(
@@ -248,10 +218,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     },
                     onCameraIdle: () {
                       setState(() => _isCameraMoving = false);
-                      // If no pickup locked, update pickup text from center
-                      if (_showCenterPin) {
-                        _reverseGeocodeCenter(_cameraCenter);
-                      }
+                      _handleCameraIdle(_cameraCenter);
                     },
                     onMapCreated: (GoogleMapController controller) {
                       _mapController = controller;
@@ -263,61 +230,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
 
-                // Center pin cursor (only shown when no pickup selected yet)
-                if (_showCenterPin)
-                  Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))],
-                          ),
-                          child: Text(
-                            _isCameraMoving ? 'Move to pick location' : (_centerAddress ?? 'Loading...'),
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                // Center pin cursor (Always visible as the pickup location)
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))],
                         ),
-                        const SizedBox(height: 4),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          transform: Matrix4.translationValues(0, _isCameraMoving ? -8 : 0, 0),
-                          child: const Icon(Icons.location_pin, color: Colors.blue, size: 40),
+                        child: Text(
+                          _isCameraMoving ? 'Move to pick location' : (_centerAddress ?? 'Loading...'),
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 20), // Offset so pin tip is at center
-                      ],
-                    ),
-                  ),
-
-                // Confirm center pin as pickup button
-                if (_showCenterPin && !_isCameraMoving && _centerAddress != null)
-                  Positioned(
-                    bottom: 12,
-                    left: 20,
-                    right: 20,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _pickupLatLng = _cameraCenter;
-                          _showCenterPin = false;
-                          _rebuildMarkers();
-                        });
-                        _searchCardKey.currentState?.updatePickupText(_centerAddress ?? '');
-                      },
-                      icon: const Icon(Icons.check_circle, color: Colors.white),
-                      label: const Text('Confirm Pickup Here', style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        transform: Matrix4.translationValues(0, _isCameraMoving ? -8 : 0, 0),
+                        child: const Icon(Icons.location_pin, color: Colors.blue, size: 40),
+                      ),
+                      const SizedBox(height: 20), // Offset so pin tip is at center
+                    ],
                   ),
+                ),
 
                 // Top bar
                 Positioned(
