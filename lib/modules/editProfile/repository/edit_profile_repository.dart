@@ -59,27 +59,37 @@ class EditProfileRepository {
           contentType: mediaType,
         ),
       );
+    String platform = "web";
+    if (Platform.isAndroid) {
+      platform = "android";
+    } else if (Platform.isIOS) {
+      platform = "ios";
+    }
+    final response = await request.send();
+    if (response.statusCode == 200) {
+     final uri = Uri.parse(AppUrls.getCurrentCustomerUser).replace(
+          queryParameters: {
+            "platform": platform,
+            "language_code": languageCode,
+            "action_when": "profile_info",
+          },
+        );
 
-      final response = await request.send();
+        final responseCurrentData = await get(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${UserDataStore.accessToken}',
+          },
+        );
 
-      if (response.statusCode == 200) {
-      //   print('Upload successful');
-      //   final userInfoRespond = await repository.receivingUserData(
-      //     plaform: AppGlobals.platform,
-      //     languageCode: languageCode,
-      //     actionWhen: 'customer_profile_picture_upload',
-      //     email: 'superadmin@gmail.com',
-      //     password: '123456',
-      //     token: UserDataStore.accessToken!,
-      //   );
-      //   if (userInfoRespond == null) {
-      //     print("Info synced");
-      //     return null;
-      //   } else {
-      //     print("error of splash repo $userInfoRespond");
-      //   }
-      // } else {
-      //   return "Server error: ${response.statusCode}";
+        if (responseCurrentData.statusCode == 200) {
+          final jsonData = jsonDecode(responseCurrentData.body);
+          CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
+          await UserDataStore.saveUserData(currentUserModel);
+          return null;
+        } else {
+          return "Failed to sync user info: ${responseCurrentData.statusCode}";
+        }
       }
     } on SocketException {
       return "No Internet connection";
@@ -102,7 +112,6 @@ class EditProfileRepository {
   }) async {
     await UserDataStore.getUuid();
     await UserDataStore.getAccessToken();
-    print("The uuid is : ${UserDataStore.uuid}");
     String platform = "web";
         if (Platform.isAndroid) {
           platform = "android";

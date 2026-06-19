@@ -14,6 +14,15 @@ import '../../../../utils/colors_code.dart';
 import '../../../../store/user_data_store.dart';
 import '../../../../utils/to_title_case.dart';
 
+import 'dart:io';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../editProfile/controller/edit_profile_picture_bloc.dart';
+import '../../../editProfile/controller/edit_profile_picture_event.dart';
+import '../../../editProfile/controller/edit_profile_picture_state.dart';
+import '../../../../utils/enums.dart';
+import '../../../theme/controller/theme_bloc.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -31,16 +40,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final name = toTiTleCase(user?.fullName ?? loc.translate("user_name"));
     final phone = user?.phoneNumber ?? 'N/A';
     final email = user?.email ?? 'N/A';
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(
-        statusBarColor: Colors.white,
-        statusBarIconBrightness: Brightness.dark,
+      SystemUiOverlayStyle(
+        statusBarColor: Theme.of(context).colorScheme.surface,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
       ),
     );
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             style: GoogleFonts.poppins(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -69,19 +79,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.grey.shade100,
+                                  color: Theme.of(context).colorScheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.star, size: 14, color: Colors.black),
+                                    Icon(Icons.star, size: 14, color: Theme.of(context).colorScheme.onSurface),
                                     const SizedBox(width: 4),
                                     Text(
                                       loc.translate("5"),
                                       style: GoogleFonts.poppins(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: Colors.black,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                   ],
@@ -104,21 +114,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
-                    Builder(
-                      builder: (context) {
-                        if (imageUrl != null && imageUrl.isNotEmpty) {
-                          return CircleAvatar(
-                            radius: 40,
-                            backgroundImage: NetworkImage(imageUrl),
-                            backgroundColor: Colors.grey.shade200,
+                    GestureDetector(
+                      onTap: () async {
+                        final picker = ImagePicker();
+                        final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          context.read<EditProfilePictureBloc>().add(
+                            EditProfilePicture(
+                              imageFile: File(pickedFile.path),
+                              languageCode: loc.locale.languageCode,
+                            ),
                           );
                         }
-                        return CircleAvatar(
-                          radius: 40,
-                          backgroundColor: Colors.grey.shade200,
-                          child: const Icon(Icons.person, size: 40, color: Colors.grey),
-                        );
                       },
+                      child: BlocConsumer<EditProfilePictureBloc, EditProfilePictureState>(
+                        listener: (context, state) {
+                          if (state.status == EditProfilePictureStatus.success) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(loc.translate("profile_picture_updated") ?? "Profile picture updated")),
+                            );
+                            setState(() {}); // to refresh AppUrls.profileImageUrl
+                          } else if (state.status == EditProfilePictureStatus.failure) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(state.errorMessage ?? "Failed to update profile picture")),
+                            );
+                          }
+                        },
+                        builder: (context, state) {
+                          Widget avatarWidget;
+                          if (state.status == EditProfilePictureStatus.loading) {
+                            avatarWidget = CircleAvatar(
+                              radius: 40,
+                              backgroundColor: Theme.of(context).colorScheme.surface,
+                              child: const CircularProgressIndicator(),
+                            );
+                          } else {
+                            final currentImageUrl = AppUrls.profileImageUrl;
+                            if (currentImageUrl != null && currentImageUrl.isNotEmpty) {
+                              avatarWidget = CircleAvatar(
+                                radius: 40,
+                                backgroundImage: NetworkImage(currentImageUrl),
+                                backgroundColor: Colors.grey.shade200,
+                              );
+                            } else {
+                              avatarWidget = CircleAvatar(
+                                radius: 40,
+                                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                child: Icon(Icons.person, size: 40, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              );
+                            }
+                          }
+
+                          return Stack(
+                            children: [
+                              avatarWidget,
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade700,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 2),
+                                  ),
+                                  child: const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -135,20 +205,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: Theme.of(context).colorScheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.wallet_giftcard, color: Colors.black, size: 28),
+                              Icon(Icons.wallet_giftcard, color: Theme.of(context).colorScheme.onSurface, size: 28),
                               const SizedBox(height: 12),
                               Text(
                                 loc.translate("points"),
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],
@@ -163,20 +233,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: Theme.of(context).colorScheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(Icons.local_offer_outlined, color: Colors.black, size: 28),
+                              Icon(Icons.local_offer_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
                               const SizedBox(height: 12),
                               Text(
                                 loc.translate("voucher"),
                                 style: GoogleFonts.poppins(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],
@@ -188,7 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Divider(thickness: 8, color: Color(0xFFF5F5F5)),
+              const Divider(),
 
               // PREFERENCES LIST
               Padding(
@@ -198,9 +268,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
+              ),
+              _buildListItem(
+                icon: Icons.dark_mode_outlined,
+                title: loc.translate("theme") ?? "Theme",
+                trailingWidget: BlocBuilder<ThemeBloc, ThemeState>(
+                  builder: (context, state) {
+                    return DropdownButton<ThemeMode>(
+                      value: state.themeMode,
+                      underline: const SizedBox(),
+                      icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface),
+                      dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                      items: const [
+                        DropdownMenuItem(value: ThemeMode.system, child: Text("System")),
+                        DropdownMenuItem(value: ThemeMode.light, child: Text("Light")),
+                        DropdownMenuItem(value: ThemeMode.dark, child: Text("Dark")),
+                      ],
+                      onChanged: (mode) {
+                        if (mode != null) {
+                          context.read<ThemeBloc>().add(ThemeChanged(mode));
+                        }
+                      },
+                    );
+                  },
+                ),
+                onTap: () {},
               ),
               _buildListItem(
                 icon: Icons.language,
@@ -224,7 +320,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onTap: () {},
               ),
 
-              const Divider(thickness: 8, color: Color(0xFFF5F5F5)),
+              const Divider(),
 
               // LEGAL LIST
               Padding(
@@ -234,7 +330,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -290,7 +386,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     bool isDestructive = false,
   }) {
     return Material(
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.surface,
       child: InkWell(
         onTap: onTap,
         child: Padding(
@@ -300,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Icon(
                 icon,
                 size: 24,
-                color: isDestructive ? Colors.red.shade600 : Colors.black87,
+                color: isDestructive ? Colors.red.shade600 : Theme.of(context).colorScheme.onSurface,
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -309,7 +405,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: isDestructive ? Colors.red.shade600 : Colors.black87,
+                    color: isDestructive ? Colors.red.shade600 : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -318,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   trailingText,
                   style: GoogleFonts.poppins(
                     fontSize: 14,
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -328,7 +424,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               else
                 Icon(
                   Icons.chevron_right,
-                  color: isDestructive ? Colors.red.shade600 : Colors.grey.shade400,
+                  color: isDestructive ? Colors.red.shade600 : Theme.of(context).colorScheme.onSurfaceVariant,
                   size: 24,
                 ),
             ],
@@ -353,7 +449,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 'Edit Profile',

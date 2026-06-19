@@ -25,6 +25,8 @@ import 'routes/route_generator.dart';
 import 'utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
 import 'utils/choose_car_bottom_sheet/repository/choose_car_bottom_sheet_repository.dart';
 import 'store/app_globals.dart';
+import 'core/utils/theme/app_theme.dart';
+import 'modules/theme/controller/theme_bloc.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -101,6 +103,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider(create: (_) => ThemeBloc()),
         BlocProvider(create: (_) => LocalizationBloc()),
         BlocProvider(create: (_) => MainBottomNavBarBloc()),
         BlocProvider(create: (_) => PointsBloc()),
@@ -127,23 +130,19 @@ class _MyAppState extends State<MyApp> {
           create: (_) => ChooseCarBottomSheetBloc(repository: ChooseCarBottomSheetRepository()),
         ),
       ],
-      child: BlocBuilder<LocalizationBloc, LocalizationState>(
-        builder: (context, localizationState) {
-          return MaterialApp(
-            scaffoldMessengerKey: globalScaffoldMessengerKey,
-            theme: ThemeData(
-              useMaterial3: true,
-              appBarTheme: AppBarTheme(
-                backgroundColor: Colors.white,
-                surfaceTintColor: Colors.white,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-              ),
-            ),
-            debugShowCheckedModeBanner: false,
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          return BlocBuilder<LocalizationBloc, LocalizationState>(
+            builder: (context, localizationState) {
+              return MaterialApp(
+                scaffoldMessengerKey: globalScaffoldMessengerKey,
+                themeMode: themeState.themeMode,
+                theme: AppTheme.lightTheme,
+                darkTheme: AppTheme.darkTheme,
+                debugShowCheckedModeBanner: false,
 
-            // 🌍 Localization
-            locale: localizationState.locale,
+                // 🌍 Localization
+                locale: localizationState.locale,
             supportedLocales: const [Locale('en'), Locale('bn')],
             localizationsDelegates: const [
               AppLocalizationsDelegate(),
@@ -157,7 +156,9 @@ class _MyAppState extends State<MyApp> {
             onGenerateRoute: RouteGenerator.generateRoute,
           );
         },
-      ),
+      );
+      },
+    ),
     );
   }
 }
