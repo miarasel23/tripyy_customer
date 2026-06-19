@@ -17,27 +17,34 @@ class SearchAndSavedCardWidget extends StatefulWidget {
 }
 
 class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
-  final TextEditingController _searchController = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
+  final List<TextEditingController> _pickupControllers = [TextEditingController()];
+  final List<FocusNode> _pickupFocusNodes = [FocusNode()];
+  final TextEditingController _destController = TextEditingController();
+  final FocusNode _destFocusNode = FocusNode();
   late SearchLocationBloc _bloc;
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
 
-  @override
-  void initState() {
-    super.initState();
-    _bloc = SearchLocationBloc(SearchLocationRepository());
-    _focusNode.addListener(() {
-      if (_focusNode.hasFocus) {
+  void _setupFocusListener(FocusNode node) {
+    node.addListener(() {
+      bool anyFocused = _pickupFocusNodes.any((n) => n.hasFocus) || _destFocusNode.hasFocus;
+      if (anyFocused) {
         _showOverlay();
       } else {
         _removeOverlay();
       }
       setState(() {});
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = SearchLocationBloc(SearchLocationRepository());
+    _setupFocusListener(_pickupFocusNodes[0]);
+    _setupFocusListener(_destFocusNode);
 
     _bloc.stream.listen((state) {
-      // Rebuild the overlay when the bloc state changes
       _overlayEntry?.markNeedsBuild();
     });
   }
@@ -109,10 +116,16 @@ class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                   )
                                 : null,
                             onTap: () {
-                              _searchController.text = loc.address ?? "";
-                              _focusNode.unfocus();
-                              if (widget.onPickupSelected != null) {
-                                widget.onPickupSelected!(loc);
+                              int pickupIndex = _pickupFocusNodes.indexWhere((n) => n.hasFocus);
+                              if (pickupIndex != -1) {
+                                _pickupControllers[pickupIndex].text = loc.address ?? "";
+                                _pickupFocusNodes[pickupIndex].unfocus();
+                                if (widget.onPickupSelected != null && pickupIndex == 0) {
+                                  widget.onPickupSelected!(loc);
+                                }
+                              } else if (_destFocusNode.hasFocus) {
+                                _destController.text = loc.address ?? "";
+                                _destFocusNode.unfocus();
                               }
                             },
                           );
@@ -133,8 +146,10 @@ class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
   @override
   void dispose() {
     _removeOverlay();
-    _searchController.dispose();
-    _focusNode.dispose();
+    for (var c in _pickupControllers) { c.dispose(); }
+    for (var n in _pickupFocusNodes) { n.dispose(); }
+    _destController.dispose();
+    _destFocusNode.dispose();
     _bloc.close();
     super.dispose();
   }
@@ -153,81 +168,139 @@ class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
           ),
           child: Column(
             children: [
-              Row(
-                children: [
-                  // timeline dots
-                  Column(
-                    children: [
-                      const Icon(Icons.circle, size: 8, color: Colors.grey),
-                      Container(height: 30, width: 2, color: Colors.grey.withOpacity(0.3)),
-                      Icon(Icons.square, size: 8, color: Colors.blue[200]),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  // text fields
-                  Expanded(
-                    child: Column(
+              IntrinsicHeight(
+                child: Row(
+                  children: [
+                    // timeline dots
+                    Column(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: TextField(
-                            controller: _searchController,
-                            focusNode: _focusNode,
-                            onChanged: (val) {
-                              _bloc.add(SearchQueryChanged(val, widget.loc.locale.languageCode));
-                            },
-                            decoration: InputDecoration(
-                              hintText: widget.loc.translate("pick_up_location") ?? "Pick up location",
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                            ),
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            children: [
-                              Text(widget.loc.translate("where_are_you_going") ?? "Where to?", style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                            ],
-                          ),
-                        ),
+                        const SizedBox(height: 24), // Approx center of first field
+                        for (int i = 0; i < _pickupControllers.length; i++) ...[
+                          if (i > 0) Expanded(child: Container(width: 2, color: Colors.grey.withOpacity(0.3))),
+                          const Icon(Icons.circle, size: 8, color: Colors.grey),
+                        ],
+                        Expanded(child: Container(width: 2, color: Colors.grey.withOpacity(0.3))),
+                        Icon(Icons.square, size: 8, color: Colors.blue[200]),
+                        const SizedBox(height: 24), // Approx center of last field
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  // Action buttons
-                  Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
+                    const SizedBox(width: 8),
+                    // text fields
+                    Expanded(
+                      child: Column(
+                        children: [
+                          for (int i = 0; i < _pickupControllers.length; i++) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            controller: _pickupControllers[i],
+                                            focusNode: _pickupFocusNodes[i],
+                                            onChanged: (val) {
+                                              _bloc.add(SearchQueryChanged(val, widget.loc.locale.languageCode));
+                                            },
+                                            decoration: InputDecoration(
+                                              hintText: i == 0 ? (widget.loc.translate("pick_up_location") ?? "Pick up location") : "Add stop",
+                                              border: InputBorder.none,
+                                              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                            ),
+                                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                          ),
+                                        ),
+                                        if (i > 0)
+                                          IconButton(
+                                            icon: const Icon(Icons.close, size: 16, color: Colors.grey),
+                                            onPressed: () {
+                                              setState(() {
+                                                _pickupControllers[i].dispose();
+                                                _pickupFocusNodes[i].dispose();
+                                                _pickupControllers.removeAt(i);
+                                                _pickupFocusNodes.removeAt(i);
+                                              });
+                                            },
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                if (i == 0) ...[
+                                  const SizedBox(width: 8),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        final newController = TextEditingController();
+                                        final newNode = FocusNode();
+                                        _setupFocusListener(newNode);
+                                        _pickupControllers.add(newController);
+                                        _pickupFocusNodes.add(newNode);
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.onSurface,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface, size: 18),
+                                    ),
+                                  ),
+                                ] else ...[
+                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 30), // Placeholder to keep field widths consistent
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: TextField(
+                                    controller: _destController,
+                                    focusNode: _destFocusNode,
+                                    onChanged: (val) {
+                                      _bloc.add(SearchQueryChanged(val, widget.loc.locale.languageCode));
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: widget.loc.translate("where_are_you_going") ?? "Where to?",
+                                      border: InputBorder.none,
+                                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                    ),
+                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 18),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
               Divider(color: Theme.of(context).colorScheme.outlineVariant),
