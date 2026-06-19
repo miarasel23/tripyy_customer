@@ -138,7 +138,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
 
                                       return Image.network(
                                         imageUrl,
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.contain,
                                         width: double.infinity,
                                         height: double.infinity,
                                         loadingBuilder:

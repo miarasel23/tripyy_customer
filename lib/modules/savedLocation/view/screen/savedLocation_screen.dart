@@ -121,6 +121,7 @@ class SavedlocationScreen extends StatelessWidget {
             size: 20,
             color: AppColors.savedLocationsScreenSavedLocationArrow,
           ),
+          
         ],
       ),
     );

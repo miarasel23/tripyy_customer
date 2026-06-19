@@ -242,6 +242,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ChooseCarBottomSheetState state,
   ) {
     final keys = state.groups?.keys.toList() ?? [];
+    final isLight = Theme.of(context).brightness == Brightness.light;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
@@ -269,30 +270,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Container(
               margin: EdgeInsets.only(right: 12),
               width: 100,
+              height: 130,
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
               decoration: BoxDecoration(
-                color: Color(0xFF2A2F3D),
+                color: isLight ? Colors.white : Color(0xFF2A2F3D),
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: isLight ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  )
+                ] : null,
               ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(12),
+                    padding: EdgeInsets.all(8), // Reduced padding to give image more space
                     decoration: BoxDecoration(
-                      color: Color(0xFF3B4155),
+                      color: isLight ? Colors.grey[100] : Color(0xFF3B4155),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: _buildServiceIcon(avatar, context),
                   ),
                   SizedBox(height: 12),
-                  Text(
-                    (key == "INTER_CITY_RENTER") ? "Intercity" : key,
-                    style: GoogleFonts.poppins(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          _formatServiceName(key),
+                          style: GoogleFonts.poppins(
+                            color: isLight ? Colors.black87 : Colors.white70,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -304,14 +321,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildServiceIcon(String? avatar, BuildContext context) {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final iconColor = isLight ? Colors.blue[600] : Colors.blue[200];
+    
     if (avatar != null && avatar.isNotEmpty) {
       final imageUrl = AppUrls.getImageUrl(avatar);
       return SizedBox(
-        height: 30,
-        width: 30,
+        height: 50, // Increased image size
+        width: 50,  // Increased image size
         child: Image.network(
           imageUrl!,
-          fit: BoxFit.cover,
+          fit: BoxFit.contain,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
             return const Center(
@@ -319,12 +339,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
           },
           errorBuilder: (context, error, stackTrace) {
-            return Icon(Icons.car_crash, color: Colors.blue[200], size: 30);
+            return Icon(Icons.car_crash, color: iconColor, size: 50);
           },
         ),
       );
     }
-    return Icon(Icons.directions_car, color: Colors.blue[200], size: 30);
+    return Icon(Icons.directions_car, color: iconColor, size: 50);
+  }
+
+  String _formatServiceName(String? key) {
+    if (key == null) return "";
+    if (key == "INTER_CITY_RENTER") return "Intercity";
+    
+    // Convert "WEDDING_CAR" to "Wedding Car"
+    return key.split('_').map((word) {
+      if (word.isEmpty) return "";
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 
   Widget additionalServiceSection(AppLocalizations loc, BuildContext context) {
