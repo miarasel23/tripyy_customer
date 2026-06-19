@@ -99,9 +99,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
         if (placemarks.isNotEmpty && mounted) {
           final p = placemarks.first;
-          final address = [p.street, p.subLocality, p.locality, p.country]
+          String address = [p.street, p.subLocality, p.locality, p.country]
               .where((s) => s != null && s.isNotEmpty)
               .join(', ');
+              
+          if (address.isEmpty) address = 'Unknown Location';
+
           setState(() {
             _centerAddress = address;
           });
@@ -109,7 +112,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Always update the pickup text from the center pin
           _searchCardKey.currentState?.updatePickupText(address);
         }
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Geocoding error: $e');
+        if (mounted) {
+          final fallbackAddress = '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
+          setState(() {
+            _centerAddress = fallbackAddress;
+          });
+          _searchCardKey.currentState?.updatePickupText(fallbackAddress);
+        }
+      }
 
       // If a destination is set, continuously redraw the route from the new camera center
       if (_dropLatLng != null) {
