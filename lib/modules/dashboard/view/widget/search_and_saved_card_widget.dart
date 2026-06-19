@@ -9,14 +9,15 @@ import '../../../searchLocation/repository/search_location_repository.dart';
 class SearchAndSavedCardWidget extends StatefulWidget {
   final AppLocalizations loc;
   final Function(SearchLocationData)? onPickupSelected;
+  final Function(SearchLocationData)? onDestinationSelected;
 
-  const SearchAndSavedCardWidget({Key? key, required this.loc, this.onPickupSelected}) : super(key: key);
+  const SearchAndSavedCardWidget({Key? key, required this.loc, this.onPickupSelected, this.onDestinationSelected}) : super(key: key);
 
   @override
-  State<SearchAndSavedCardWidget> createState() => _SearchAndSavedCardWidgetState();
+  SearchAndSavedCardWidgetState createState() => SearchAndSavedCardWidgetState();
 }
 
-class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
+class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
   final List<TextEditingController> _pickupControllers = [TextEditingController()];
   final List<FocusNode> _pickupFocusNodes = [FocusNode()];
   final TextEditingController _destController = TextEditingController();
@@ -126,6 +127,9 @@ class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                               } else if (_destFocusNode.hasFocus) {
                                 _destController.text = loc.address ?? "";
                                 _destFocusNode.unfocus();
+                                if (widget.onDestinationSelected != null) {
+                                  widget.onDestinationSelected!(loc);
+                                }
                               }
                             },
                           );
@@ -152,6 +156,15 @@ class _SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
     _destFocusNode.dispose();
     _bloc.close();
     super.dispose();
+  }
+
+  /// Called externally (e.g., from map drag) to update the first pickup field
+  void updatePickupText(String address) {
+    if (_pickupControllers.isNotEmpty) {
+      setState(() {
+        _pickupControllers[0].text = address;
+      });
+    }
   }
 
   @override
