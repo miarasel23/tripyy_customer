@@ -22,6 +22,7 @@ import '../../../editProfile/controller/edit_profile_picture_event.dart';
 import '../../../editProfile/controller/edit_profile_picture_state.dart';
 import '../../../../utils/enums.dart';
 import '../../../theme/controller/theme_bloc.dart';
+import '../../../localization/Controller/localization_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -300,8 +301,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               _buildListItem(
                 icon: Icons.language,
-                title: loc.translate("language"),
-                trailingText: loc.translate("english"),
+                title: loc.translate("language") ?? "Language",
+                trailingWidget: BlocBuilder<LocalizationBloc, LocalizationState>(
+                  builder: (context, state) {
+                    return DropdownButton<String>(
+                      value: state.locale.languageCode,
+                      underline: const SizedBox(),
+                      icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface),
+                      dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                      items: const [
+                        DropdownMenuItem(value: 'en', child: Text("English")),
+                        DropdownMenuItem(value: 'bn', child: Text("বাংলা")),
+                      ],
+                      onChanged: (code) {
+                        if (code != null) {
+                          context.read<LocalizationBloc>().add(ChangeLanguageEvent(code));
+                        }
+                      },
+                    );
+                  },
+                ),
                 onTap: () {},
               ),
               _buildListItem(
