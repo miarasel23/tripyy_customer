@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:trippy_customer/utils/app_urls.dart';
-import 'package:trippy_customer/utils/choose_car_bottom_sheet/models/choose_car_model.dart';
+import '../models/choose_car_model.dart';
 import 'package:trippy_customer/utils/custom_map_body_builder.dart';
 
 class ChooseCarBottomSheetRepository {

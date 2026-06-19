@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../core/utils/localization/app_localization.dart';
-import '../../app_urls.dart';
-import '../../enums.dart';
+import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/app_urls.dart';
+import '../../../../utils/enums.dart';
 import '../controller/choose_car_bottom_sheet_bloc.dart';
 import '../controller/choose_car_bottom_sheet_events.dart';
 import '../controller/choose_car_bottom_sheet_state.dart';
-import '../../colors_code.dart';
+import '../../../../utils/colors_code.dart';
 import '../models/choose_car_model.dart';
 
 class CarOption {

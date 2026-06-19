@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../enums.dart';
+import '../../../../utils/enums.dart';
 import '../models/choose_car_model.dart';
 
 class ChooseCarBottomSheetState extends Equatable {

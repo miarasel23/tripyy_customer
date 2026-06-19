@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:trippy_customer/utils/app_urls.dart';
-import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
-import '../../../../utils/choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
+import '../../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
+import '../../choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 
 class ServicesSectionWidget extends StatelessWidget {
   final ChooseCarBottomSheetState state;

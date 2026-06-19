@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:trippy_customer/utils/enums.dart';
+import '../../../../utils/enums.dart';
 
 import '../repository/choose_car_bottom_sheet_repository.dart';
 import 'choose_car_bottom_sheet_events.dart';
