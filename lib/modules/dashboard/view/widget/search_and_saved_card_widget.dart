@@ -174,6 +174,14 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
       if (_destFocusNode.hasFocus) {
         _destController.text = address;
       } else {
+        // Find exactly which pickup field has focus
+        for (int i = 0; i < _pickupFocusNodes.length; i++) {
+          if (_pickupFocusNodes[i].hasFocus) {
+            _pickupControllers[i].text = address;
+            return;
+          }
+        }
+        // If none has explicit focus, default to the first one
         if (_pickupControllers.isNotEmpty) {
           _pickupControllers[0].text = address;
         }
