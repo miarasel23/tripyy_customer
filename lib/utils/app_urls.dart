@@ -15,6 +15,9 @@ class AppUrls {
       "$baseUrl/v1/customer/customer-profile-picture-update";
   static const String rentalInfo = "$baseUrl/v1/rental-trip/rental-info";
   static const String searchLocation = "$baseUrl/v1/global-api/search-location";
+  
+  /// Google Maps API Key
+  static const String googleMapApiKey = 'AIzaSyAYf-MPMgwHhXT2h-kKSchXFH5GiwuURcw';
 
   static String? get profileImageUrl {
     final image = UserDataStore.userData?.data?.user?.profilePicture;

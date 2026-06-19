@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../modules/searchLocation/models/search_location_model.dart';
 import '../../../../utils/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
@@ -18,8 +15,7 @@ import '../widget/top_bar_widget.dart';
 import '../widget/search_and_saved_card_widget.dart';
 import '../widget/services_section_widget.dart';
 
-/// Google Maps API Key (same key used in AndroidManifest / AppDelegate)
-const String _kGoogleApiKey = 'AIzaSyAYf-MPMgwHhXT2h-kKSchXFH5GiwuURcw';
+import '../../../../utils/map_helper.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -96,20 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _handleCameraIdle(latLng);
   }
 
-  /// Fallback Google Maps Geocoding API if native fails
-  Future<String?> _getGoogleGeocode(LatLng position) async {
-    try {
-      final url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$_kGoogleApiKey';
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['results'] != null && data['results'].isNotEmpty) {
-          return data['results'][0]['formatted_address'];
-        }
-      }
-    } catch (_) {}
-    return null;
-  }
+
 
   /// Debounced reverse geocoding & route redrawing
   void _handleCameraIdle(LatLng position) {
@@ -129,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (address.trim().isEmpty) throw Exception("Empty native address");
       } catch (e) {
         debugPrint('Native geocoding failed: $e, trying Google API...');
-        final googleAddress = await _getGoogleGeocode(position);
+        final googleAddress = await MapHelper.getGoogleGeocode(position);
         if (googleAddress != null && googleAddress.isNotEmpty) {
           address = googleAddress;
         } else {
@@ -232,18 +215,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _drawRoute(LatLng from, LatLng to) async {
-    final polylinePoints = PolylinePoints();
-    final result = await polylinePoints.getRouteBetweenCoordinates(
-      googleApiKey: _kGoogleApiKey,
-      request: PolylineRequest(
-        origin: PointLatLng(from.latitude, from.longitude),
-        destination: PointLatLng(to.latitude, to.longitude),
-        mode: TravelMode.driving,
-      ),
-    );
+    final coords = await MapHelper.getRouteCoordinates(from, to);
 
-    if (result.points.isNotEmpty && mounted) {
-      final coords = result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
+    if (coords.isNotEmpty && mounted) {
       setState(() {
         _polylines = {
           Polyline(
