@@ -35,110 +35,203 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+      backgroundColor: Color(0xFF0A0F1C), // Dark placeholder for map
+      body: Stack(
+        children: [
+          // Background Map Placeholder / Center Car Icon
+          Center(
+            child: Icon(
+              Icons.directions_car,
+              color: Colors.blue[200],
+              size: 50,
+            ),
+          ),
+
+          // Top App Bar
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 10,
+            left: 20,
+            right: 20,
+            child: _buildTopBar(context),
+          ),
+
+          // Bottom UI
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 20,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                starPointsWidget(loc, context),
-                SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.notification);
+                BlocBuilder<ChooseCarBottomSheetBloc, ChooseCarBottomSheetState>(
+                  builder: (context, state) {
+                    return servicesSection(loc, context, state);
                   },
-                  child: Container(
-                    padding: EdgeInsets.all(7),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Icon(Icons.notifications_outlined, size: 24),
-                    ),
-                  ),
                 ),
+                SizedBox(height: 20),
+                _buildSearchAndSavedCard(context, loc),
               ],
             ),
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.only(left: 18, right: 18, top: 18, bottom: 2),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Color(0xFF1E2433),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
             children: [
-              locationSearchingWidget(loc),
-              SizedBox(height: 6),
-              locationSaveWidgetRow(loc, context),
-              SizedBox(height: 10),
+              Icon(Icons.menu, color: Colors.white70),
+              SizedBox(width: 16),
               Text(
-                loc.translate("services"),
+                "RapidRide",
                 style: GoogleFonts.poppins(
-                  fontSize: 17,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: Colors.white,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              SizedBox(height: 13),
-              BlocBuilder<ChooseCarBottomSheetBloc, ChooseCarBottomSheetState>(
-                builder: (context, state) {
-                  return servicesSection(loc, context, state);
-                },
-              ),
-              SizedBox(height: 13),
-              imagePlaceHolderContainer(),
-              SizedBox(height: 13),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            ],
+          ),
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: Colors.grey[800],
+            child: Icon(Icons.person, color: Colors.white, size: 20),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchAndSavedCard(BuildContext context, AppLocalizations loc) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              // timeline dots
+              Column(
                 children: [
-                  Text(
-                    loc.translate("saved_routes"),
-                    style: GoogleFonts.poppins(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.savedRoute);
-                    },
-                    child: Text(
-                      loc.translate("see_all"),
-                      style: GoogleFonts.poppins(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w400,
+                  Icon(Icons.circle, size: 8, color: Colors.grey),
+                  Container(height: 30, width: 2, color: Colors.grey.withOpacity(0.3)),
+                  Icon(Icons.square, size: 8, color: Colors.blue[200]),
+                ],
+              ),
+              SizedBox(width: 16),
+              // text fields
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(loc.translate("current_location") ?? "Current Location", style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                        ],
                       ),
                     ),
+                    SizedBox(height: 8),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(loc.translate("where_are_you_going") ?? "Where to?", style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 16),
+              // Action buttons
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface),
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                 ],
               ),
-              SizedBox(height: 10),
-              savedRoutesSection(loc),
-              SizedBox(height: 25),
-              Text(
-                loc.translate("additional_services"),
-                style: GoogleFonts.poppins(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: 10),
-              additionalServiceSection(loc, context),
             ],
           ),
-        ),
+          SizedBox(height: 20),
+          Divider(color: Theme.of(context).colorScheme.outlineVariant),
+          SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildSavedLocItem(context, Icons.home, loc.translate("home") ?? "Home", "2.4 KM", () {
+                Navigator.pushNamed(context, AppRoutes.savedLoc);
+              }),
+              Container(width: 1, height: 30, color: Theme.of(context).colorScheme.outlineVariant),
+              _buildSavedLocItem(context, Icons.work, loc.translate("work") ?? "Work", "8.1 KM", () {
+                Navigator.pushNamed(context, AppRoutes.savedLoc);
+              }),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSavedLocItem(BuildContext context, IconData icon, String title, String subtitle, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+          ),
+          SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+              Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 10)),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -148,79 +241,90 @@ class _DashboardScreenState extends State<DashboardScreen> {
     BuildContext context,
     ChooseCarBottomSheetState state,
   ) {
-    final keys = state.groups?.keys.toList();
-    return GridView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.0,
-      ),
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      itemCount: keys?.length ?? 0,
-      itemBuilder: (context, index) {
-        var key = keys?[index];
-        final serviceGroup = state.groups?[key];
-        final avatar = serviceGroup?.avatar;
-        return GestureDetector(
-          onTap: () {
-            final cars = state.groups?[key]?.cars ?? [];
-
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (BuildContext context) {
-                return FractionallySizedBox(
-                  heightFactor: 0.845,
-                  child: ChooseCarBottomSheet(
-                    cars: cars,
-                    serviceName: key ?? '',
-                  ),
-                );
-              },
-            );
-            print("clicked 2");
-          },
-          child: serviceWidget(
-            icon: Builder(
-              builder: (context) {
-                final imageUrl = AppUrls.getImageUrl(avatar);
-                if (avatar != null && avatar.isNotEmpty) {
-                  return SizedBox(
-                    height: 70,
-                    width: 70,
-                    child: Image.network(
-                      imageUrl!,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) {
-                          return child;
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator(color: Colors.blue),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(Icons.cancel);
-                      },
+    final keys = state.groups?.keys.toList() ?? [];
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: keys.map((key) {
+          final serviceGroup = state.groups?[key];
+          final avatar = serviceGroup?.avatar;
+          return GestureDetector(
+            onTap: () {
+              final cars = state.groups?[key]?.cars ?? [];
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                builder: (BuildContext context) {
+                  return FractionallySizedBox(
+                    heightFactor: 0.845,
+                    child: ChooseCarBottomSheet(
+                      cars: cars,
+                      serviceName: key ?? '',
                     ),
                   );
-                }
-                return Icon(
-                  Icons.car_crash,
-                  size: 70,
-                  color: Theme.of(context).colorScheme.onSurface,
-                );
-              },
+                },
+              );
+            },
+            child: Container(
+              margin: EdgeInsets.only(right: 12),
+              width: 100,
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+              decoration: BoxDecoration(
+                color: Color(0xFF2A2F3D),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Color(0xFF3B4155),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: _buildServiceIcon(avatar, context),
+                  ),
+                  SizedBox(height: 12),
+                  Text(
+                    (key == "INTER_CITY_RENTER") ? "Intercity" : key,
+                    style: GoogleFonts.poppins(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
-            label: (key == "INTER_CITY_RENTER") ? "INTERCITY " : (key ?? ""),
-            context: context,
-          ),
-        );
-      },
+          );
+        }).toList(),
+      ),
     );
+  }
+
+  Widget _buildServiceIcon(String? avatar, BuildContext context) {
+    if (avatar != null && avatar.isNotEmpty) {
+      final imageUrl = AppUrls.getImageUrl(avatar);
+      return SizedBox(
+        height: 30,
+        width: 30,
+        child: Image.network(
+          imageUrl!,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.blue),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Icon(Icons.car_crash, color: Colors.blue[200], size: 30);
+          },
+        ),
+      );
+    }
+    return Icon(Icons.directions_car, color: Colors.blue[200], size: 30);
   }
 
   Widget additionalServiceSection(AppLocalizations loc, BuildContext context) {
