@@ -55,11 +55,11 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: AppColors.editProfileScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           loc.translate("Profile"),
           style: GoogleFonts.poppins(
-            color: AppColors.editProfileScreenProfileText,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
@@ -262,7 +262,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                           Text(
                             loc.translate("name"),
                             style: GoogleFonts.poppins(
-                              color: AppColors.editProfileScreenNameText,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
@@ -283,7 +283,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                           Text(
                             loc.translate("phone_number"),
                             style: GoogleFonts.poppins(
-                              color: AppColors.editProfileScreenPhoneText,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
@@ -305,7 +305,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                           Text(
                             loc.translate("email"),
                             style: GoogleFonts.poppins(
-                              color: AppColors.editProfileScreenPhoneText,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),

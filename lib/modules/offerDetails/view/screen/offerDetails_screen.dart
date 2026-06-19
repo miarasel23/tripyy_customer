@@ -11,17 +11,17 @@ class OfferdetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.offerDetailsScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         forceMaterialTransparency: true,
-        backgroundColor: AppColors.offerDetailsScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Align(
           alignment: Alignment.center,
           child: Text(
             loc.translate("boishak_400"),
             style: GoogleFonts.poppins(
               fontSize: 20,
-              color: AppColors.offerDetailsScreenAppBarText,
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w200,
             ),
           ),
@@ -38,7 +38,7 @@ class OfferdetailsScreen extends StatelessWidget {
               width: double.infinity,
               height: 120,
               decoration: BoxDecoration(
-                color: AppColors.offerDetailsScreenOfferContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

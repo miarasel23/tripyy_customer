@@ -10,9 +10,9 @@ class VoucherScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.voucherScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.voucherScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           loc.translate("voucher_appbar_title"),
           style: GoogleFonts.poppins(fontSize: 20),
@@ -33,7 +33,7 @@ class VoucherScreen extends StatelessWidget {
               loc.translate("voucher_come_back_message"),
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: AppColors.voucherScreenNoVoucherComeBackText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],

@@ -11,13 +11,13 @@ class HelpcenterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.helpCenterScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.helpCenterScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           loc.translate("help_center"),
           style: GoogleFonts.poppins(
-            color: AppColors.helpCenterScreenAppBarText,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w400,
           ),
@@ -37,7 +37,7 @@ class HelpcenterScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: AppColors.helpCenterScreenQuestionContainer,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(22),
                   ),
                   child: Row(
@@ -45,7 +45,7 @@ class HelpcenterScreen extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.call,
-                        color: AppColors.helpCenterScreenQuestionIcon,
+                        color: Theme.of(context).colorScheme.onSurface,
                         size: 70,
                       ),
                       SizedBox(width: 8),
@@ -53,7 +53,7 @@ class HelpcenterScreen extends StatelessWidget {
                         child: Text(
                           loc.translate("how_can_we_help"),
                           style: GoogleFonts.poppins(
-                            color: AppColors.helpCenterScreenQuestionText,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 25,
                           ),
                         ),
@@ -63,34 +63,38 @@ class HelpcenterScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 30),
                 helpCenterCommonTasks(
+                  context: context,
                   operation: loc.translate('chat_support'),
                   icon: Icon(
                     Icons.chat_rounded,
-                    color: AppColors.helpCenterScreenTasksIcon,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 30,
                   ),
                 ),
                 helpCenterCommonTasks(
+                  context: context,
                   operation: loc.translate('customer_care'),
                   icon: Icon(
                     Icons.chat_rounded,
-                    color: AppColors.helpCenterScreenTasksIcon,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 30,
                   ),
                 ),
                 helpCenterCommonTasks(
+                  context: context,
                   operation: 'support@garibook.com',
                   icon: Icon(
                     Icons.mail,
-                    color: AppColors.helpCenterScreenTasksIcon,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 30,
                   ),
                 ),
                 helpCenterCommonTasks(
+                  context: context,
                   operation: loc.translate('emergency_service'),
                   icon: Icon(
                     Icons.emergency,
-                    color: AppColors.helpCenterScreenTasksIcon,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 30,
                   ),
                 ),
@@ -103,6 +107,7 @@ class HelpcenterScreen extends StatelessWidget {
   }
 
   Column helpCenterCommonTasks({
+    required BuildContext context,
     required String operation,
     required Widget icon,
   }) {
@@ -116,7 +121,7 @@ class HelpcenterScreen extends StatelessWidget {
           child: Container(
             padding: EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: AppColors.helpCenterScreenTasksContainer,
+              color: Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(15),
             ),
             child: Row(
@@ -132,7 +137,7 @@ class HelpcenterScreen extends StatelessWidget {
                       operation,
                       style: GoogleFonts.poppins(
                         fontSize: 15,
-                        color: AppColors.helpCenterScreenTasksText,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -140,7 +145,7 @@ class HelpcenterScreen extends StatelessWidget {
                 ),
                 Icon(
                   Icons.arrow_forward_ios,
-                  color: AppColors.helpCenterScreenTasksForwardIcon,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ],
             ),

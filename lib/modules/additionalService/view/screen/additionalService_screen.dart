@@ -12,7 +12,7 @@ class AdditionalserviceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.additionalServiceScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +25,7 @@ class AdditionalserviceScreen extends StatelessWidget {
                   width: double.infinity,
                   height: 220,
                   decoration: BoxDecoration(
-                    color: AppColors.additionalServiceScreenNameContainer,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                   ),
                 ),
                 Positioned(
@@ -36,7 +36,7 @@ class AdditionalserviceScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 28,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.additionalServiceScreenNameText,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ),
@@ -49,7 +49,7 @@ class AdditionalserviceScreen extends StatelessWidget {
                     },
                     child: Icon(
                       Icons.arrow_back,
-                      color: AppColors.additionalServiceScreenNameContainerIcon,
+                      color: Theme.of(context).colorScheme.onSurface,
                       size: 30,
                     ),
                   ),
@@ -61,7 +61,7 @@ class AdditionalserviceScreen extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.additionalServiceScreenDescriptionContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(

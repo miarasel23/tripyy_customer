@@ -12,14 +12,14 @@ class OfferScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.offerScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         forceMaterialTransparency: true,
-        backgroundColor: AppColors.offerScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           loc.translate("offers"),
           style: TextStyle(
-            color: AppColors.offerScreenAppBarText,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -48,7 +48,7 @@ class OfferScreen extends StatelessWidget {
         Container(
           clipBehavior: Clip.hardEdge,
           decoration: BoxDecoration(
-            color: AppColors.offerScreenImgBannerContainer,
+            color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           width: double.infinity,
@@ -69,7 +69,7 @@ class OfferScreen extends StatelessWidget {
               Text(
                 loc.translate("offer_title"),
                 style: TextStyle(
-                  color: AppColors.offerScreenImgBannerTitleText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                 ),
@@ -77,7 +77,7 @@ class OfferScreen extends StatelessWidget {
               Text(
                 loc.translate("offer_desc"),
                 style: TextStyle(
-                  color: AppColors.offerScreenImgBannerDescriptionText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 13,
                 ),
               ),
@@ -90,7 +90,7 @@ class OfferScreen extends StatelessWidget {
                 child: Text(
                   loc.translate("see_details"),
                   style: TextStyle(
-                    color: AppColors.offerScreenButtonText,
+                    color: Theme.of(context).colorScheme.onSurface,
                     decorationColor: AppColors.offerScreenButtonTextDecoration,
                     decoration: TextDecoration.underline,
                     fontWeight: FontWeight.w600,

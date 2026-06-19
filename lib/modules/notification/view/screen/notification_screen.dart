@@ -11,9 +11,9 @@ class NotificationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.notificationScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.notificationScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           loc.translate("notification_appbar_title"),
           style: GoogleFonts.poppins(fontSize: 20),
@@ -25,10 +25,10 @@ class NotificationScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(vertical: 4, horizontal: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                color: AppColors.notificationScreenClearAllContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 border: Border.all(
                   width: 1,
-                  color: AppColors.notificationScreenClearAllContainerBorder,
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
@@ -40,7 +40,7 @@ class NotificationScreen extends StatelessWidget {
                     loc.translate("notification_clear_all"),
                     style: GoogleFonts.poppins(
                       fontSize: 13,
-                      color: AppColors.notificationScreenClearAllText,
+                      color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -64,14 +64,14 @@ class NotificationScreen extends StatelessWidget {
               loc.translate("notification_saying_no_notification"),
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: AppColors.notificationScreenNoNotificationComeBackText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(
               loc.translate("notification_come_back_message"),
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: AppColors.notificationScreenNoNotificationComeBackText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ],

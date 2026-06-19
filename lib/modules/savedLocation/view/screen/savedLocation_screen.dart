@@ -12,14 +12,14 @@ class SavedlocationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.savedLocationsScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.savedLocationsScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           loc.translate("saved_locations"),
           style: GoogleFonts.poppins(
             fontSize: 20,
-            color: AppColors.savedLocationsScreenAppBarText,
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -31,20 +31,22 @@ class SavedlocationScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             savedLocationCredentials(
+              context,
               loc,
               Icon(
                 Icons.home_filled,
-                color: AppColors.savedLocationsScreenSavedLocationIcon,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 30,
               ),
               "home",
             ),
             SizedBox(height: 8),
             savedLocationCredentials(
+              context,
               loc,
               Icon(
                 Icons.work,
-                color: AppColors.savedLocationsScreenSavedLocationIcon,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 30,
               ),
               "work",
@@ -69,6 +71,7 @@ class SavedlocationScreen extends StatelessWidget {
   }
 
   Widget savedLocationCredentials(
+    BuildContext context,
     AppLocalizations loc,
     Widget icon,
     String label,
@@ -76,7 +79,7 @@ class SavedlocationScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: AppColors.savedLocationsScreenSavedLocationContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -97,7 +100,7 @@ class SavedlocationScreen extends StatelessWidget {
                     loc.translate(label),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: AppColors.savedLocationsScreenSavedLocationTitle,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -105,7 +108,7 @@ class SavedlocationScreen extends StatelessWidget {
                     loc.translate("set_address"),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: AppColors.savedLocationsScreenSavedLocationDetails,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w200,
                     ),
                   ),

@@ -75,7 +75,7 @@ class NumberInputScreen extends StatelessWidget {
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.submitButton, // Pathao/inDrive vibrant color
-                            foregroundColor: AppColors.submitButtonText,
+                            foregroundColor: Theme.of(context).colorScheme.onSurface,
                             minimumSize: const Size(double.infinity, 54),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

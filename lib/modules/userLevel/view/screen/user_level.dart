@@ -16,12 +16,12 @@ class UserLevel extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.userLevelScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
             pinned: true,
-            backgroundColor: AppColors.userLevelScreenAppBarBackground,
+            backgroundColor: Theme.of(context).colorScheme.surface,
             elevation: 0,
             title: Text(
               loc.translate("user_level_screen_appbar_title"),
@@ -36,11 +36,11 @@ class UserLevel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 15),
-                  _buildUserLevelInfo(loc),
+                  _buildUserLevelInfo(context, loc),
                   SizedBox(height: 13),
-                  _buildPointsOfEachLevelInfo(loc),
+                  _buildPointsOfEachLevelInfo(context, loc),
                   SizedBox(height: 13),
-                  _buildCompanyBrief(),
+                  _buildCompanyBrief(context),
                   SizedBox(height: 13),
                   Text(
                     loc.translate("user_level_faq_text"),
@@ -144,7 +144,7 @@ class UserLevel extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.userLevelScreenFaqContainer,
+          color: Theme.of(context).colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -175,50 +175,54 @@ class UserLevel extends StatelessWidget {
     );
   }
 
-  Widget _buildCompanyBrief() {
+  Widget _buildCompanyBrief(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.userLevelScreenCompanyBriefContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         border: Border.all(
           width: 1,
-          color: AppColors.userLevelScreenCompanyBriefBorder,
+          color: Theme.of(context).colorScheme.outline,
         ),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Text(
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit.Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.",
         style: GoogleFonts.poppins(
-          color: AppColors.userLevelScreenCompanyBriefText,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );
   }
 
-  Widget _buildPointsOfEachLevelInfo(AppLocalizations loc) {
+  Widget _buildPointsOfEachLevelInfo(BuildContext context, AppLocalizations loc) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildLevelPointsInfo(
+          context,
           Icon(Icons.circle_notifications, size: 43),
           loc.translate("user_level_bronze_text"),
           loc.translate("user_level_bronze_points"),
           AppColors.userLevelScreenLevelPointsInfo,
         ),
         _buildLevelPointsInfo(
+          context,
           Icon(Icons.sign_language, size: 43),
           loc.translate("user_level_silver_text"),
           loc.translate("user_level_silver_points"),
           AppColors.userLevelScreenLevelPointsInfo,
         ),
         _buildLevelPointsInfo(
+          context,
           Icon(Icons.sign_language, size: 43),
           loc.translate("user_level_gold_text"),
           loc.translate("user_level_gold_points"),
           AppColors.userLevelScreenLevelPointsInfo,
         ),
         _buildLevelPointsInfo(
+          context,
           Icon(Icons.sign_language, size: 43),
           loc.translate("user_level_platinum_text"),
           loc.translate("user_level_platinum_points"),
@@ -229,6 +233,7 @@ class UserLevel extends StatelessWidget {
   }
 
   Widget _buildLevelPointsInfo(
+    BuildContext context,
     Widget icon,
     String levelName,
     String points,
@@ -255,18 +260,18 @@ class UserLevel extends StatelessWidget {
         Text(
           points,
           style: GoogleFonts.poppins(
-            color: AppColors.userLevelScreenLevelPointsText,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildUserLevelInfo(AppLocalizations loc) {
+  Widget _buildUserLevelInfo(BuildContext context, AppLocalizations loc) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
       decoration: BoxDecoration(
-        color: AppColors.userLevelScreenUserLevelInfoContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(

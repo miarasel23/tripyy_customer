@@ -35,10 +35,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.dashboardScreenBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         forceMaterialTransparency: true,
-        backgroundColor: AppColors.dashboardScreenAppBarBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 18),
@@ -54,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   child: Container(
                     padding: EdgeInsets.all(7),
                     decoration: BoxDecoration(
-                      color: AppColors.dashboardNotificationIconBackground,
+                      color: Theme.of(context).colorScheme.surface,
                       shape: BoxShape.circle,
                     ),
                     child: Align(
@@ -84,7 +84,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 loc.translate("services"),
                 style: GoogleFonts.poppins(
                   fontSize: 17,
-                  color: AppColors.dashboardServiceText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -103,7 +103,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     loc.translate("saved_routes"),
                     style: GoogleFonts.poppins(
-                      color: AppColors.dashboardSavedRoutesText,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
                     ),
@@ -115,7 +115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Text(
                       loc.translate("see_all"),
                       style: GoogleFonts.poppins(
-                        color: AppColors.dashboardSeeAllText,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 17,
                         fontWeight: FontWeight.w400,
                       ),
@@ -129,7 +129,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Text(
                 loc.translate("additional_services"),
                 style: GoogleFonts.poppins(
-                  color: AppColors.dashboardAdditionalServiceText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 17,
                   fontWeight: FontWeight.w600,
                 ),
@@ -211,7 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 return Icon(
                   Icons.car_crash,
                   size: 70,
-                  color: AppColors.dashboardServiceIcon,
+                  color: Theme.of(context).colorScheme.onSurface,
                 );
               },
             ),
@@ -251,7 +251,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         width: 220,
         clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          color: AppColors.dashboardAdditionalServiceBackground,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -278,7 +278,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     loc.translate("tourist_bus"),
                     style: GoogleFonts.poppins(
-                      color: AppColors.dashboardAdditionalServiceTitle,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
@@ -287,7 +287,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text(
                     loc.translate("tour_bus_description"),
                     style: GoogleFonts.poppins(
-                      color: AppColors.dashboardAdditionalServiceDescription,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 9,
                       fontWeight: FontWeight.w400,
                     ),
@@ -318,7 +318,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             loc.translate("no_saved_routes"),
             style: GoogleFonts.poppins(
-              color: AppColors.dashboardNoSavedRoutesText,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 15,
               fontWeight: FontWeight.w600,
             ),
@@ -330,7 +330,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               loc.translate("save_routes_hint"),
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                color: AppColors.dashboardNoSavedRoutesHintText,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -340,9 +340,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               elevation: 0,
-              backgroundColor: AppColors.dashboardElevatedButtonBackground,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               side: BorderSide(
-                color: AppColors.dashboardElevatedButtonSide,
+                color: Theme.of(context).colorScheme.outline,
                 width: 2,
               ),
             ),
@@ -350,7 +350,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Text(
               loc.translate("add_routes"),
               style: GoogleFonts.poppins(
-                color: AppColors.dashboardElevatedButtonForeground,
+                color: Theme.of(context).colorScheme.onPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -366,7 +366,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: double.infinity,
       height: 100,
       decoration: BoxDecoration(
-        color: AppColors.dashboardImageContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
       ),
     );
@@ -383,7 +383,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(
           label,
           style: GoogleFonts.poppins(
-            color: AppColors.dashboardServiceLabel,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 11,
             fontWeight: FontWeight.w500,
           ),
@@ -403,7 +403,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           icon: Icon(
             Icons.home,
             size: 14,
-            color: AppColors.dashboardSavedLocationIcon,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           label: loc.translate('home'),
           loc: loc,
@@ -412,7 +412,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           icon: Icon(
             Icons.add_home_work_sharp,
             size: 14,
-            color: AppColors.dashboardSavedLocationIcon,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
           label: loc.translate('work'),
           loc: loc,
@@ -424,14 +424,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.dashboardSavedMoreLocationIconBackground,
+              color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
             ),
             child: Align(
               alignment: Alignment.center,
               child: Icon(
                 Icons.arrow_forward_ios,
-                color: AppColors.dashboardSavedMoreLocationIcon,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 20,
               ),
             ),
@@ -450,10 +450,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: 130,
       padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: AppColors.dashboardSavedLocationContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: AppColors.dashboardSavedLocationContainerSide,
+          color: Theme.of(context).colorScheme.outline,
           width: 1.5,
         ),
         shape: BoxShape.rectangle,
@@ -471,7 +471,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Text(
                 label,
                 style: GoogleFonts.poppins(
-                  color: AppColors.dashboardSavedLocationText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                 ),
@@ -481,7 +481,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             loc.translate("add_location"),
             style: GoogleFonts.poppins(
-              color: AppColors.dashboardSavedLocationDetails,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 11,
             ),
           ),
@@ -494,7 +494,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.dashboardLocationSearchContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
         shape: BoxShape.rectangle,
       ),
@@ -505,7 +505,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Text(
             loc.translate("where_are_you_going"),
             style: GoogleFonts.poppins(
-              color: AppColors.dashboardLocationSearchQuestionText,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 17,
               fontWeight: FontWeight.w600,
             ),
@@ -516,14 +516,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               Icon(
                 Icons.search,
-                color: AppColors.dashboardLocationSearchFindLocationIcon,
+                color: Theme.of(context).colorScheme.onSurface,
                 size: 30,
               ),
               SizedBox(width: 3),
               Text(
                 loc.translate("find_location"),
                 style: GoogleFonts.poppins(
-                  color: AppColors.dashboardLocationSearchFindLocationText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   fontWeight: FontWeight.w200,
                 ),
@@ -543,7 +543,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.dashboardStarPointsWidget,
+          color: Theme.of(context).colorScheme.surfaceContainer,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -552,12 +552,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: AppColors.dashboardStarPointsIconBackground,
+                color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.star,
-                color: AppColors.dashboardStarPointsIconForeground,
+                color: Theme.of(context).colorScheme.onPrimary,
                 size: 15,
               ),
             ),
@@ -565,7 +565,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Text(
               loc.translate("470"),
               style: TextStyle(
-                color: AppColors.dashboardStarPointsWidgetText,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -581,7 +581,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             icon: Icon(
               Icons.car_crash,
               size: 70,
-              color: AppColors.dashboardServiceIcon,
+              color: Theme.of(context).colorScheme.onSurface,
             ),
             label: loc.translate('ride_share'),
             context: context,

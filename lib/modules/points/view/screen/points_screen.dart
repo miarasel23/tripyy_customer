@@ -44,11 +44,11 @@ class PointsScreen extends StatelessWidget {
                 builder: (context, state) {
                   switch (state.selectedIndex) {
                     case 0:
-                      return _buildEarnedWidget(loc);
+                      return _buildEarnedWidget(context, loc);
                     case 1:
-                      return _buildBenefitsWidget(loc);
+                      return _buildBenefitsWidget(context, loc);
                     case 2:
-                      return _buildSpentWidget(loc);
+                      return _buildSpentWidget(context, loc);
                     default:
                       return SizedBox.shrink();
                   }
@@ -61,17 +61,17 @@ class PointsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBenefitsWidget(AppLocalizations loc) {
+  Widget _buildBenefitsWidget(BuildContext context, AppLocalizations loc) {
     return ListView.builder(
       scrollDirection: Axis.vertical,
       itemCount: 3,
       itemBuilder: (BuildContext context, int index) {
-        return _buildBenefitsWidgetElement(loc);
+        return _buildBenefitsWidgetElement(context, loc);
       },
     );
   }
 
-  Widget _buildBenefitsWidgetElement(AppLocalizations loc) {
+  Widget _buildBenefitsWidgetElement(BuildContext context, AppLocalizations loc) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +79,7 @@ class PointsScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(vertical: 13, horizontal: 20),
           decoration: BoxDecoration(
-            color: AppColors.pointsScreenPointsHistoryBenefitsDataContainer,
+            color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -159,7 +159,7 @@ class PointsScreen extends StatelessWidget {
     );
   }
 
-  Center _buildSpentWidget(AppLocalizations loc) {
+  Center _buildSpentWidget(BuildContext context, AppLocalizations loc) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -178,7 +178,7 @@ class PointsScreen extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
                 fontSize: 14,
-                color: AppColors.voucherScreenNoVoucherComeBackText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -187,7 +187,7 @@ class PointsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEarnedWidget(AppLocalizations loc) {
+  Widget _buildEarnedWidget(BuildContext context, AppLocalizations loc) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +195,7 @@ class PointsScreen extends StatelessWidget {
         Container(
           padding: EdgeInsets.symmetric(vertical: 13, horizontal: 20),
           decoration: BoxDecoration(
-            color: AppColors.pointsScreenPointsHistoryEarnedDataContainer,
+            color: Theme.of(context).colorScheme.surfaceContainer,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -272,7 +272,7 @@ class PointsScreen extends StatelessWidget {
                       )
                     : null,
                 backgroundColor:
-                    AppColors.pointsScreenPointsHistoryButtonsContainer,
+                    Theme.of(context).colorScheme.surfaceContainer,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               ),
               onPressed: () {
@@ -285,7 +285,7 @@ class PointsScreen extends StatelessWidget {
                   color: (state.selectedIndex == 0)
                       ? AppColors
                             .pointsScreenPointsHistoryButtonsColorIfSelected
-                      : AppColors.pointsScreenPointsHistoryButtonsText,
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             );
@@ -305,7 +305,7 @@ class PointsScreen extends StatelessWidget {
                       )
                     : null,
                 backgroundColor:
-                    AppColors.pointsScreenPointsHistoryButtonsContainer,
+                    Theme.of(context).colorScheme.surfaceContainer,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               ),
               onPressed: () {
@@ -318,7 +318,7 @@ class PointsScreen extends StatelessWidget {
                   color: (state.selectedIndex == 1)
                       ? AppColors
                             .pointsScreenPointsHistoryButtonsColorIfSelected
-                      : AppColors.pointsScreenPointsHistoryButtonsText,
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             );
@@ -335,12 +335,12 @@ class PointsScreen extends StatelessWidget {
                         color: (state.selectedIndex == 2)
                             ? AppColors
                                   .pointsScreenPointsHistoryButtonsColorIfSelected
-                            : AppColors.pointsScreenPointsHistoryButtonsText,
+                            : Theme.of(context).colorScheme.onSurface,
                         width: 1.5,
                       )
                     : null,
                 backgroundColor:
-                    AppColors.pointsScreenPointsHistoryButtonsContainer,
+                    Theme.of(context).colorScheme.surfaceContainer,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               ),
               onPressed: () {
@@ -353,7 +353,7 @@ class PointsScreen extends StatelessWidget {
                   color: (state.selectedIndex == 2)
                       ? AppColors
                             .pointsScreenPointsHistoryButtonsColorIfSelected
-                      : AppColors.pointsScreenPointsHistoryButtonsText,
+                      : Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             );
@@ -370,7 +370,7 @@ class PointsScreen extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: AppColors.pointsScreenPointsInfoContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -414,7 +414,7 @@ class PointsScreen extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.pointsScreenPointsButtonContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(

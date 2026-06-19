@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
         }
       },
       child: Scaffold(
-        backgroundColor: AppColors.pageBackground,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: SafeArea(
           child: Stack(
             children: [
@@ -87,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: Container(
                     width: double.infinity,
                     height: 400,
-                    color: AppColors.pageBackground,
+                    color: Theme.of(context).colorScheme.surface,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -106,7 +106,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.submitButton,
-                              foregroundColor: AppColors.submitButtonText,
+                              foregroundColor: Theme.of(context).colorScheme.onSurface,
                               minimumSize: const Size(double.infinity, 50),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
@@ -139,8 +139,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 left: MediaQuery.of(context).size.width / 2 - 25,
                 child: Container(
                   padding: const EdgeInsets.all(8.0),
-                  decoration: const BoxDecoration(
-                    color: AppColors.pageBackground,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

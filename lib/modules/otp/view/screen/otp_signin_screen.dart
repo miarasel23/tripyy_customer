@@ -199,7 +199,7 @@ class _OtpSignInState extends State<OtpSignIn> {
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.submitButton,
-                            foregroundColor: AppColors.submitButtonText,
+                            foregroundColor: Theme.of(context).colorScheme.onSurface,
                             minimumSize: const Size(double.infinity, 54),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),

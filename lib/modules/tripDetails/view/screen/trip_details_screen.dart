@@ -12,7 +12,7 @@ class TripDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.tripDetailsScreenAppBarBackground,
+      backgroundColor: Theme.of(context).colorScheme.surface,
 
       body: Padding(
         padding: EdgeInsets.only(top: 20, left: 18, right: 20),
@@ -21,12 +21,12 @@ class TripDetailsScreen extends StatelessWidget {
           children: [
             _buildAppBar(context, loc),
             SizedBox(height: 20),
-            _buildVehicleInfoAndTripType(loc),
+            _buildVehicleInfoAndTripType(context, loc),
             SizedBox(height: 15),
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: AppColors.tripDetailsScreenContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
               ),
               padding: EdgeInsets.only(
                 left: 13,
@@ -48,21 +48,24 @@ class TripDetailsScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   tripDetailsOthersInfo(
-                    AppColors.tripDetailsScreenBookingIdInfoText,
+                    context,
+                    Theme.of(context).colorScheme.onSurface,
                     Icon(Icons.scanner, size: 25),
                     loc.translate("trip_detail_booking_text"),
                     loc.translate("trip_detail_booking_id_value"),
                   ),
                   SizedBox(height: 12),
                   tripDetailsOthersInfo(
-                    AppColors.tripDetailsScreenFareInfoText,
+                    context,
+                    Theme.of(context).colorScheme.onSurface,
                     Icon(Icons.wallet, size: 25),
                     loc.translate("trip_detail_fare_text"),
                     loc.translate("trip_detail_fare_amount"),
                   ),
                   SizedBox(height: 12),
                   tripDetailsOthersInfo(
-                    AppColors.tripDetailsScreenDateTimeInfoText,
+                    context,
+                    Theme.of(context).colorScheme.onSurface,
                     Icon(Icons.calendar_view_week_rounded, size: 25),
                     loc.translate("trip_detail_date_time_text"),
                     loc.translate("trip_detail_date_time_info"),
@@ -77,6 +80,7 @@ class TripDetailsScreen extends StatelessWidget {
   }
 
   Widget tripDetailsOthersInfo(
+    BuildContext context,
     Color value,
     Icon icon,
     String title,
@@ -96,7 +100,7 @@ class TripDetailsScreen extends StatelessWidget {
               title,
               style: GoogleFonts.poppins(
                 fontSize: 16,
-                color: AppColors.tripDetailsScreenOthersText,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             Text(data, style: GoogleFonts.poppins(fontSize: 18, color: value)),
@@ -106,11 +110,11 @@ class TripDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildVehicleInfoAndTripType(AppLocalizations loc) {
+  Widget _buildVehicleInfoAndTripType(BuildContext context, AppLocalizations loc) {
     return Container(
       padding: EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: AppColors.tripDetailsScreenContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -144,7 +148,7 @@ class TripDetailsScreen extends StatelessWidget {
                         loc.translate("trip_details_seat_info"),
                         style: GoogleFonts.poppins(
                           fontSize: 11,
-                          color: AppColors.tripDetailsScreenSeatInfoText,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ],
@@ -154,23 +158,23 @@ class TripDetailsScreen extends StatelessWidget {
             ],
           ),
           Spacer(),
-          tripTypeInfo(loc),
+          tripTypeInfo(context, loc),
         ],
       ),
     );
   }
 
-  Widget tripTypeInfo(AppLocalizations loc) {
+  Widget tripTypeInfo(BuildContext context, AppLocalizations loc) {
     return IntrinsicWidth(
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           minimumSize: Size.zero,
           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          side: BorderSide(color: AppColors.customAddButtonBorder, width: 1.5),
+          side: BorderSide(color: Theme.of(context).colorScheme.outline, width: 1.5),
           elevation: 0,
           disabledBackgroundColor: Color(0xffeef7fe),
-          disabledForegroundColor: AppColors.customAddButtonForeground,
+          disabledForegroundColor: Theme.of(context).colorScheme.onPrimary,
         ),
         onPressed: null,
         child: Row(
@@ -182,7 +186,7 @@ class TripDetailsScreen extends StatelessWidget {
               loc.translate("trip_details_trip_type"),
               style: GoogleFonts.poppins(
                 fontSize: 12,
-                color: AppColors.customAddButtonText,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),
