@@ -104,8 +104,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors
-                                      .editProfileScreenBackgroundContainer,
+                                  color: Theme.of(context).colorScheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 width: double.infinity,
@@ -147,8 +146,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                                   width: 3,
                                                   color: Colors.white,
                                                 ),
-                                                color: AppColors
-                                                    .editProfileScreenProfileIconContainer,
+                                                color: Theme.of(context).colorScheme.surfaceContainer,
                                                 shape: BoxShape.circle,
                                               ),
                                               child: CircularProgressIndicator(
@@ -231,12 +229,10 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                             padding: EdgeInsets.all(4.0),
                                             alignment: Alignment.center,
                                             decoration: BoxDecoration(
-                                              color: AppColors
-                                                  .editProfileScreenEditButtonContainer,
+                                              color: Theme.of(context).colorScheme.surfaceContainer,
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                color: AppColors
-                                                    .editProfileScreenEditButtonContainerSide,
+                                                color: Theme.of(context).colorScheme.outline,
                                                 width: 2,
                                               ),
                                             ),
@@ -244,8 +240,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                               padding: const EdgeInsets.all(1.0),
                                               child: Icon(
                                                 Icons.edit,
-                                                color: AppColors
-                                                    .editProfileScreenEditButtonIcon,
+                                                color: Theme.of(context).colorScheme.onSurface,
                                                 size: 15,
                                               ),
                                             ),
@@ -272,7 +267,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                             controller: _name,
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: AppColors.editProfileScreenNameTextfield,
+                              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(28),
                                 borderSide: BorderSide.none,
@@ -294,7 +289,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                             readOnly: true,
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: AppColors.editProfileScreenPhoneTextfield,
+                              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(28),
                                 borderSide: BorderSide.none,
@@ -315,7 +310,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                             controller: _email,
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: AppColors.editProfileScreenPhoneTextfield,
+                              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(28),
                                 borderSide: BorderSide.none,
@@ -331,15 +326,13 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                               Expanded(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors
-                                        .editProfileScreenDeleteButtonElevatedbuttonBackground,
+                                    backgroundColor: Theme.of(context).colorScheme.surface,
                                   ),
                                   onPressed: () {},
                                   child: Text(
                                     loc.translate("delete_account"),
                                     style: GoogleFonts.poppins(
-                                      color: AppColors
-                                          .editProfileScreenDeleteButtonElevatedbuttonForeground,
+                                      color: Theme.of(context).colorScheme.onPrimary,
                                     ),
                                   ),
                                 ),
@@ -348,8 +341,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                               Expanded(
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors
-                                        .editProfileScreenUpdateButtonElevatedbuttonBackground,
+                                    backgroundColor: Theme.of(context).colorScheme.surface,
                                   ),
                                   onPressed: () async {
                                     context.read<EditProfileInfoBloc>().add(
@@ -377,24 +369,21 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                                               return Text(
                                                 loc.translate("update"),
                                                 style: GoogleFonts.poppins(
-                                                  color: AppColors
-                                                      .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                                  color: Theme.of(context).colorScheme.onPrimary,
                                                 ),
                                               );
                                             case EditProfileUpdateStatus.initial:
                                               return Text(
                                                 loc.translate("update"),
                                                 style: GoogleFonts.poppins(
-                                                  color: AppColors
-                                                      .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                                  color: Theme.of(context).colorScheme.onPrimary,
                                                 ),
                                               );
                                             case EditProfileUpdateStatus.failure:
                                               return Text(
                                                 loc.translate("failed"),
                                                 style: GoogleFonts.poppins(
-                                                  color: AppColors
-                                                      .editProfileScreenUpdateButtonElevatedbuttonForeground,
+                                                  color: Theme.of(context).colorScheme.onPrimary,
                                                 ),
                                               );
                                             default:

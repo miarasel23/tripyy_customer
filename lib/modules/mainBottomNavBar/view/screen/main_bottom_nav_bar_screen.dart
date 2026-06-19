@@ -46,10 +46,10 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
               unselectedFontSize: 14,
               elevation: 0,
               currentIndex: state.selectedIndex,
-              selectedItemColor: Colors.black,
-              unselectedItemColor: Colors.grey,
+              selectedItemColor: Theme.of(context).colorScheme.onSurface,
+              unselectedItemColor: Theme.of(context).colorScheme.onSurfaceVariant,
               type: BottomNavigationBarType.fixed,
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).colorScheme.surface,
               onTap: (index) {
                 context.read<MainBottomNavBarBloc>().add(ChangeTabEvent(index));
               },

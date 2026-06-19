@@ -86,10 +86,8 @@ class AdditionalserviceScreen extends StatelessWidget {
                       children: [
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors
-                                .additionalServiceScreenCallMessageButtonBackground,
-                            foregroundColor: AppColors
-                                .additionalServiceScreenCallMessageButtonForeground,
+                            backgroundColor: Theme.of(context).colorScheme.surface,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
 
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,

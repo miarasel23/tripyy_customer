@@ -21,10 +21,10 @@ class CustomAddButton extends StatelessWidget {
     return IntrinsicWidth(
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          side: BorderSide(color: AppColors.customAddButtonBorder, width: 1.5),
+          side: BorderSide(color: Theme.of(context).colorScheme.outline, width: 1.5),
           elevation: 0,
-          backgroundColor: AppColors.customAddButtonBackground,
-          foregroundColor: AppColors.customAddButtonForeground,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
         ),
         onPressed: () {},
         child: Row(
@@ -36,7 +36,7 @@ class CustomAddButton extends StatelessWidget {
               loc.translate(labelKey),
               style: GoogleFonts.poppins(
                 fontSize: 12,
-                color: AppColors.customAddButtonText,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
               ),
             ),

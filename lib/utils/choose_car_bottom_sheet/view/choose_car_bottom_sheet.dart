@@ -61,31 +61,94 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(24, 2, 16, 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          loc.translate("choose_car"),
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.dashboardBottomSheetChooseCarColor,
-                          ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 12),
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(2),
                         ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            color: Colors.black87,
-                            size: 24,
-                          ),
+                      ),
+                      SizedBox(height: 16),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Timeline graphics
+                            Column(
+                              children: [
+                                SizedBox(height: 6),
+                                Icon(Icons.circle, size: 8, color: Colors.grey[400]),
+                                Container(
+                                  height: 20, 
+                                  width: 2, 
+                                  margin: EdgeInsets.symmetric(vertical: 2),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: List.generate(4, (index) => Container(
+                                      width: 2, height: 2, color: Colors.grey[600],
+                                    )),
+                                  ),
+                                ),
+                                Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[400]),
+                              ],
+                            ),
+                            SizedBox(width: 12),
+                            // Text info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "PICKUP & DROP-OFF",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[500],
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    "Mission District · Financial Center",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).colorScheme.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Edit button
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size(0, 0),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                "EDIT",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.indigo.shade200,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ),
                   Flexible(
                     child: ListView.separated(
@@ -97,6 +160,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                       itemCount: widget.cars.length,
                       itemBuilder: (context, index) {
                         final car = widget.cars[index];
+                        final isSelected = state.currentCarIndex == index.toString();
                         return GestureDetector(
                           onTap: () {
                             context.read<ChooseCarBottomSheetBloc>().add(
@@ -109,23 +173,25 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors
-                                  .dashboardBottomSheetCarShowingContainer,
-                              border:
-                                  (state.currentCarIndex == index.toString())
-                                  ? Border.all(
-                                      color: AppColors
-                                          .dashboardBottomSheetCarShowingContainerBorder,
-                                      width: 2,
-                                    )
-                                  : null,
-                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.transparent,
+                              border: Border.all(
+                                color: isSelected 
+                                    ? Colors.indigo.shade200 
+                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                                width: isSelected ? 1.5 : 1,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               children: [
-                                SizedBox(
-                                  width: 80,
-                                  height: 55,
+                                Container(
+                                  width: 65,
+                                  height: 65,
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.black,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
                                   child: Builder(
                                     builder: (context) {
                                       final avatar = car.carAvatar;
@@ -134,7 +200,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                       );
                                       if (imageUrl == null ||
                                           imageUrl.isEmpty) {
-                                        return Icon(Icons.directions_car);
+                                        return Icon(Icons.directions_car, color: Colors.grey);
                                       }
 
                                       return Image.network(
@@ -157,13 +223,12 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                                   height: double.infinity,
                                                   decoration: BoxDecoration(
                                                     color: isLight ? Colors.white : Colors.black,
-                                                    borderRadius: BorderRadius.circular(8),
                                                   ),
                                                 ),
                                               );
                                             },
                                         errorBuilder: (_, _, _) {
-                                          return Icon(Icons.directions_car);
+                                          return Icon(Icons.directions_car, color: Colors.grey);
                                         },
                                       );
                                     },
@@ -179,28 +244,26 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                       Text(
                                         car.carType,
                                         style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors
-                                              .dashboardBottomSheetChooseCarNameColor,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).colorScheme.onSurface,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Row(
                                         children: [
-                                          const Icon(
-                                            Icons.people,
-                                            size: 16,
-                                            color: AppColors
-                                                .dashboardBottomSheetChooseCarSeatsLogo,
+                                          Icon(
+                                            Icons.person_outline,
+                                            size: 14,
+                                            color: Theme.of(context).colorScheme.onSurface,
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             '${car.setCapacity} Seats',
                                             style: GoogleFonts.poppins(
-                                              fontSize: 14,
-                                              color: AppColors
-                                                  .dashboardBottomSheetChooseCarSeatsInfo,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                              color: Theme.of(context).colorScheme.onSurface,
                                             ),
                                           ),
                                         ],
@@ -219,33 +282,70 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                     ),
                   ),
 
-                  (state.clicked == true)
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 21),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: EdgeInsets.symmetric(vertical: 12),
-                                elevation: 0,
-                                backgroundColor: Color(0xff0e52ff),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: Text(
-                                "Continue",
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                  if (state.clicked == true && state.currentCarIndex != null && int.tryParse(state.currentCarIndex!) != null)
+                    Builder(builder: (context) {
+                      final idx = int.parse(state.currentCarIndex!);
+                      if (idx < 0 || idx >= widget.cars.length) return SizedBox();
+                      final selectedCar = widget.cars[idx];
+                      
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 21),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              elevation: 0,
+                              backgroundColor: Color(0xff0e52ff),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
                               ),
                             ),
+                            onPressed: () {},
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 40,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black26,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      clipBehavior: Clip.hardEdge,
+                                      child: Builder(builder: (context) {
+                                        final avatar = selectedCar.carAvatar;
+                                        final imageUrl = AppUrls.getImageUrl(avatar);
+                                        if (imageUrl == null || imageUrl.isEmpty) {
+                                          return Icon(Icons.directions_car, color: Colors.white);
+                                        }
+                                        return Image.network(
+                                          imageUrl, 
+                                          fit: BoxFit.contain,
+                                          errorBuilder: (_,__,___) => Icon(Icons.directions_car, color: Colors.white),
+                                        );
+                                      }),
+                                    ),
+                                    SizedBox(width: 12),
+                                    Text(
+                                      "TRIPPY ${selectedCar.carType}",
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Icon(Icons.arrow_forward, color: Colors.white),
+                              ],
+                            ),
                           ),
-                        )
-                      : SizedBox(),
+                        ),
+                      );
+                    }),
 
                   SizedBox(height: 10),
                 ],

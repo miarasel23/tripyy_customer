@@ -11,7 +11,7 @@ class YellowStarBadge extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(1),
       decoration: BoxDecoration(
-        color: AppColors.pointsScreenPointsIconContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         shape: BoxShape.circle,
       ),
       child: Align(
@@ -19,7 +19,7 @@ class YellowStarBadge extends StatelessWidget {
         child: Icon(
           Icons.star,
           size: iconSize,
-          color: AppColors.pointsScreenPointsIcon,
+          color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
     );

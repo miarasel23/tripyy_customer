@@ -44,7 +44,7 @@ class TimelineTileWithDivider extends StatelessWidget {
                   child: Container(
                     width: 2,
                     height: 4,
-                    color: AppColors.timelineTileDividerContainer,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                   ),
                 ),
               ),
@@ -65,7 +65,7 @@ class TimelineTileWithDivider extends StatelessWidget {
               Text(
                 loc.translate(pickupTitle),
                 style: GoogleFonts.poppins(
-                  color: AppColors.tripDetailsScreenOthersText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
                 ),
               ),
@@ -85,7 +85,7 @@ class TimelineTileWithDivider extends StatelessWidget {
               Divider(
                 thickness: 1,
                 height: 1,
-                color: AppColors.myTripScreenCancelledDivider,
+                color: Theme.of(context).colorScheme.outlineVariant,
               ),
 
               const SizedBox(height: 16),
@@ -94,7 +94,7 @@ class TimelineTileWithDivider extends StatelessWidget {
               Text(
                 loc.translate(dropOffTitle),
                 style: GoogleFonts.poppins(
-                  color: AppColors.tripDetailsScreenOthersText,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
                 ),
               ),

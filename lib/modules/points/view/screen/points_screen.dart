@@ -120,8 +120,7 @@ class PointsScreen extends StatelessWidget {
                 padding: EdgeInsets.all(8),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppColors
-                      .pointsScreenPointsHistoryBenefitsPointsDataContainer,
+                  color: Theme.of(context).colorScheme.surfaceContainer,
                   borderRadius: BorderRadius.circular(26),
                 ),
                 child: Row(

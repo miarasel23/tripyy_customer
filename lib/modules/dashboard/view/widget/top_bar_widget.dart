@@ -9,31 +9,30 @@ class TopBarWidget extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Color(0xFF1E2433),
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
-              Icon(Icons.menu, color: Colors.white70),
-              SizedBox(width: 16),
               Text(
-                "RapidRide",
+                "TRIPPY",
                 style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
+                  letterSpacing: 1.0,
                 ),
               ),
             ],
           ),
           CircleAvatar(
             radius: 16,
-            backgroundColor: Colors.grey[800],
-            child: Icon(Icons.person, color: Colors.white, size: 20),
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+            child: Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ],
       ),

@@ -489,8 +489,7 @@ class MytripScreen extends StatelessWidget {
                       Text(
                         loc.translate("trip_address"),
                         style: GoogleFonts.poppins(
-                          color: AppColors
-                              .myTripScreenCancelledTripTripAddressText,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -532,8 +531,7 @@ class MytripScreen extends StatelessWidget {
                       Text(
                         loc.translate("7"),
                         style: GoogleFonts.poppins(
-                          color: AppColors
-                              .myTripScreenCancelledTripTripAddressText,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
