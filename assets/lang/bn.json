@@ -165,9 +165,10 @@
   "points_history_earned_data_points_text": "পয়েন্ট",
   "points_history_spent_data_title": "কোনো পয়েন্ট খরচ করা হয়নি",
   "points_history_spent_data_message_1": "আপনার অভিজ্ঞতা থেকে সর্বোচ্চ সুবিধা পেতে আপনার পয়েন্টগুলো ব্যবহার করুন।",
-   "points_history_benefits_data_title": "রূপার জন্য চুক্তি",
-   "points_history_benefits_data_description": "২০০ পয়েন্ট রিডিম করুন এবং ২০০ টাকা ছাড় উপভোগ করুন।",
-   "points_history_benefits_data_points_score": "২০০",
-   "points_history_benefits_data_points_text": "পয়েন্ট",
-   "my_trip_wedding_car_message": "দেখানোর জন্য কোনো ট্রিপ নেই"
+  "points_history_benefits_data_title": "রূপার জন্য চুক্তি",
+  "points_history_benefits_data_description": "২০০ পয়েন্ট রিডিম করুন এবং ২০০ টাকা ছাড় উপভোগ করুন।",
+  "points_history_benefits_data_points_score": "২০০",
+  "points_history_benefits_data_points_text": "পয়েন্ট",
+  "my_trip_wedding_car_message": "দেখানোর জন্য কোনো ট্রিপ নেই",
+  "pick_up_location": "পিক আপ লোকেশন"
 }

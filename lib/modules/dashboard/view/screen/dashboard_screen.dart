@@ -113,6 +113,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     myLocationButtonEnabled: false,
                     zoomControlsEnabled: false,
                     circles: _circles,
+                    onTap: (LatLng location) {
+                      setState(() {
+                        _currentPosition = Position(
+                          longitude: location.longitude,
+                          latitude: location.latitude,
+                          timestamp: DateTime.now(),
+                          accuracy: 0.0,
+                          altitude: 0.0,
+                          altitudeAccuracy: 0.0,
+                          heading: 0.0,
+                          headingAccuracy: 0.0,
+                          speed: 0.0,
+                          speedAccuracy: 0.0,
+                        );
+                        _circles = {
+                          Circle(
+                            circleId: CircleId("radius"),
+                            center: location,
+                            radius: 5000,
+                            fillColor: Colors.blue.withOpacity(0.2),
+                            strokeColor: Colors.blue,
+                            strokeWidth: 2,
+                          )
+                        };
+                      });
+                      if (_mapController != null) {
+                        _mapController!.animateCamera(CameraUpdate.newCameraPosition(
+                          CameraPosition(target: location, zoom: 15.0),
+                        ));
+                      }
+                    },
                     onMapCreated: (GoogleMapController controller) {
                       _mapController = controller;
                       if (_currentPosition != null) {
@@ -148,7 +179,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                 ),
                 SizedBox(height: 20),
-                SearchAndSavedCardWidget(loc: loc),
+                SearchAndSavedCardWidget(
+                  loc: loc,
+                  onPickupSelected: (location) {
+                    if (location.latitude != null && location.longitude != null) {
+                      final latLng = LatLng(location.latitude!, location.longitude!);
+                      setState(() {
+                        _currentPosition = Position(
+                          longitude: latLng.longitude,
+                          latitude: latLng.latitude,
+                          timestamp: DateTime.now(),
+                          accuracy: 0.0,
+                          altitude: 0.0,
+                          altitudeAccuracy: 0.0,
+                          heading: 0.0,
+                          headingAccuracy: 0.0,
+                          speed: 0.0,
+                          speedAccuracy: 0.0,
+                        );
+                        _circles = {
+                          Circle(
+                            circleId: CircleId("radius"),
+                            center: latLng,
+                            radius: 5000,
+                            fillColor: Colors.blue.withOpacity(0.2),
+                            strokeColor: Colors.blue,
+                            strokeWidth: 2,
+                          )
+                        };
+                      });
+                      if (_mapController != null) {
+                        _mapController!.animateCamera(CameraUpdate.newCameraPosition(
+                          CameraPosition(target: latLng, zoom: 15.0),
+                        ));
+                      }
+                    }
+                  },
+                ),
               ],
             ),
           ),
