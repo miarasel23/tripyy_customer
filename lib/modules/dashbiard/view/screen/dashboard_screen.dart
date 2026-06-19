@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:trippy_customer/utils/app_urls.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
@@ -19,9 +21,14 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  GoogleMapController? _mapController;
+  Position? _currentPosition;
+  Set<Circle> _circles = {};
+
   @override
   void initState() {
     super.initState();
+    _getCurrentLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final loc = AppLocalizations.of(context);
       context.read<ChooseCarBottomSheetBloc>().add(
@@ -31,35 +38,101 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
+  Future<void> _getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    
+    setState(() {
+      _currentPosition = position;
+      _circles = {
+        Circle(
+          circleId: CircleId("radius"),
+          center: LatLng(position.latitude, position.longitude),
+          radius: 5000, // 5km radius
+          fillColor: Colors.blue.withOpacity(0.2),
+          strokeColor: Colors.blue,
+          strokeWidth: 2,
+        )
+      };
+    });
+
+    if (_mapController != null) {
+      _mapController!.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(position.latitude, position.longitude),
+          zoom: 12.0, // Zoom level to fit ~5km radius
+        ),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: Color(0xFF0A0F1C), // Dark placeholder for map
-      body: Stack(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: Column(
         children: [
-          // Background Map Placeholder / Center Car Icon
-          Center(
-            child: Icon(
-              Icons.directions_car,
-              color: Colors.blue[200],
-              size: 50,
+          // Top portion: Map and Top App Bar
+          Expanded(
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(23.8103, 90.4125), // Default to Dhaka or adjust as needed
+                      zoom: 10,
+                    ),
+                    myLocationEnabled: true,
+                    myLocationButtonEnabled: false,
+                    zoomControlsEnabled: false,
+                    circles: _circles,
+                    onMapCreated: (GoogleMapController controller) {
+                      _mapController = controller;
+                      if (_currentPosition != null) {
+                        _mapController!.animateCamera(CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                            target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+                            zoom: 12.0,
+                          ),
+                        ));
+                      }
+                    },
+                  ),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 10,
+                  left: 20,
+                  right: 20,
+                  child: _buildTopBar(context),
+                ),
+              ],
             ),
           ),
-
-          // Top App Bar
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
-            left: 20,
-            right: 20,
-            child: _buildTopBar(context),
-          ),
-
-          // Bottom UI
-          Positioned(
-            bottom: 20,
-            left: 20,
-            right: 20,
+          
+          // Bottom portion: Services and Search
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
