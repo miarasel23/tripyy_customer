@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/localization/app_localization.dart';
-import '../../../dashbiard/view/screen/dashboard_screen.dart';
+import '../../../dashboard/view/screen/dashboard_screen.dart';
 import '../../../myTrip/view/screen/myTrip_screen.dart';
 import '../../../offer/view/screen/offer_screen.dart';
 import '../../../profile/view/screen/profile_screen.dart';

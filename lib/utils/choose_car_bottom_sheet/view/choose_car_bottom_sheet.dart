@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
 import '../../app_urls.dart';
@@ -147,11 +148,18 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                                 return child;
                                               }
 
-                                              return Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      color: Colors.blue,
-                                                    ),
+                                              final isLight = Theme.of(context).brightness == Brightness.light;
+                                              return Shimmer.fromColors(
+                                                baseColor: isLight ? Colors.grey[300]! : Colors.grey[700]!,
+                                                highlightColor: isLight ? Colors.grey[100]! : Colors.grey[500]!,
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  height: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: isLight ? Colors.white : Colors.black,
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                ),
                                               );
                                             },
                                         errorBuilder: (_, _, _) {
