@@ -10,8 +10,15 @@ class SearchAndSavedCardWidget extends StatefulWidget {
   final AppLocalizations loc;
   final Function(SearchLocationData)? onPickupSelected;
   final Function(SearchLocationData)? onDestinationSelected;
+  final Function(bool isDropFocused)? onFocusChanged;
 
-  const SearchAndSavedCardWidget({Key? key, required this.loc, this.onPickupSelected, this.onDestinationSelected}) : super(key: key);
+  const SearchAndSavedCardWidget({
+    super.key,
+    required this.loc,
+    this.onPickupSelected,
+    this.onDestinationSelected,
+    this.onFocusChanged,
+  });
 
   @override
   SearchAndSavedCardWidgetState createState() => SearchAndSavedCardWidgetState();
@@ -34,6 +41,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
       } else {
         _removeOverlay();
       }
+      widget.onFocusChanged?.call(_destFocusNode.hasFocus);
       setState(() {});
     });
   }
@@ -158,13 +166,19 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
     super.dispose();
   }
 
-  /// Called externally (e.g., from map drag) to update the first pickup field
-  void updatePickupText(String address) {
-    if (_pickupControllers.isNotEmpty) {
-      setState(() {
-        _pickupControllers[0].text = address;
-      });
-    }
+  bool get isDropFocused => _destFocusNode.hasFocus;
+
+  /// Called externally (e.g., from map drag) to update the active field
+  void updateActiveFieldText(String address) {
+    setState(() {
+      if (_destFocusNode.hasFocus) {
+        _destController.text = address;
+      } else {
+        if (_pickupControllers.isNotEmpty) {
+          _pickupControllers[0].text = address;
+        }
+      }
+    });
   }
 
   @override

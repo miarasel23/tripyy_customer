@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -32,6 +34,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Current camera center (updated as user drags map)
   LatLng _cameraCenter = const LatLng(23.8103, 90.4125);
   bool _isCameraMoving = false;
+
+  /// Pickup location (explicitly tracked)
+  LatLng? _pickupLatLng;
 
   /// Drop location set from the search card
   LatLng? _dropLatLng;
@@ -91,43 +96,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _handleCameraIdle(latLng);
   }
 
+  /// Fallback Google Maps Geocoding API if native fails
+  Future<String?> _getGoogleGeocode(LatLng position) async {
+    try {
+      final url = 'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$_kGoogleApiKey';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['results'] != null && data['results'].isNotEmpty) {
+          return data['results'][0]['formatted_address'];
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   /// Debounced reverse geocoding & route redrawing
   void _handleCameraIdle(LatLng position) {
     _mapIdleDebounce?.cancel();
     _mapIdleDebounce = Timer(const Duration(milliseconds: 600), () async {
+      final isDropFocused = _searchCardKey.currentState?.isDropFocused ?? false;
+      
+      String address = 'Unknown Location';
       try {
         final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
         if (placemarks.isNotEmpty && mounted) {
           final p = placemarks.first;
-          String address = [p.street, p.subLocality, p.locality, p.country]
+          address = [p.street, p.subLocality, p.locality, p.country]
               .where((s) => s != null && s.isNotEmpty)
               .join(', ');
-              
-          if (address.isEmpty) address = 'Unknown Location';
-
-          setState(() {
-            _centerAddress = address;
-          });
-
-          // Always update the pickup text from the center pin
-          _searchCardKey.currentState?.updatePickupText(address);
         }
+        if (address.trim().isEmpty) throw Exception("Empty native address");
       } catch (e) {
-        debugPrint('Geocoding error: $e');
-        if (mounted) {
-          final fallbackAddress = '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
-          setState(() {
-            _centerAddress = fallbackAddress;
-          });
-          _searchCardKey.currentState?.updatePickupText(fallbackAddress);
+        debugPrint('Native geocoding failed: $e, trying Google API...');
+        final googleAddress = await _getGoogleGeocode(position);
+        if (googleAddress != null && googleAddress.isNotEmpty) {
+          address = googleAddress;
+        } else {
+          // If BOTH fail, fallback to coordinates
+          address = '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
         }
       }
 
-      // If a destination is set, continuously redraw the route from the new camera center
-      if (_dropLatLng != null) {
-        _drawRoute(position, _dropLatLng!);
+      if (mounted) {
+        setState(() {
+          _centerAddress = address;
+          if (isDropFocused) {
+            _dropLatLng = position;
+          } else {
+            _pickupLatLng = position;
+          }
+        });
+        
+        _searchCardKey.currentState?.updateActiveFieldText(address);
+        
+        if (_pickupLatLng != null && _dropLatLng != null) {
+          _drawRoute(_pickupLatLng!, _dropLatLng!);
+        }
       }
     });
+  }
+
+  void _onSearchFieldFocusChanged(bool isDropFocused) {
+    setState(() {
+      _rebuildMarkers();
+    });
+    
+    // Pan camera to the currently focused location
+    final targetLatLng = isDropFocused ? _dropLatLng : _pickupLatLng;
+    if (targetLatLng != null) {
+      _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: targetLatLng, zoom: 15.0),
+      ));
+    }
   }
 
   /// Called when the user selects a pickup from the search list
@@ -135,8 +176,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (location.latitude == null || location.longitude == null) return;
     final latLng = LatLng(location.latitude!, location.longitude!);
 
-    // Simply pan the camera to the selected pickup location.
-    // The center pin remains, and onCameraIdle will trigger update & route redraw.
+    setState(() {
+      _pickupLatLng = latLng;
+    });
+
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(target: latLng, zoom: 15.0),
     ));
@@ -152,19 +195,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _rebuildMarkers();
     });
 
-    _drawRoute(_cameraCenter, latLng);
+    if (_pickupLatLng != null) {
+      _drawRoute(_pickupLatLng!, latLng);
+    }
 
-    // Zoom out to show the route, but strictly keep the camera target on the pickup location!
-    // Otherwise, the map center (pickup) would change.
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: _cameraCenter, zoom: 11.0),
+      CameraPosition(target: _pickupLatLng ?? _cameraCenter, zoom: 11.0),
     ));
   }
 
   void _rebuildMarkers() {
     final markers = <Marker>{};
+    final isDropFocused = _searchCardKey.currentState?.isDropFocused ?? false;
 
-    if (_dropLatLng != null) {
+    // If we are currently modifying the drop location, draw a static marker for the pickup!
+    if (isDropFocused && _pickupLatLng != null) {
+      markers.add(Marker(
+        markerId: const MarkerId('pickup'),
+        position: _pickupLatLng!,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        infoWindow: const InfoWindow(title: 'Pickup'),
+      ));
+    }
+
+    // If we are currently modifying the pickup location, draw a static marker for the drop!
+    if (!isDropFocused && _dropLatLng != null) {
       markers.add(Marker(
         markerId: const MarkerId('drop'),
         position: _dropLatLng!,
@@ -265,7 +320,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         transform: Matrix4.translationValues(0, _isCameraMoving ? -8 : 0, 0),
-                        child: const Icon(Icons.location_pin, color: Colors.blue, size: 40),
+                        child: Icon(
+                          Icons.location_pin, 
+                          color: (_searchCardKey.currentState?.isDropFocused ?? false) ? Colors.red : Colors.blue, 
+                          size: 40
+                        ),
                       ),
                       const SizedBox(height: 20), // Offset so pin tip is at center
                     ],
@@ -298,6 +357,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   loc: loc,
                   onPickupSelected: _onPickupSelected,
                   onDestinationSelected: _onDestinationSelected,
+                  onFocusChanged: _onSearchFieldFocusChanged,
                 ),
               ],
             ),
