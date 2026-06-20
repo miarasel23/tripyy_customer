@@ -337,9 +337,9 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
-              Divider(color: Theme.of(context).colorScheme.outlineVariant),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
+              Divider(color: Theme.of(context).colorScheme.outlineVariant, height: 4, thickness: 1),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

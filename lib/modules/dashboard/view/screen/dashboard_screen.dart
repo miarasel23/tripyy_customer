@@ -9,16 +9,22 @@ import 'package:geocoding/geocoding.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../modules/searchLocation/models/search_location_model.dart';
+import '../../../../modules/searchLocation/repository/search_location_repository.dart';
 import '../../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
 import '../../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_events.dart';
 import '../../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
+import '../../choose_car_bottom_sheet/models/choose_car_model.dart';
 
 // Import extracted widgets
 import '../widget/top_bar_widget.dart';
 import '../widget/search_and_saved_card_widget.dart';
 import '../widget/services_section_widget.dart';
+import '../widget/date_time_selection_dialogs.dart';
 
 import '../../helpers/map_helper.dart';
+import '../../models/trip_price_details_model.dart';
+import '../../repository/trip_price_details_repository.dart';
+import '../../choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -39,6 +45,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   /// Drop location set from the search card
   LatLng? _dropLatLng;
+
+  String? _pickupUuid;
+  String? _dropoffUuid;
 
   /// Reverse geocoded address for center pin
   String? _centerAddress;
@@ -134,6 +143,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         });
         
+        // Fetch UUID for this address from API
+        try {
+          final loc = AppLocalizations.of(context);
+          final searchRepo = SearchLocationRepository();
+          final response = await searchRepo.searchLocations(address, loc.locale.languageCode);
+          if (mounted && response.data != null && response.data!.isNotEmpty) {
+            final uuid = response.data!.first.uuid;
+            setState(() {
+              if (isDropFocused) {
+                _dropoffUuid = uuid;
+              } else {
+                _pickupUuid = uuid;
+              }
+            });
+          }
+        } catch (e) {
+          debugPrint('Failed to fetch UUID for map location: $e');
+        }
+        
         _searchCardKey.currentState?.updateActiveFieldText(address);
         
         if (_pickupLatLng != null && _dropLatLng != null) {
@@ -164,6 +192,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     setState(() {
       _pickupLatLng = latLng;
+      _pickupUuid = location.uuid;
     });
 
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
@@ -178,6 +207,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     setState(() {
       _dropLatLng = latLng;
+      _dropoffUuid = location.uuid;
       _rebuildMarkers();
     });
 
@@ -223,6 +253,134 @@ class _DashboardScreenState extends State<DashboardScreen> {
       setState(() {
         _polylines = polylines;
       });
+    }
+  }
+
+  Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {
+    // 1. Validate pickup and dropoff UUIDs
+    if (_pickupUuid == null || _dropoffUuid == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select both pickup and drop-off locations first.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    DateTime? startDateTime;
+    DateTime? returnDateTime;
+
+    // 2. Determine Date/Time based on service type
+    if (serviceKey == "RIDE_SHARE") {
+      startDateTime = DateTime.now();
+    } else if (serviceKey == "HOURLY") {
+      final date = await DateTimeSelectionDialogs.pickDateAndTime(context);
+      if (date == null) return;
+      
+      final hours = await DateTimeSelectionDialogs.pickHours(context);
+      if (hours == null) return;
+      
+      startDateTime = date;
+      // In a real scenario, you'd likely pass `hours` to the API. 
+      // We will append it to actionWhen or handle according to exact backend specs.
+    } else if (serviceKey == "RETURN") {
+      final startDate = await DateTimeSelectionDialogs.pickDateAndTime(context);
+      if (startDate == null) return;
+      
+      // Assume pickDateAndTime used again for return date
+      final returnDate = await DateTimeSelectionDialogs.pickDateAndTime(context, initialDate: startDate);
+      if (returnDate == null) return;
+      
+      startDateTime = startDate;
+      returnDateTime = returnDate;
+    } else {
+      startDateTime = await DateTimeSelectionDialogs.pickDateAndTime(context);
+      if (startDateTime == null) return;
+    }
+
+    // Show loading
+    showDialog(
+      context: context, 
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final loc = AppLocalizations.of(context);
+      final req = TripPriceDetailsRequest(
+        platform: "web", // or detect using Platform
+        languageCode: loc.locale.languageCode,
+        serviceType: serviceKey,
+        pickupLocationUuid: [_pickupUuid!],
+        dropoffLocationUuid: [_dropoffUuid!],
+        startDatetime: "${startDateTime.year}-${startDateTime.month.toString().padLeft(2, '0')}-${startDateTime.day.toString().padLeft(2, '0')} ${startDateTime.hour.toString().padLeft(2, '0')}:${startDateTime.minute.toString().padLeft(2, '0')}:00",
+        returnDatetime: returnDateTime != null ? "${returnDateTime.year}-${returnDateTime.month.toString().padLeft(2, '0')}-${returnDateTime.day.toString().padLeft(2, '0')} ${returnDateTime.hour.toString().padLeft(2, '0')}:${returnDateTime.minute.toString().padLeft(2, '0')}:00" : null,
+      );
+
+      final repo = TripPriceDetailsRepository();
+      final response = await repo.getTripPriceDetails(req);
+      
+      if (mounted) Navigator.pop(context); // Hide loading
+      
+      if (response.status == true) {
+        // Parse the vehicles from the response data if available
+        List<Car> finalCars = defaultCars.cast<Car>();
+        
+        try {
+          if (response.data != null && response.data is List) {
+            final parsedCars = (response.data as List).map((e) => Car.fromJson(e)).toList();
+            if (parsedCars.isNotEmpty) {
+              finalCars = parsedCars;
+            }
+          }
+        } catch (parseErr) {
+          debugPrint("Failed to parse API vehicles: $parseErr");
+        }
+
+        // Show Vehicle Details in bottom sheet
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Trip details loaded successfully!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            builder: (BuildContext context) {
+              return FractionallySizedBox(
+                heightFactor: 0.845,
+                child: ChooseCarBottomSheet(
+                  cars: finalCars,
+                  serviceName: serviceKey,
+                ),
+              );
+            },
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(response.message ?? 'Failed to get trip price details'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) Navigator.pop(context); // Hide loading
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -318,7 +476,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 BlocBuilder<ChooseCarBottomSheetBloc, ChooseCarBottomSheetState>(
-                  builder: (context, state) => ServicesSectionWidget(state: state),
+                  builder: (context, state) => ServicesSectionWidget(
+                    state: state,
+                    onServiceTap: _handleServiceSelection,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 SearchAndSavedCardWidget(

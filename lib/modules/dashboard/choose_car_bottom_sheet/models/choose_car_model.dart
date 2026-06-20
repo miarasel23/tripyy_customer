@@ -3,20 +3,33 @@ class Car {
   final String carType;
   final int setCapacity;
   final String carAvatar;
+  final num? minimumBookingPrice;
+  final String? distance;
 
   Car({
     required this.uuid,
     required this.carType,
     required this.setCapacity,
     required this.carAvatar,
+    this.minimumBookingPrice,
+    this.distance,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
+    num? minPrice;
+    if (json['rent_calculation'] != null) {
+      minPrice = json['rent_calculation']['minimum_booking_price'];
+    } else {
+      minPrice = json['minimum_booking_price'];
+    }
+
     return Car(
       uuid: json['uuid'],
       carType: json['car_type'],
       setCapacity: json['set_capacity'],
       carAvatar: json['car_avatar'],
+      minimumBookingPrice: minPrice,
+      distance: json['distance']?.toString(),
     );
   }
 }

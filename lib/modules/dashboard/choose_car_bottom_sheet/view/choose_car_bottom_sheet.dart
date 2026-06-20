@@ -268,6 +268,17 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                           ),
                                         ],
                                       ),
+                                      if (car.minimumBookingPrice != null) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          'Fare up to ৳${car.minimumBookingPrice}${car.distance != null ? ' • ${car.distance} KM' : ''}',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ]
                                     ],
                                   ),
                                 ),

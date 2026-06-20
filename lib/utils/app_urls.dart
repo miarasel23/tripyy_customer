@@ -16,6 +16,7 @@ class AppUrls {
       "$baseUrl/v1/customer/customer-profile-picture-update";
   static const String rentalInfo = "$baseUrl/v1/rental-trip/rental-info";
   static const String searchLocation = "$baseUrl/v1/global-api/search-location";
+  static const String tripPriceDetailsCustomer = "$baseUrl/v1/rental-trip/trip-price-details-customer";
 
   static String? get profileImageUrl {
     final image = UserDataStore.userData?.data?.user?.profilePicture;

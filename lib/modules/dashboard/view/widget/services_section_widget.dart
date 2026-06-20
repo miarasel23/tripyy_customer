@@ -7,8 +7,9 @@ import '../../choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 
 class ServicesSectionWidget extends StatelessWidget {
   final ChooseCarBottomSheetState state;
+  final Function(String serviceKey, List<dynamic> defaultCars) onServiceTap;
 
-  const ServicesSectionWidget({Key? key, required this.state}) : super(key: key);
+  const ServicesSectionWidget({Key? key, required this.state, required this.onServiceTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,20 +25,10 @@ class ServicesSectionWidget extends StatelessWidget {
           final avatar = serviceGroup?.avatar;
           return GestureDetector(
             onTap: () {
-              final cars = state.groups?[key]?.cars ?? [];
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (BuildContext context) {
-                  return FractionallySizedBox(
-                    heightFactor: 0.845,
-                    child: ChooseCarBottomSheet(
-                      cars: cars,
-                      serviceName: key ?? '',
-                    ),
-                  );
-                },
-              );
+              if (key != null) {
+                final cars = state.groups?[key]?.cars ?? [];
+                onServiceTap(key, cars);
+              }
             },
             child: Container(
               margin: EdgeInsets.only(right: 12),
