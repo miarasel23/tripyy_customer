@@ -18,7 +18,7 @@ import '../widget/top_bar_widget.dart';
 import '../widget/search_and_saved_card_widget.dart';
 import '../widget/services_section_widget.dart';
 
-import '../helpers/map_helper.dart';
+import '../../helpers/map_helper.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
