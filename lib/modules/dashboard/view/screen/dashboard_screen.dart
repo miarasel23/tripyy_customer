@@ -260,8 +260,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // 1. Validate pickup and dropoff UUIDs
     if (_pickupUuid == null || _dropoffUuid == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select both pickup and drop-off locations first.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).translate('select_pickup_dropoff')),
           backgroundColor: Colors.red,
         ),
       );

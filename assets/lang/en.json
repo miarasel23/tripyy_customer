@@ -178,5 +178,6 @@
   "points_history_benefits_data_points_score": "200",
   "points_history_benefits_data_points_text": "points",
   "my_trip_wedding_car_message": "No trips to show",
-  "pick_up_location": "Pick Up Location"
+  "pick_up_location": "Pick Up Location",
+  "select_pickup_dropoff": "Please select both pickup and drop-off locations first."
 }
