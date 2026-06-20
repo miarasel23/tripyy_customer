@@ -277,6 +277,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     DateTime? startDateTime;
     DateTime? returnDateTime;
+    String? hoursBooked;
 
     // 2. Determine Date/Time based on service type
     if (serviceKey == "RIDE_SHARE") {
@@ -289,6 +290,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (hours == null) return;
       
       startDateTime = date;
+      hoursBooked = hours.toString();
       // In a real scenario, you'd likely pass `hours` to the API. 
       // We will append it to actionWhen or handle according to exact backend specs.
     } else if (serviceKey == "RETURN") {
@@ -371,6 +373,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   serviceName: serviceKey,
                   pickupAddress: _pickupAddress ?? 'Unknown Pickup',
                   dropoffAddress: _dropoffAddress ?? 'Unknown Dropoff',
+                  tripReq: req,
+                  hoursBooked: hoursBooked,
                 ),
               );
             },

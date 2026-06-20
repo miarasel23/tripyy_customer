@@ -180,5 +180,14 @@
   "my_trip_wedding_car_message": "No trips to show",
   "pick_up_location": "Pick Up Location",
   "select_pickup_dropoff": "Please select both pickup and drop-off locations first.",
-  "up_to": "Up to"
+  "up_to": "Up to",
+  "confirm_trip": "Trip Summary",
+  "dropoff": "Drop-off",
+  "service": "Service",
+  "vehicle": "Vehicle",
+  "payment": "Payment",
+  "estimated_fare": "Estimated Fare",
+  "cancel": "Cancel",
+  "submit": "Submit",
+  "pickup_and_dropoff": "Pickup and Dropoff"
 }

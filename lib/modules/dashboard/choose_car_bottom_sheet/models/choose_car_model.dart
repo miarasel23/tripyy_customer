@@ -5,6 +5,7 @@ class Car {
   final String carAvatar;
   final num? minimumBookingPrice;
   final String? distance;
+  final String? priceSetUuid;
 
   Car({
     required this.uuid,
@@ -13,6 +14,7 @@ class Car {
     required this.carAvatar,
     this.minimumBookingPrice,
     this.distance,
+    this.priceSetUuid,
   });
 
   factory Car.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,11 @@ class Car {
       parsedDistance = json['distance']?.toString();
     }
 
+    String? priceSetUuid;
+    if (json['price_sets'] != null && json['price_sets'] is List && (json['price_sets'] as List).isNotEmpty) {
+      priceSetUuid = json['price_sets'][0]['uuid'];
+    }
+
     return Car(
       uuid: json['uuid'],
       carType: json['car_type'],
@@ -37,6 +44,7 @@ class Car {
       carAvatar: json['car_avatar'],
       minimumBookingPrice: minPrice,
       distance: parsedDistance,
+      priceSetUuid: priceSetUuid,
     );
   }
 }

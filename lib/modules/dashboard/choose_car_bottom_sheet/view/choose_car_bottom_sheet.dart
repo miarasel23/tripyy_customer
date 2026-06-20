@@ -6,11 +6,17 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../utils/enums.dart';
+import '../../models/trip_price_details_model.dart';
 import '../controller/choose_car_bottom_sheet_bloc.dart';
 import '../controller/choose_car_bottom_sheet_events.dart';
 import '../controller/choose_car_bottom_sheet_state.dart';
 import '../../../../utils/colors_code.dart';
 import '../models/choose_car_model.dart';
+import '../../../../store/user_data_store.dart';
+import '../../models/create_rental_trip_model.dart';
+import '../../repository/create_trip_repository.dart';
+import '../../view/screen/bidding_screen.dart';
+import 'widget/confirm_trip_dialog.dart';
 
 class CarOption {
   final String name;
@@ -27,17 +33,108 @@ class ChooseCarBottomSheet extends StatefulWidget {
     required this.serviceName,
     required this.pickupAddress,
     required this.dropoffAddress,
+    required this.tripReq,
+    this.hoursBooked,
   });
 
   final List<Car> cars;
   final String serviceName;
   final String pickupAddress;
   final String dropoffAddress;
+  final TripPriceDetailsRequest tripReq;
+  final String? hoursBooked;
   @override
   State<ChooseCarBottomSheet> createState() => _ChooseCarBottomSheetState();
 }
 
 class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
+  bool _isCreatingTrip = false;
+
+  Future<void> _handleCreateTrip(Car selectedCar) async {
+    final loc = AppLocalizations.of(context);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => ConfirmTripDialog(
+        selectedCar: selectedCar,
+        serviceName: widget.serviceName,
+        pickupAddress: widget.pickupAddress,
+        dropoffAddress: widget.dropoffAddress,
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() {
+      _isCreatingTrip = true;
+    });
+
+    try {
+      final loc = AppLocalizations.of(context);
+      
+      String startDatetime;
+      String? endDatetime;
+
+      if (widget.serviceName == "RETURN") {
+        startDatetime = "2026-06-20 23:59:00";
+        endDatetime = "2026-06-20 23:59:00";
+      } else if (widget.serviceName == "RIDE_SHARE") {
+        final now = DateTime.now();
+        startDatetime = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:00";
+      } else {
+        startDatetime = widget.tripReq.startDatetime;
+      }
+
+      final req = CreateRentalTripRequest(
+        serviceType: widget.serviceName,
+        hoursBooked: widget.hoursBooked,
+        startDatetime: startDatetime,
+        endDatetime: endDatetime,
+        paymentMethod: "CASH",
+        customerUuid: await UserDataStore.getUuid() ?? "",
+        countryCode: "BD",
+        actionWhen: "create_rental_trip",
+        platform: "web",
+        languageCode: loc.locale.languageCode,
+        pickupLocationUuid: widget.tripReq.pickupLocationUuid,
+        dropoffLocationUuid: widget.tripReq.dropoffLocationUuid,
+        priceSetUuid: selectedCar.priceSetUuid ?? selectedCar.uuid,
+      );
+
+      final repo = CreateTripRepository();
+      await repo.createRentalTrip(req);
+
+      if (mounted) {
+        // Dismiss bottom sheet
+        Navigator.pop(context);
+        
+        // Navigate to Bidding Screen
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BiddingScreen(
+              customerUuid: UserDataStore.uuid ?? "",
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCreatingTrip = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
@@ -298,13 +395,20 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                               elevation: 0,
-                              backgroundColor: Color(0xff0e52ff),
+                              backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                              foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            onPressed: () {},
-                            child: Row(
+                            onPressed: _isCreatingTrip ? null : () => _handleCreateTrip(selectedCar),
+                            child: _isCreatingTrip 
+                              ? SizedBox(
+                                  height: 24, 
+                                  width: 24, 
+                                  child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, strokeWidth: 2)
+                                )
+                              : Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(
@@ -318,15 +422,17 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                       ),
                                       clipBehavior: Clip.hardEdge,
                                       child: Builder(builder: (context) {
+                                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                                        final iconColor = isDark ? Colors.black : Colors.white;
                                         final avatar = selectedCar.carAvatar;
                                         final imageUrl = AppUrls.getImageUrl(avatar);
                                         if (imageUrl == null || imageUrl.isEmpty) {
-                                          return Icon(Icons.directions_car, color: Colors.white);
+                                          return Icon(Icons.directions_car, color: iconColor);
                                         }
                                         return Image.network(
                                           imageUrl, 
                                           fit: BoxFit.contain,
-                                          errorBuilder: (_,__,___) => Icon(Icons.directions_car, color: Colors.white),
+                                          errorBuilder: (_,__,___) => Icon(Icons.directions_car, color: iconColor),
                                         );
                                       }),
                                     ),
@@ -334,14 +440,14 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                     Text(
                                       "TRIPPY ${selectedCar.carType}",
                                       style: GoogleFonts.poppins(
-                                        color: Colors.white,
+                                        color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                   ],
                                 ),
-                                Icon(Icons.arrow_forward, color: Colors.white),
+                                Icon(Icons.arrow_forward, color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white),
                               ],
                             ),
                           ),

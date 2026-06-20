@@ -172,5 +172,14 @@
   "my_trip_wedding_car_message": "দেখানোর জন্য কোনো ট্রিপ নেই",
   "pick_up_location": "পিক আপ লোকেশন",
   "select_pickup_dropoff": "দয়া করে প্রথমে পিকআপ এবং ড্রপ-অফ অবস্থান উভয়ই নির্বাচন করুন।",
-  "up_to": "কম আথবা বেশি"
+  "up_to": "কম আথবা বেশি",
+  "confirm_trip": "ট্রিপ সারাংশ",
+  "dropoff": "ড্রপ-অফ",
+  "service": "সার্ভিস",
+  "vehicle": "গাড়ি",
+  "payment": "পেমেন্ট",
+  "estimated_fare": "আনুমানিক ভাড়া",
+  "cancel": "বাতিল",
+  "submit": "জমা দিন",
+  "pickup_and_dropoff": "পিকআপ এবং ড্রপ-অফ"
 }
