@@ -171,5 +171,6 @@
   "points_history_benefits_data_points_text": "পয়েন্ট",
   "my_trip_wedding_car_message": "দেখানোর জন্য কোনো ট্রিপ নেই",
   "pick_up_location": "পিক আপ লোকেশন",
-  "select_pickup_dropoff": "দয়া করে প্রথমে পিকআপ এবং ড্রপ-অফ অবস্থান উভয়ই নির্বাচন করুন।"
+  "select_pickup_dropoff": "দয়া করে প্রথমে পিকআপ এবং ড্রপ-অফ অবস্থান উভয়ই নির্বাচন করুন।",
+  "up_to": "কম আথবা বেশি"
 }

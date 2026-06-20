@@ -25,10 +25,14 @@ class ChooseCarBottomSheet extends StatefulWidget {
     super.key,
     required this.cars,
     required this.serviceName,
+    required this.pickupAddress,
+    required this.dropoffAddress,
   });
 
   final List<Car> cars;
   final String serviceName;
+  final String pickupAddress;
+  final String dropoffAddress;
   @override
   State<ChooseCarBottomSheet> createState() => _ChooseCarBottomSheetState();
 }
@@ -37,15 +41,6 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
-    // final List<CarOption> options = [
-    //   CarOption(name: 'Sedan 1', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 2', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 3', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 4', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 5', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 6', seats: 4, imagePath: Images.carPicture),
-    //   CarOption(name: 'Sedan 7', seats: 4, imagePath: Images.carPicture),
-    // ];
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -115,7 +110,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    "Mission District · Financial Center",
+                                    "${widget.pickupAddress.split(',').first} · ${widget.dropoffAddress.split(',').first}",
                                     style: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
@@ -168,39 +163,36 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                             );
                           },
                           child: Container(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: Colors.transparent,
+                              color: Theme.of(context).brightness == Brightness.dark 
+                                  ? const Color(0xFF2B2B36) 
+                                  : Colors.white,
                               border: Border.all(
                                 color: isSelected 
-                                    ? Colors.indigo.shade200 
-                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                                width: isSelected ? 1.5 : 1,
+                                    ? const Color(0xFF8C9EFF) 
+                                    : Colors.grey.withOpacity(0.3),
+                                width: isSelected ? 2 : 1,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(16),
                             ),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                // Car Image
                                 Container(
-                                  width: 65,
-                                  height: 65,
+                                  width: 80,
+                                  height: 50,
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).brightness == Brightness.light ? Colors.white : Colors.black,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   clipBehavior: Clip.hardEdge,
                                   child: Builder(
                                     builder: (context) {
                                       final avatar = car.carAvatar;
-                                      final imageUrl = AppUrls.getImageUrl(
-                                        avatar,
-                                      );
-                                      if (imageUrl == null ||
-                                          imageUrl.isEmpty) {
-                                        return Icon(Icons.directions_car, color: Colors.grey);
+                                      final imageUrl = AppUrls.getImageUrl(avatar);
+                                      if (imageUrl == null || imageUrl.isEmpty) {
+                                        return const Icon(Icons.directions_car, color: Colors.grey);
                                       }
 
                                       return Image.network(
@@ -208,54 +200,34 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                         fit: BoxFit.contain,
                                         width: double.infinity,
                                         height: double.infinity,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                              if (loadingProgress == null) {
-                                                return child;
-                                              }
-
-                                              final isLight = Theme.of(context).brightness == Brightness.light;
-                                              return Shimmer.fromColors(
-                                                baseColor: isLight ? Colors.grey[300]! : Colors.grey[700]!,
-                                                highlightColor: isLight ? Colors.grey[100]! : Colors.grey[500]!,
-                                                child: Container(
-                                                  width: double.infinity,
-                                                  height: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: isLight ? Colors.white : Colors.black,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                        errorBuilder: (_, _, _) {
-                                          return Icon(Icons.directions_car, color: Colors.grey);
-                                        },
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.directions_car, color: Colors.grey),
                                       );
                                     },
                                   ),
                                 ),
-                                SizedBox(width: 16),
-                                //Text Details
-                                Flexible(
+                                const SizedBox(width: 16),
+                                // Text Details (Middle)
+                                Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         car.carType,
                                         style: GoogleFonts.poppins(
                                           fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                          fontWeight: FontWeight.w700,
                                           color: Theme.of(context).colorScheme.onSurface,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         children: [
                                           Icon(
                                             Icons.person_outline,
                                             size: 14,
-                                            color: Theme.of(context).colorScheme.onSurface,
+                                            color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
@@ -263,24 +235,43 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                             style: GoogleFonts.poppins(
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
-                                              color: Theme.of(context).colorScheme.onSurface,
+                                              color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                             ),
                                           ),
                                         ],
                                       ),
-                                      if (car.minimumBookingPrice != null) ...[
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Fare up to ৳${car.minimumBookingPrice}${car.distance != null ? ' • ${car.distance} KM' : ''}',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.green,
-                                          ),
-                                        ),
-                                      ]
                                     ],
                                   ),
+                                ),
+                                // Price & Distance (Right)
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (car.minimumBookingPrice != null)
+                                      Text(
+                                        '${loc.translate("up_to") ?? "Up to"} ' + 
+                                        (loc.locale.languageCode == 'bn' 
+                                            ? '৳${car.minimumBookingPrice}' 
+                                            : 'BDT ${car.minimumBookingPrice}'),
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                        ),
+                                      ),
+                                    if (car.distance != null) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        '${car.distance} km',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ],
                             ),
@@ -288,7 +279,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                         );
                       },
                       separatorBuilder: (BuildContext context, int index) {
-                        return SizedBox(height: 12);
+                        return const SizedBox(height: 12);
                       },
                     ),
                   ),

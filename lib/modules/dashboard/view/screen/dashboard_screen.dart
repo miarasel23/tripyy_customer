@@ -48,6 +48,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   String? _pickupUuid;
   String? _dropoffUuid;
+  
+  String? _pickupAddress;
+  String? _dropoffAddress;
 
   /// Reverse geocoded address for center pin
   String? _centerAddress;
@@ -153,8 +156,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             setState(() {
               if (isDropFocused) {
                 _dropoffUuid = uuid;
+                _dropoffAddress = address;
               } else {
                 _pickupUuid = uuid;
+                _pickupAddress = address;
               }
             });
           }
@@ -193,6 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _pickupLatLng = latLng;
       _pickupUuid = location.uuid;
+      _pickupAddress = location.address;
     });
 
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
@@ -208,6 +214,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _dropLatLng = latLng;
       _dropoffUuid = location.uuid;
+      _dropoffAddress = location.address;
       _rebuildMarkers();
     });
 
@@ -328,10 +335,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         List<Car> finalCars = defaultCars.cast<Car>();
         
         try {
-          if (response.data != null && response.data is List) {
-            final parsedCars = (response.data as List).map((e) => Car.fromJson(e)).toList();
-            if (parsedCars.isNotEmpty) {
-              finalCars = parsedCars;
+          if (response.data != null && response.data is Map) {
+            final Map<String, dynamic> dataMap = response.data;
+            if (dataMap.containsKey(serviceKey)) {
+              final serviceGroup = dataMap[serviceKey];
+              if (serviceGroup != null && serviceGroup['cars'] is List) {
+                final parsedCars = (serviceGroup['cars'] as List).map((e) => Car.fromJson(e)).toList();
+                if (parsedCars.isNotEmpty) {
+                  finalCars = parsedCars;
+                }
+              }
             }
           }
         } catch (parseErr) {
@@ -356,6 +369,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ChooseCarBottomSheet(
                   cars: finalCars,
                   serviceName: serviceKey,
+                  pickupAddress: _pickupAddress ?? 'Unknown Pickup',
+                  dropoffAddress: _dropoffAddress ?? 'Unknown Dropoff',
                 ),
               );
             },

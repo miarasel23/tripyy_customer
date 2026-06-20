@@ -23,13 +23,20 @@ class Car {
       minPrice = json['minimum_booking_price'];
     }
 
+    String? parsedDistance;
+    if (json['distance'] is Map) {
+      parsedDistance = json['distance']['total_km']?.toString();
+    } else {
+      parsedDistance = json['distance']?.toString();
+    }
+
     return Car(
       uuid: json['uuid'],
       carType: json['car_type'],
       setCapacity: json['set_capacity'],
       carAvatar: json['car_avatar'],
       minimumBookingPrice: minPrice,
-      distance: json['distance']?.toString(),
+      distance: parsedDistance,
     );
   }
 }
