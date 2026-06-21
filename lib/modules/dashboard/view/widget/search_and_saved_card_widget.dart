@@ -202,20 +202,37 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
       if (_isDropActive) {
         _destController.text = address;
       } else {
-        // Find exactly which pickup field has focus, or use the first one
-        bool found = false;
-        for (int i = 0; i < _pickupFocusNodes.length; i++) {
-          if (_pickupFocusNodes[i].hasFocus) {
-            _pickupControllers[i].text = address;
-            found = true;
-            break;
-          }
-        }
-        if (!found && _pickupControllers.isNotEmpty) {
-          _pickupControllers[0].text = address;
+        int idx = getActivePickupIndex();
+        if (idx >= 0 && idx < _pickupControllers.length) {
+          _pickupControllers[idx].text = address;
         }
       }
     });
+  }
+
+  int getActivePickupIndex() {
+    for (int i = 0; i < _pickupFocusNodes.length; i++) {
+      if (_pickupFocusNodes[i].hasFocus) return i;
+    }
+    return 0; // Default to first
+  }
+
+  void setLocationFromMapDrag(SearchLocationData location) {
+    setState(() {
+      if (_isDropActive) {
+        _destController.text = location.address ?? "";
+      } else {
+        int idx = getActivePickupIndex();
+        if (idx >= 0 && idx < _pickupControllers.length) {
+           _pickupControllers[idx].text = location.address ?? "";
+           _selectedPickups[idx] = location;
+        }
+      }
+    });
+  }
+
+  List<SearchLocationData> getValidPickups() {
+    return _selectedPickups.whereType<SearchLocationData>().toList();
   }
 
   @override

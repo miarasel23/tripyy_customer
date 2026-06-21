@@ -137,11 +137,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         setState(() {
           _centerAddress = address;
-          if (isDropFocused) {
-            _dropLatLng = position;
-          }
         });
-        
+
         // Fetch UUID for this address from API
         try {
           final loc = AppLocalizations.of(context);
@@ -149,19 +146,46 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final response = await searchRepo.searchLocations(address, loc.locale.languageCode);
           if (mounted && response.data != null && response.data!.isNotEmpty) {
             final uuid = response.data!.first.uuid;
+            final locData = SearchLocationData(
+              uuid: uuid,
+              address: address,
+              latitude: position.latitude,
+              longitude: position.longitude,
+            );
+
             setState(() {
               if (isDropFocused) {
                 _dropoffUuid = uuid;
                 _dropoffAddress = address;
+                _dropLatLng = position;
+              } else {
+                int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
+                if (pIndex >= 0 && pIndex < _pickups.length) {
+                   _pickups[pIndex] = locData;
+                } else if (_pickups.isEmpty) {
+                   _pickups.add(locData);
+                }
               }
             });
+            _searchCardKey.currentState?.setLocationFromMapDrag(locData);
+          } else {
+            _searchCardKey.currentState?.updateActiveFieldText(address);
           }
         } catch (e) {
           debugPrint('Failed to fetch UUID for map location: $e');
+          _searchCardKey.currentState?.updateActiveFieldText(address);
         }
-        
-        _searchCardKey.currentState?.updateActiveFieldText(address);
-        
+
+        // Sync local _pickups properly without triggering camera
+        if (!isDropFocused) {
+          setState(() {
+             final validPickups = _searchCardKey.currentState?.getValidPickups() ?? [];
+             if (validPickups.isNotEmpty) {
+               _pickups = validPickups;
+             }
+          });
+        }
+
         if (_pickups.isNotEmpty && _dropLatLng != null) {
           _drawRouteMulti();
         }
