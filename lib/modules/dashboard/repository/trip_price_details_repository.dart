@@ -16,15 +16,11 @@ class TripPriceDetailsRepository {
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
-
-      print("Request: ${request.toJson()}");
-
       final response = await http.post(
         Uri.parse(AppUrls.tripPriceDetailsCustomer),
         headers: headers,
         body: request.toJson(),
       );
-     print(response.body);
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         if (decoded['status'] == false) {

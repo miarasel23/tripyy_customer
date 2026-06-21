@@ -69,8 +69,6 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
     });
 
     try {
-      final loc = AppLocalizations.of(context);
-      
       String startDatetime = widget.tripReq.startDatetime;
       String? endDatetime = widget.tripReq.endDatetime;
 
@@ -109,11 +107,21 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
+        showDialog(
+          context: context,
+          builder: (ctx) {
+            final loc = AppLocalizations.of(context);
+            return AlertDialog(
+              title: Text(loc.translate("message") ?? "Message"),
+              content: Text(e.toString().replaceAll('Exception: ', '').replaceAll('Error: ', '')),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
         );
       }
     } finally {

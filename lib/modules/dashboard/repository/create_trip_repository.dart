@@ -31,21 +31,24 @@ class CreateTripRepository {
         body: formFields,
       );
 
-      debugPrint("Create trip response [${response.statusCode}]: ${response.body}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 400) {
         final decoded = jsonDecode(response.body);
         if (decoded['status'] == false) {
           throw Exception(decoded['message'] ?? "Unknown server error");
         }
         return decoded;
       } else {
+        String? errorMessage;
         try {
           final decoded = jsonDecode(response.body);
           if (decoded['message'] != null) {
-            throw Exception(decoded['message']);
+            errorMessage = decoded['message'];
           }
         } catch (_) {}
+        
+        if (errorMessage != null) {
+          throw Exception(errorMessage);
+        }
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {

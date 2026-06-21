@@ -194,5 +194,6 @@
   "select_start_time": "SELECT START TIME",
   "select_return_date": "SELECT RETURN DATE",
   "select_return_time": "SELECT RETURN TIME",
-  "please_select_time_after": "Please select a time after"
+  "please_select_time_after": "Please select a time after",
+  "message": "Message"
 }

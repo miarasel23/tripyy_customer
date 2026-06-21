@@ -186,5 +186,6 @@
   "select_start_time": "শুরুর সময় নির্বাচন করুন",
   "select_return_date": "ফেরার তারিখ নির্বাচন করুন",
   "select_return_time": "ফেরার সময় নির্বাচন করুন",
-  "please_select_time_after": "অনুগ্রহ করে এই সময়ের পরের একটি সময় নির্বাচন করুন:"
+  "please_select_time_after": "অনুগ্রহ করে এই সময়ের পরের একটি সময় নির্বাচন করুন:",
+  "message": "বার্তা"
 }
