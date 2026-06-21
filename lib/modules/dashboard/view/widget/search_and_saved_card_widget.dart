@@ -32,16 +32,23 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
   late SearchLocationBloc _bloc;
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
+  bool _isDropActive = false;
 
   void _setupFocusListener(FocusNode node) {
     node.addListener(() {
+      if (_destFocusNode.hasFocus) {
+        _isDropActive = true;
+      } else if (_pickupFocusNodes.any((n) => n.hasFocus)) {
+        _isDropActive = false;
+      }
+
       bool anyFocused = _pickupFocusNodes.any((n) => n.hasFocus) || _destFocusNode.hasFocus;
       if (anyFocused) {
         _showOverlay();
       } else {
         _removeOverlay();
       }
-      widget.onFocusChanged?.call(_destFocusNode.hasFocus);
+      widget.onFocusChanged?.call(_isDropActive);
       setState(() {});
     });
   }
@@ -185,23 +192,24 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
     super.dispose();
   }
 
-  bool get isDropFocused => _destFocusNode.hasFocus;
+  bool get isDropFocused => _isDropActive;
 
   /// Called externally (e.g., from map drag) to update the active field
   void updateActiveFieldText(String address) {
     setState(() {
-      if (_destFocusNode.hasFocus) {
+      if (_isDropActive) {
         _destController.text = address;
       } else {
-        // Find exactly which pickup field has focus
+        // Find exactly which pickup field has focus, or use the first one
+        bool found = false;
         for (int i = 0; i < _pickupFocusNodes.length; i++) {
           if (_pickupFocusNodes[i].hasFocus) {
             _pickupControllers[i].text = address;
-            return;
+            found = true;
+            break;
           }
         }
-        // If none has explicit focus, default to the first one
-        if (_pickupControllers.isNotEmpty) {
+        if (!found && _pickupControllers.isNotEmpty) {
           _pickupControllers[0].text = address;
         }
       }
