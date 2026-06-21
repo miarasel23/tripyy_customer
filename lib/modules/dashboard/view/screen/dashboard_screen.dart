@@ -509,6 +509,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   right: 20,
                   child: TopBarWidget(),
                 ),
+
+                // Zoom controls
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: Column(
+                    children: [
+                      FloatingActionButton(
+                        heroTag: "zoomInBtn",
+                        mini: true,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        onPressed: () {
+                          _mapController?.animateCamera(CameraUpdate.zoomIn());
+                        },
+                        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                      const SizedBox(height: 8),
+                      FloatingActionButton(
+                        heroTag: "zoomOutBtn",
+                        mini: true,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        onPressed: () {
+                          _mapController?.animateCamera(CameraUpdate.zoomOut());
+                        },
+                        child: Icon(Icons.remove, color: Theme.of(context).colorScheme.onSurface),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

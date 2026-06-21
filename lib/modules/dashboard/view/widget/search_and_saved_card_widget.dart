@@ -98,14 +98,30 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                     borderRadius: BorderRadius.circular(16),
                     color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     child: Container(
-                      constraints: const BoxConstraints(maxHeight: 200),
+                      constraints: const BoxConstraints(maxHeight: 240),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: state.locations.length,
-                        separatorBuilder: (_, __) => Divider(height: 1, thickness: 0.5, color: Colors.grey.withOpacity(0.3)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: IconButton(
+                              icon: const Icon(Icons.close, size: 20),
+                              padding: const EdgeInsets.all(8),
+                              constraints: const BoxConstraints(),
+                              onPressed: () {
+                                for (var n in _pickupFocusNodes) n.unfocus();
+                                _destFocusNode.unfocus();
+                              },
+                            ),
+                          ),
+                          Flexible(
+                            child: ListView.separated(
+                              shrinkWrap: true,
+                              itemCount: state.locations.length,
+                              separatorBuilder: (_, __) => Divider(height: 1, thickness: 0.5, color: Colors.grey.withOpacity(0.3)),
                         itemBuilder: (context, index) {
                           final loc = state.locations[index];
                           final parts = (loc.address ?? "").split(',');
@@ -144,8 +160,11 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                         },
                       ),
                     ),
-                  );
-                }
+                  ],
+                ),
+              ),
+            );
+            }
                 return const SizedBox.shrink(); // Hide overlay if nothing is found or empty
               },
             ),
