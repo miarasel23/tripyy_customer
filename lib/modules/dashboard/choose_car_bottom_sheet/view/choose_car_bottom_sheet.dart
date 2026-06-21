@@ -31,16 +31,16 @@ class ChooseCarBottomSheet extends StatefulWidget {
     super.key,
     required this.cars,
     required this.serviceName,
-    required this.pickupAddress,
-    required this.dropoffAddress,
+    required this.pickupAddresses,
+    required this.dropoffAddresses,
     required this.tripReq,
     this.hoursBooked,
   });
 
   final List<Car> cars;
   final String serviceName;
-  final String pickupAddress;
-  final String dropoffAddress;
+  final List<String> pickupAddresses;
+  final List<String> dropoffAddresses;
   final TripPriceDetailsRequest tripReq;
   final String? hoursBooked;
   @override
@@ -57,8 +57,8 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
       builder: (ctx) => ConfirmTripDialog(
         selectedCar: selectedCar,
         serviceName: widget.serviceName,
-        pickupAddress: widget.pickupAddress,
-        dropoffAddress: widget.dropoffAddress,
+        pickupAddresses: widget.pickupAddresses,
+        dropoffAddresses: widget.dropoffAddresses,
       ),
     );
 
@@ -133,9 +133,84 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
     }
   }
 
+  List<Widget> _buildDynamicLocationList(bool isDark) {
+    List<Widget> children = [];
+    
+    final int pickupCount = widget.pickupAddresses.length;
+    for (int i = 0; i < pickupCount; i++) {
+      children.add(
+        _buildLocationRow(
+          icon: Icons.my_location,
+          iconColor: isDark ? Colors.white : Colors.black87,
+          label: pickupCount > 1 ? "PICKUP ${i + 1}" : "PICKUP",
+          address: widget.pickupAddresses[i],
+          isDark: isDark,
+        ),
+      );
+      
+      children.add(
+        Padding(
+          padding: const EdgeInsets.only(left: 11.0, top: 4, bottom: 4),
+          child: Container(
+            width: 2,
+            height: 20,
+            color: isDark ? Colors.white12 : Colors.grey.shade300,
+          ),
+        ),
+      );
+    }
+    
+    final int dropoffCount = widget.dropoffAddresses.length;
+    for (int i = 0; i < dropoffCount; i++) {
+      children.add(
+        _buildLocationRow(
+          icon: Icons.location_on,
+          iconColor: const Color(0xFF6C63FF),
+          label: dropoffCount > 1 ? "DESTINATION ${i + 1}" : "DESTINATION",
+          address: widget.dropoffAddresses[i],
+          isDark: isDark,
+        ),
+      );
+      
+      if (i < dropoffCount - 1) {
+        children.add(
+          Padding(
+            padding: const EdgeInsets.only(left: 11.0, top: 4, bottom: 4),
+            child: Container(
+              width: 2,
+              height: 20,
+              color: isDark ? Colors.white12 : Colors.grey.shade300,
+            ),
+          ),
+        );
+      }
+    }
+    
+    return children;
+  }
+
+  Widget _buildLocationRow({required IconData icon, required Color iconColor, required String label, required String address, required bool isDark}) {
+    return Row(
+      children: [
+        Icon(icon, size: 22, color: iconColor),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.w600)),
+              Text(address, style: GoogleFonts.poppins(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -164,77 +239,28 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                         ),
                       ),
                       SizedBox(height: 16),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Timeline graphics
-                            Column(
-                              children: [
-                                SizedBox(height: 6),
-                                Icon(Icons.circle, size: 8, color: Colors.grey[400]),
-                                Container(
-                                  height: 20, 
-                                  width: 2, 
-                                  margin: EdgeInsets.symmetric(vertical: 2),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: List.generate(4, (index) => Container(
-                                      width: 2, height: 2, color: Colors.grey[600],
-                                    )),
-                                  ),
-                                ),
-                                Icon(Icons.location_on_outlined, size: 14, color: Colors.grey[400]),
-                              ],
-                            ),
-                            SizedBox(width: 12),
-                            // Text info
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "PICKUP & DROP-OFF",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[500],
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    "${widget.pickupAddress.split(',').first} · ${widget.dropoffAddress.split(',').first}",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).colorScheme.onSurface,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Edit button
-                            TextButton(
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size(0, 0),
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text(
-                                "EDIT",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.indigo.shade200,
-                                ),
-                              ),
-                            ),
+                      // Trip Details Map/Location Box
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: isDark ? const Color(0xFF252833) : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            )
                           ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ..._buildDynamicLocationList(isDark),
+                            ],
+                          ),
                         ),
                       ),
                       SizedBox(height: 16),

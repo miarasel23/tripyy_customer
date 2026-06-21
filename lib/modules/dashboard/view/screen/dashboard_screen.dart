@@ -41,16 +41,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   LatLng _cameraCenter = const LatLng(23.8103, 90.4125);
   bool _isCameraMoving = false;
 
-  /// Pickup location (explicitly tracked)
-  LatLng? _pickupLatLng;
+  /// List of pickup locations
+  List<SearchLocationData> _pickups = [];
 
   /// Drop location set from the search card
   LatLng? _dropLatLng;
 
-  String? _pickupUuid;
   String? _dropoffUuid;
-  
-  String? _pickupAddress;
   String? _dropoffAddress;
 
   /// Reverse geocoded address for center pin
@@ -142,8 +139,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _centerAddress = address;
           if (isDropFocused) {
             _dropLatLng = position;
-          } else {
-            _pickupLatLng = position;
           }
         });
         
@@ -158,9 +153,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (isDropFocused) {
                 _dropoffUuid = uuid;
                 _dropoffAddress = address;
-              } else {
-                _pickupUuid = uuid;
-                _pickupAddress = address;
               }
             });
           }
@@ -170,8 +162,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         
         _searchCardKey.currentState?.updateActiveFieldText(address);
         
-        if (_pickupLatLng != null && _dropLatLng != null) {
-          _drawRoute(_pickupLatLng!, _dropLatLng!);
+        if (_pickups.isNotEmpty && _dropLatLng != null) {
+          _drawRouteMulti();
         }
       }
     });
@@ -183,7 +175,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
     
     // Pan camera to the currently focused location
-    final targetLatLng = isDropFocused ? _dropLatLng : _pickupLatLng;
+    final targetLatLng = isDropFocused ? _dropLatLng : (_pickups.isNotEmpty ? LatLng(_pickups.first.latitude!, _pickups.first.longitude!) : null);
     if (targetLatLng != null) {
       _mapController?.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: targetLatLng, zoom: 15.0),
@@ -191,20 +183,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  /// Called when the user selects a pickup from the search list
-  void _onPickupSelected(SearchLocationData location) {
-    if (location.latitude == null || location.longitude == null) return;
-    final latLng = LatLng(location.latitude!, location.longitude!);
-
+  /// Called when the user updates the pickups from the search list
+  void _onPickupsUpdated(List<SearchLocationData> locations) {
     setState(() {
-      _pickupLatLng = latLng;
-      _pickupUuid = location.uuid;
-      _pickupAddress = location.address;
+      _pickups = List.from(locations);
+      _rebuildMarkers();
     });
 
-    _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: latLng, zoom: 15.0),
-    ));
+    _drawRouteMulti();
+
+    if (_pickups.isNotEmpty) {
+      final last = _pickups.last;
+      if (last.latitude != null && last.longitude != null) {
+        _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: LatLng(last.latitude!, last.longitude!), zoom: 15.0),
+        ));
+      }
+    }
   }
 
   /// Called when the user selects a destination from the search list
@@ -219,12 +214,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _rebuildMarkers();
     });
 
-    if (_pickupLatLng != null) {
-      _drawRoute(_pickupLatLng!, latLng);
-    }
+    _drawRouteMulti();
 
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: _pickupLatLng ?? _cameraCenter, zoom: 11.0),
+      CameraPosition(target: _pickups.isNotEmpty ? LatLng(_pickups.first.latitude!, _pickups.first.longitude!) : _cameraCenter, zoom: 11.0),
     ));
   }
 
@@ -232,14 +225,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final markers = <Marker>{};
     final isDropFocused = _searchCardKey.currentState?.isDropFocused ?? false;
 
-    // If we are currently modifying the drop location, draw a static marker for the pickup!
-    if (isDropFocused && _pickupLatLng != null) {
-      markers.add(Marker(
-        markerId: const MarkerId('pickup'),
-        position: _pickupLatLng!,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        infoWindow: const InfoWindow(title: 'Pickup'),
-      ));
+    // If we are currently modifying the drop location, draw static markers for the pickups!
+    if (isDropFocused) {
+      for (int i = 0; i < _pickups.length; i++) {
+        final p = _pickups[i];
+        if (p.latitude != null && p.longitude != null) {
+          markers.add(Marker(
+            markerId: MarkerId('pickup_$i'),
+            position: LatLng(p.latitude!, p.longitude!),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+            infoWindow: InfoWindow(title: 'Pickup ${i + 1}'),
+          ));
+        }
+      }
     }
 
     // If we are currently modifying the pickup location, draw a static marker for the drop!
@@ -255,21 +253,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _markers = markers;
   }
 
-  Future<void> _drawRoute(LatLng from, LatLng to) async {
-    final polylines = await MapHelper.getRouteBetweenCoordinates(from, to);
-    if (mounted && polylines.isNotEmpty) {
+  Future<void> _drawRouteMulti() async {
+    if (_pickups.isEmpty || _dropLatLng == null) return;
+
+    List<LatLng> allRoutePoints = [];
+    
+    // Pickups sequentially
+    for (int i = 0; i < _pickups.length - 1; i++) {
+      final p1 = _pickups[i];
+      final p2 = _pickups[i + 1];
+      if (p1.latitude != null && p1.longitude != null && p2.latitude != null && p2.longitude != null) {
+        final r = await MapHelper.getRouteBetweenCoordinates(
+          LatLng(p1.latitude!, p1.longitude!),
+          LatLng(p2.latitude!, p2.longitude!),
+        );
+        if (r.isNotEmpty) {
+          allRoutePoints.addAll(r.first.points);
+        }
+      }
+    }
+    
+    // Last pickup to dropoff
+    final lastPickup = _pickups.last;
+    if (lastPickup.latitude != null && lastPickup.longitude != null) {
+      final r = await MapHelper.getRouteBetweenCoordinates(
+        LatLng(lastPickup.latitude!, lastPickup.longitude!),
+        _dropLatLng!,
+      );
+      if (r.isNotEmpty) {
+        allRoutePoints.addAll(r.first.points);
+      }
+    }
+
+    if (mounted) {
       setState(() {
-        _polylines = polylines;
+        _polylines = {
+          Polyline(
+            polylineId: const PolylineId('route'),
+            points: allRoutePoints,
+            color: const Color(0xFF6C63FF),
+            width: 5,
+          )
+        };
       });
     }
   }
 
   Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {
-    // 1. Validate pickup and dropoff UUIDs
-    if (_pickupUuid == null || _dropoffUuid == null) {
+    if (_pickups.isEmpty || _dropoffUuid == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context).translate('select_pickup_dropoff')),
+          content: Text(AppLocalizations.of(context).translate('select_pickup_dropoff') ?? 'select_pickup_dropoff'),
           backgroundColor: Colors.red,
         ),
       );
@@ -346,7 +380,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         platform: "web", // or detect using Platform
         languageCode: loc.locale.languageCode,
         serviceType: serviceKey,
-        pickupLocationUuid: [_pickupUuid!],
+        pickupLocationUuid: _pickups.map((e) => e.uuid!).toList(),
         dropoffLocationUuid: [_dropoffUuid!],
         startDatetime: "${startDateTime.year}-${startDateTime.month.toString().padLeft(2, '0')}-${startDateTime.day.toString().padLeft(2, '0')} ${startDateTime.hour.toString().padLeft(2, '0')}:${startDateTime.minute.toString().padLeft(2, '0')}:00",
         endDatetime: returnDateTime != null ? "${returnDateTime.year}-${returnDateTime.month.toString().padLeft(2, '0')}-${returnDateTime.day.toString().padLeft(2, '0')} ${returnDateTime.hour.toString().padLeft(2, '0')}:${returnDateTime.minute.toString().padLeft(2, '0')}:00" : null,
@@ -396,8 +430,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: ChooseCarBottomSheet(
                   cars: finalCars,
                   serviceName: serviceKey,
-                  pickupAddress: _pickupAddress ?? 'Unknown Pickup',
-                  dropoffAddress: _dropoffAddress ?? 'Unknown Dropoff',
+                  pickupAddresses: _pickups.map((e) => e.address ?? 'Unknown').toList(),
+                  dropoffAddresses: [_dropoffAddress ?? 'Unknown Dropoff'],
                   tripReq: req,
                   hoursBooked: hoursBooked,
                 ),
@@ -558,7 +592,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 SearchAndSavedCardWidget(
                   key: _searchCardKey,
                   loc: loc,
-                  onPickupSelected: _onPickupSelected,
+                  onPickupsUpdated: _onPickupsUpdated,
                   onDestinationSelected: _onDestinationSelected,
                   onFocusChanged: _onSearchFieldFocusChanged,
                 ),

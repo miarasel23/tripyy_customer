@@ -8,14 +8,14 @@ import '../../../searchLocation/repository/search_location_repository.dart';
 
 class SearchAndSavedCardWidget extends StatefulWidget {
   final AppLocalizations loc;
-  final Function(SearchLocationData)? onPickupSelected;
+  final Function(List<SearchLocationData>) onPickupsUpdated;
   final Function(SearchLocationData)? onDestinationSelected;
   final Function(bool isDropFocused)? onFocusChanged;
 
   const SearchAndSavedCardWidget({
     super.key,
     required this.loc,
-    this.onPickupSelected,
+    required this.onPickupsUpdated,
     this.onDestinationSelected,
     this.onFocusChanged,
   });
@@ -27,6 +27,7 @@ class SearchAndSavedCardWidget extends StatefulWidget {
 class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
   final List<TextEditingController> _pickupControllers = [TextEditingController()];
   final List<FocusNode> _pickupFocusNodes = [FocusNode()];
+  final List<SearchLocationData?> _selectedPickups = [null];
   final TextEditingController _destController = TextEditingController();
   final FocusNode _destFocusNode = FocusNode();
   late SearchLocationBloc _bloc;
@@ -151,10 +152,11 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                               int pickupIndex = _pickupFocusNodes.indexWhere((n) => n.hasFocus);
                               if (pickupIndex != -1) {
                                 _pickupControllers[pickupIndex].text = loc.address ?? "";
+                                _selectedPickups[pickupIndex] = loc;
                                 _pickupFocusNodes[pickupIndex].unfocus();
-                                if (widget.onPickupSelected != null && pickupIndex == 0) {
-                                  widget.onPickupSelected!(loc);
-                                }
+                                
+                                final List<SearchLocationData> validPickups = _selectedPickups.whereType<SearchLocationData>().toList();
+                                widget.onPickupsUpdated(validPickups);
                               } else if (_destFocusNode.hasFocus) {
                                 _destController.text = loc.address ?? "";
                                 _destFocusNode.unfocus();
@@ -287,6 +289,10 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                                 _pickupFocusNodes[i].dispose();
                                                 _pickupControllers.removeAt(i);
                                                 _pickupFocusNodes.removeAt(i);
+                                                _selectedPickups.removeAt(i);
+                                                
+                                                final List<SearchLocationData> validPickups = _selectedPickups.whereType<SearchLocationData>().toList();
+                                                widget.onPickupsUpdated(validPickups);
                                               });
                                             },
                                           ),
@@ -304,6 +310,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                         _setupFocusListener(newNode);
                                         _pickupControllers.add(newController);
                                         _pickupFocusNodes.add(newNode);
+                                        _selectedPickups.add(null);
                                       });
                                     },
                                     child: Container(

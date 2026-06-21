@@ -7,6 +7,7 @@ import '../../repository/create_trip_repository.dart';
 import '../../../../widgets/radar_animation.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../widgets/full_screen_image_gallery.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 class BiddingScreen extends StatefulWidget {
   final String customerUuid;
@@ -23,11 +24,22 @@ class _BiddingScreenState extends State<BiddingScreen> {
   bool _isLoading = true;
   RentalTrip? _currentTrip;
   String? _errorMessage;
+  int _previousDriverCount = 0;
+
+  bool _isInit = false;
 
   @override
   void initState() {
     super.initState();
-    _startPolling();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      _isInit = true;
+      _startPolling();
+    }
   }
 
   void _startPolling() {
@@ -49,6 +61,12 @@ class _BiddingScreenState extends State<BiddingScreen> {
         setState(() {
           if (response.trips.isNotEmpty) {
             _currentTrip = response.trips.first;
+            
+            int currentDriverCount = _currentTrip!.drivers.length;
+            if (currentDriverCount > _previousDriverCount) {
+              FlutterRingtonePlayer().playNotification();
+              _previousDriverCount = currentDriverCount;
+            }
           }
           _isLoading = false;
           _errorMessage = null;
@@ -292,8 +310,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                     ? '৳${bid.totalAmount ?? bid.bidAmount ?? '0.00'}' 
                                     : 'BDT ${bid.totalAmount ?? bid.bidAmount ?? '0.00'}'),
                                 style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: Colors.green,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black,
                                 ),
                               ),
                             ],
@@ -360,14 +379,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
   }
 
   Widget _buildTripDetailsCard(bool isDark) {
-    final pickup = _currentTrip!.pickupLocations.isNotEmpty 
-      ? _currentTrip!.pickupLocations.first.address 
-      : "Unknown Pickup";
-      
-    final dropoff = _currentTrip!.dropoffLocations.isNotEmpty 
-      ? _currentTrip!.dropoffLocations.first.address 
-      : "Unknown Dropoff";
-
     final carType = _currentTrip!.carCategory?.carType ?? "Standard Sedan";
     final price = _currentTrip!.priceInfo?.minimumBookingPrice?.toStringAsFixed(2) ?? "0.00";
 
@@ -457,30 +468,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
           
           const SizedBox(height: 24),
           
-          _buildLocationRow(
-            icon: Icons.my_location,
-            iconColor: isDark ? Colors.white : Colors.black87,
-            label: "PICKUP",
-            address: pickup ?? "",
-            isDark: isDark,
-          ),
-          
-          Padding(
-            padding: const EdgeInsets.only(left: 11.0, top: 4, bottom: 4),
-            child: Container(
-              width: 2,
-              height: 20,
-              color: isDark ? Colors.white12 : Colors.grey.shade300,
-            ),
-          ),
-          
-          _buildLocationRow(
-            icon: Icons.location_on,
-            iconColor: const Color(0xFF6C63FF),
-            label: "DESTINATION",
-            address: dropoff ?? "",
-            isDark: isDark,
-          ),
+          ..._buildDynamicLocationList(isDark),
           
           const SizedBox(height: 24),
           
@@ -522,6 +510,64 @@ class _BiddingScreenState extends State<BiddingScreen> {
         ],
       ),
     );
+  }
+
+  List<Widget> _buildDynamicLocationList(bool isDark) {
+    List<Widget> children = [];
+    
+    final int pickupCount = _currentTrip!.pickupLocations.length;
+    for (int i = 0; i < pickupCount; i++) {
+      children.add(
+        _buildLocationRow(
+          icon: Icons.my_location,
+          iconColor: isDark ? Colors.white : Colors.black87,
+          label: pickupCount > 1 ? "PICKUP ${i + 1}" : "PICKUP",
+          address: _currentTrip!.pickupLocations[i].address ?? "Unknown Pickup",
+          isDark: isDark,
+        ),
+      );
+      
+      // Add a line connector after each pickup
+      children.add(
+        Padding(
+          padding: const EdgeInsets.only(left: 11.0, top: 4, bottom: 4),
+          child: Container(
+            width: 2,
+            height: 20,
+            color: isDark ? Colors.white12 : Colors.grey.shade300,
+          ),
+        ),
+      );
+    }
+    
+    final int dropoffCount = _currentTrip!.dropoffLocations.length;
+    for (int i = 0; i < dropoffCount; i++) {
+      children.add(
+        _buildLocationRow(
+          icon: Icons.location_on,
+          iconColor: const Color(0xFF6C63FF),
+          label: dropoffCount > 1 ? "DESTINATION ${i + 1}" : "DESTINATION",
+          address: _currentTrip!.dropoffLocations[i].address ?? "Unknown Dropoff",
+          isDark: isDark,
+        ),
+      );
+      
+      // Add a line connector after each dropoff EXCEPT the last one
+      if (i < dropoffCount - 1) {
+        children.add(
+          Padding(
+            padding: const EdgeInsets.only(left: 11.0, top: 4, bottom: 4),
+            child: Container(
+              width: 2,
+              height: 20,
+              color: isDark ? Colors.white12 : Colors.grey.shade300,
+            ),
+          ),
+        );
+      }
+    }
+    
+    return children;
   }
 
   Widget _buildLocationRow({

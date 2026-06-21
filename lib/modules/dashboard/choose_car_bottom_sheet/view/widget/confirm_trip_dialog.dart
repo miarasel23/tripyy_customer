@@ -6,16 +6,16 @@ import '../../models/choose_car_model.dart';
 class ConfirmTripDialog extends StatelessWidget {
   final Car selectedCar;
   final String serviceName;
-  final String pickupAddress;
-  final String dropoffAddress;
+  final List<String> pickupAddresses;
+  final List<String> dropoffAddresses;
 
   const ConfirmTripDialog({
-    Key? key,
+    super.key,
     required this.selectedCar,
     required this.serviceName,
-    required this.pickupAddress,
-    required this.dropoffAddress,
-  }) : super(key: key);
+    required this.pickupAddresses,
+    required this.dropoffAddresses,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -63,54 +63,38 @@ class ConfirmTripDialog extends StatelessWidget {
             const SizedBox(height: 12),
             
             // Route Visual
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(height: 4),
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E1E26) : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: borderColor ?? Colors.grey),
+              ),
+              child: Column(
+                children: [
+                  for (int i = 0; i < pickupAddresses.length; i++)
+                    _buildSummaryRow(
+                      pickupAddresses.length > 1 ? "Pickup ${i + 1}" : "Pickup", 
+                      pickupAddresses[i], 
+                      Icons.my_location, 
+                      isDark,
+                      textColor,
+                      subTextColor
                     ),
-                    Container(
-                      height: 30,
-                      width: 1,
-                      color: subTextColor?.withOpacity(0.5),
+                  
+                  const SizedBox(height: 12),
+                  
+                  for (int i = 0; i < dropoffAddresses.length; i++)
+                    _buildSummaryRow(
+                      dropoffAddresses.length > 1 ? "Dropoff ${i + 1}" : "Dropoff", 
+                      dropoffAddresses[i], 
+                      Icons.location_on, 
+                      isDark,
+                      textColor,
+                      subTextColor
                     ),
-                    const Icon(Icons.location_on_outlined, color: Colors.white, size: 16),
-                  ],
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        pickupAddress,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
-                      ),
-                      const SizedBox(height: 18),
-                      Text(
-                        dropoffAddress,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: textColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
             
             const SizedBox(height: 24),
@@ -203,6 +187,24 @@ class ConfirmTripDialog extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, String address, IconData icon, bool isDark, Color textColor, Color? subTextColor) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: isDark ? Colors.white : Colors.black87),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(label, style: GoogleFonts.poppins(fontSize: 10, color: subTextColor, fontWeight: FontWeight.w600)),
+              Text(address, style: GoogleFonts.poppins(fontSize: 14, color: textColor, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
