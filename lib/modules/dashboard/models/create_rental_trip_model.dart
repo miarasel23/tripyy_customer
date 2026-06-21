@@ -1,4 +1,23 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+
+String _getPlatformName() {
+  if (kIsWeb) return 'web';
+  switch (defaultTargetPlatform) {
+    case TargetPlatform.android:
+      return 'android';
+    case TargetPlatform.iOS:
+      return 'ios';
+    case TargetPlatform.macOS:
+      return 'macos';
+    case TargetPlatform.windows:
+      return 'windows';
+    case TargetPlatform.linux:
+      return 'linux';
+    case TargetPlatform.fuchsia:
+      return 'fuchsia';
+  }
+}
 
 class CreateRentalTripRequest {
   final String serviceType;
@@ -24,12 +43,12 @@ class CreateRentalTripRequest {
     required this.customerUuid,
     this.countryCode = "BD",
     this.actionWhen = "create_rental_trip",
-    this.platform = "web",
+    String? platform,
     required this.languageCode,
     required this.pickupLocationUuid,
     required this.dropoffLocationUuid,
     required this.priceSetUuid,
-  });
+  }) : platform = platform ?? _getPlatformName();
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = {
@@ -58,18 +77,88 @@ class CreateRentalTripRequest {
   }
 }
 
+class RentalDriverBid {
+  final String? rentBidUuid;
+  final double? bidAmount;
+  final double? totalAmount;
+  final double? insuranceChargeAmount;
+  final double? customerDiscountAmount;
+  final String? driverUuid;
+  final String? name;
+  final String? email;
+  final String? profilePicture;
+  final String? countryCode;
+  final String? isActive;
+  final String? phone;
+  final String? bidStatus;
+  final bool? hasBid;
+  final List<String>? carPhotos;
+
+  RentalDriverBid({
+    this.rentBidUuid,
+    this.bidAmount,
+    this.totalAmount,
+    this.insuranceChargeAmount,
+    this.customerDiscountAmount,
+    this.driverUuid,
+    this.name,
+    this.email,
+    this.profilePicture,
+    this.countryCode,
+    this.isActive,
+    this.phone,
+    this.bidStatus,
+    this.hasBid,
+    this.carPhotos,
+  });
+
+  factory RentalDriverBid.fromJson(Map<String, dynamic> json) {
+    return RentalDriverBid(
+      rentBidUuid: json['rent_bid_uuid'],
+      bidAmount: (json['bid_amount'] as num?)?.toDouble(),
+      totalAmount: (json['total_amount'] as num?)?.toDouble(),
+      insuranceChargeAmount: (json['insurance_charge_amount'] as num?)?.toDouble(),
+      customerDiscountAmount: (json['customer_discount_amount'] as num?)?.toDouble(),
+      driverUuid: json['driver_uuid'],
+      name: json['name'],
+      email: json['email'],
+      profilePicture: json['profile_picture'],
+      countryCode: json['country_code'],
+      isActive: json['is_active'],
+      phone: json['phone']?.toString(),
+      bidStatus: json['bid_status'],
+      hasBid: json['has_bid'],
+      carPhotos: (json['car_photos'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
+    );
+  }
+}
+
 class RentalBidListResponse {
   final bool? status;
   final String? message;
-  final dynamic data;
+  final List<RentalDriverBid> drivers;
 
-  RentalBidListResponse({this.status, this.message, this.data});
+  RentalBidListResponse({this.status, this.message, this.drivers = const []});
 
   factory RentalBidListResponse.fromJson(Map<String, dynamic> json) {
+    List<RentalDriverBid> parsedDrivers = [];
+    final data = json['data'];
+    
+    if (data is Map<String, dynamic> && data['drivers'] is List) {
+      parsedDrivers = (data['drivers'] as List).map((e) => RentalDriverBid.fromJson(e)).toList();
+    } else if (data is List) {
+      // If data is the list itself (and the driver object is inside)
+      try {
+        parsedDrivers = data.map((e) => RentalDriverBid.fromJson(e)).toList();
+      } catch (_) {}
+    } else if (json['drivers'] is List) {
+      parsedDrivers = (json['drivers'] as List).map((e) => RentalDriverBid.fromJson(e)).toList();
+    }
+
     return RentalBidListResponse(
       status: json['status'],
       message: json['message'],
-      data: json['data'],
+      drivers: parsedDrivers,
     );
   }
 }

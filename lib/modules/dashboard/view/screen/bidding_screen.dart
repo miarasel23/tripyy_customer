@@ -18,7 +18,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
   late Timer _pollingTimer;
   final CreateTripRepository _repo = CreateTripRepository();
   bool _isLoading = true;
-  List<dynamic> _bids = [];
+  List<RentalDriverBid> _bids = [];
   String? _errorMessage;
 
   @override
@@ -44,7 +44,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
       if (mounted) {
         setState(() {
-          _bids = response.data is List ? response.data : [];
+          _bids = response.drivers;
           _isLoading = false;
           _errorMessage = null;
         });
@@ -108,15 +108,14 @@ class _BiddingScreenState extends State<BiddingScreen> {
       padding: const EdgeInsets.all(16),
       itemBuilder: (context, index) {
         final bid = _bids[index];
-        // Parse your bid data accordingly. Assuming standard JSON object format.
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           child: ListTile(
             title: Text(
-              "Bid Amount: ${bid['bid_amount'] ?? 'N/A'}",
+              "Bid Amount: ${bid.bidAmount ?? 'N/A'}",
               style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
             ),
-            subtitle: Text("Driver: ${bid['driver_name'] ?? 'Unknown'}"),
+            subtitle: Text("Driver: ${bid.name ?? 'Unknown'}"),
             trailing: ElevatedButton(
               onPressed: () {
                 // Handle Accept Bid

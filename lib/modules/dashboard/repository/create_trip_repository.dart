@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../../../../store/user_data_store.dart';
 import '../../../../utils/app_urls.dart';
+import '../../../../utils/custom_map_body_builder.dart';
 import '../models/create_rental_trip_model.dart';
 
 class CreateTripRepository {
@@ -60,20 +61,19 @@ class CreateTripRepository {
   Future<RentalBidListResponse> fetchBids({
     required String customerUuid,
     required String langCode,
-    String platform = "web",
+    String? platform,
     String tripStatus = "REQUESTED",
   }) async {
     try {
-      final queryParams = {
-        'platform': platform,
-        'language_code': langCode,
-        'action_when': 'rental_bid_trip_list_for_customer',
-        'customer_uuid': customerUuid,
-        'trip_status': tripStatus,
-      };
-
+      final queryParams = CustomMapBodyBuilder.build(
+        actionWhen: 'rental_bid_trip_list_for_customer',
+        languageCode: langCode,
+        data: {
+          'customer_uuid': customerUuid,
+          'trip_status': tripStatus,
+        },
+      ).map((key, value) => MapEntry(key, value.toString()));
       final uri = Uri.parse('${AppUrls.baseUrl}/v1/rental-trip/rental-bid-trip-list_for_customer').replace(queryParameters: queryParams);
-
       final token = await UserDataStore.getAccessToken();
       final headers = {
         'Accept': 'application/json',
@@ -81,12 +81,10 @@ class CreateTripRepository {
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
-
       final response = await http.get(
         uri,
         headers: headers,
       );
-
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         if (decoded['status'] == false) {
@@ -94,12 +92,17 @@ class CreateTripRepository {
         }
         return RentalBidListResponse.fromJson(decoded);
       } else {
+        String? errorMessage;
         try {
           final decoded = jsonDecode(response.body);
           if (decoded['message'] != null) {
-            throw Exception(decoded['message']);
+            errorMessage = decoded['message'];
           }
         } catch (_) {}
+        
+        if (errorMessage != null) {
+          throw Exception(errorMessage);
+        }
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
