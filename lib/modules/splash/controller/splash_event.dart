@@ -11,23 +11,17 @@ class SplashAuthCheck extends SplashEvent {
   final String platform;
   final String languageCode;
   final String actionWhen;
-  final String email;
-  final String password;
 
   SplashAuthCheck({
     required this.platform,
     required this.languageCode,
-    required this.actionWhen,
-    required this.email,
-    required this.password,
+    required this.actionWhen
   });
 
   @override
   List<Object> get props => [
     platform,
     languageCode,
-    actionWhen,
-    email,
-    password,
+    actionWhen
   ];
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../modules/error/view/screen/error_screen.dart';
 import '../modules/additionalService/view/screen/additionalService_screen.dart';
 import '../modules/auth/view/screen/number_Input_screen.dart';
 import '../modules/dashboard/view/screen/dashboard_screen.dart';
@@ -66,6 +67,9 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const VoucherScreen());
       case AppRoutes.profile:
         return MaterialPageRoute(builder: (_) => const ProfileScreen());
+
+      case AppRoutes.error:
+        return MaterialPageRoute(builder: (_) => const ErrorScreen());
 
       default:
         return MaterialPageRoute(

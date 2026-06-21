@@ -36,6 +36,7 @@ void main() {
 }
 
 final GlobalKey<ScaffoldMessengerState> globalScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -136,6 +137,7 @@ class _MyAppState extends State<MyApp> {
           return BlocBuilder<LocalizationBloc, LocalizationState>(
             builder: (context, localizationState) {
               return MaterialApp(
+                navigatorKey: globalNavigatorKey,
                 scaffoldMessengerKey: globalScaffoldMessengerKey,
                 themeMode: themeState.themeMode,
                 theme: AppTheme.lightTheme,

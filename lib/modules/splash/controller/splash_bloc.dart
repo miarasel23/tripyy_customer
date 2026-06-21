@@ -21,8 +21,6 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
       plaform: event.platform,
       languageCode: event.languageCode,
       actionWhen: event.actionWhen,
-      email: event.email,
-      password: event.password,
       token: UserDataStore.accessToken!,
     );
 

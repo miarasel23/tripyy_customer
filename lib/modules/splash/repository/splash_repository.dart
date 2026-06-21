@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:http/http.dart';
+import '../../../core/network/api_service.dart';
 import 'package:trippy_customer/store/user_data_store.dart';
 import 'package:trippy_customer/utils/app_urls.dart';
 
@@ -15,19 +15,15 @@ class SplashRepository {
     required String plaform,
     required String languageCode,
     required String actionWhen,
-    required String email,
-    required String password,
     required String token
   }) async {
     try {
-      final response = await get(
+      final response = await ApiService().get(
         Uri.parse(AppUrls.getCurrentCustomerUser).replace(
           queryParameters: {
             "platform": plaform,
             "language_code": languageCode,
             "action_when": actionWhen,
-            "email": "superadmin@gmail.com",
-            "password": "123456",
           },
         ),
         headers: {

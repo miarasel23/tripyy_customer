@@ -7,8 +7,6 @@ class SplashState extends Equatable {
   final String? platform;
   final String? languageCode;
   final String? actionWhen;
-  final String? email;
-  final String? password;
 
   final String? errorMessage;
 
@@ -17,8 +15,6 @@ class SplashState extends Equatable {
     this.platform,
     this.languageCode,
     this.actionWhen,
-    this.email,
-    this.password,
     this.errorMessage,
   });
 
@@ -27,8 +23,6 @@ class SplashState extends Equatable {
     String? platform,
     String? languageCode,
     String? actionWhen,
-    String? email,
-    String? password,
     String? errorMessage,
   }) {
     return SplashState(
@@ -36,8 +30,6 @@ class SplashState extends Equatable {
       platform: platform ?? this.platform,
       languageCode: languageCode ?? this.languageCode,
       actionWhen: actionWhen ?? this.actionWhen,
-      email: email ?? this.email,
-      password: password ?? this.password,
       errorMessage: errorMessage,
     );
   }
@@ -48,8 +40,6 @@ class SplashState extends Equatable {
         platform,
         languageCode,
         actionWhen,
-        email,
-        password,
-        errorMessage,
+        errorMessage
       ];
 }
