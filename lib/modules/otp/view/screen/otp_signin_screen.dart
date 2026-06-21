@@ -8,6 +8,7 @@ import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../utils/enums.dart';
+import '../../../../core/utils/ui_utils.dart';
 import '../../../localization/Controller/localization_controller.dart';
 import '../../controller/otp_receive_bloc.dart';
 import '../../controller/otp_receive_event.dart';
@@ -90,13 +91,7 @@ class _OtpSignInState extends State<OtpSignIn> {
             BlocListener<OtpReceiveBloc, OtpReceiveState>(
               listener: (context, state) {
                 if (state.status == OtpReceiveStatus.failure) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.errorMessage ?? "Otp failed"),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
+                  UiUtils.showApiErrorPopup(context, state.errorMessage ?? "Otp failed");
                 }
                 if (state.status == OtpReceiveStatus.success) {
                   Navigator.pushNamedAndRemoveUntil(
@@ -122,19 +117,13 @@ class _OtpSignInState extends State<OtpSignIn> {
                     ),
                   );
                 } else if (state.status == OtpStatus.failure) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.errorMessage ?? "Failed to resend OTP"),
-                      backgroundColor: Colors.red,
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
+                  UiUtils.showApiErrorPopup(context, state.errorMessage ?? "Failed to resend OTP");
                 }
               },
             ),
           ],
           child: Scaffold(
-            backgroundColor: const Color(0xFFF8F9FA),
+            backgroundColor: Theme.of(context).colorScheme.surface,
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
@@ -198,8 +187,8 @@ class _OtpSignInState extends State<OtpSignIn> {
                       builder: (context, state) {
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.submitButton,
-                            foregroundColor: Theme.of(context).colorScheme.onSurface,
+                            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                            foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                             minimumSize: const Size(double.infinity, 54),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -210,13 +199,7 @@ class _OtpSignInState extends State<OtpSignIn> {
                               ? null
                               : () {
                                   if (_otpController.text.length < 6) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text("Please enter the full OTP"),
-                                        backgroundColor: Colors.red,
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
+                                    UiUtils.showApiErrorPopup(context, "Please enter the full OTP");
                                     return;
                                   }
                                   context.read<OtpReceiveBloc>().add(
@@ -229,10 +212,10 @@ class _OtpSignInState extends State<OtpSignIn> {
                                 },
                           child: switch (state.status) {
                             OtpReceiveStatus.loading =>
-                              const SizedBox(
+                              SizedBox(
                                 height: 24,
                                 width: 24,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, strokeWidth: 2.5),
                               ),
                             OtpReceiveStatus.failure => Text(
                               loc.translate("retry") ?? "Retry",
@@ -267,7 +250,7 @@ class _OtpSignInState extends State<OtpSignIn> {
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -278,7 +261,7 @@ class _OtpSignInState extends State<OtpSignIn> {
                           style: GoogleFonts.poppins(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(width: 8),
@@ -332,6 +315,7 @@ class _OtpSignInState extends State<OtpSignIn> {
                             autofillHints: const [AutofillHints.oneTimeCode],
                             autoFocus: true,
                             theme: MaterialPinTheme(
+                              textStyle: const TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                               shape: MaterialPinShape.outlined,
                               cellSize: Size(cellWidth, cellHeight),
                               borderRadius: BorderRadius.circular(12),

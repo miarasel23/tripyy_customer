@@ -161,7 +161,7 @@ class _HourSelectionDialogState extends State<_HourSelectionDialog> {
               height: 54,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff0e52ff),
+                  backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -170,10 +170,10 @@ class _HourSelectionDialogState extends State<_HourSelectionDialog> {
                 onPressed: () {
                   Navigator.of(context).pop(_selectedHour);
                 },
-                child: const Text(
+                child: Text(
                   "Confirm Selection",
                   style: TextStyle(
-                    color: Colors.white, 
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, 
                     fontSize: 16, 
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,

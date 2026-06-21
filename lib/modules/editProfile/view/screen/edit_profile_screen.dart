@@ -9,6 +9,7 @@ import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../utils/enums.dart';
+import '../../../../core/utils/ui_utils.dart';
 import '../../controller/edit_profile_info_bloc.dart';
 import '../../controller/edit_profile_info_event.dart';
 import '../../controller/edit_profile_info_state.dart';
@@ -77,13 +78,7 @@ class _EditprofileScreenState extends State<EditprofileScreen> {
                 ),
               );
             } else if (state.status == EditProfileUpdateStatus.failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ?? loc.translate("failed")),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              UiUtils.showApiErrorPopup(context, state.errorMessage ?? loc.translate("failed"));
             }
           },
           child: LayoutBuilder(

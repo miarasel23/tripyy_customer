@@ -20,7 +20,7 @@ class ThemeState {
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   static const String _themeKey = 'app_theme_mode';
 
-  ThemeBloc() : super(ThemeState(ThemeMode.system)) {
+  ThemeBloc() : super(ThemeState(ThemeMode.light)) {
     on<ThemeChanged>(_onThemeChanged);
     _loadTheme();
   }

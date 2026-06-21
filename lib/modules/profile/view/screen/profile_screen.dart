@@ -13,6 +13,7 @@ import '../../../../utils/app_urls.dart';
 import '../../../../utils/colors_code.dart';
 import '../../../../store/user_data_store.dart';
 import '../../../../utils/to_title_case.dart';
+import '../../../../core/utils/ui_utils.dart';
 
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -136,9 +137,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                             setState(() {}); // to refresh AppUrls.profileImageUrl
                           } else if (state.status == EditProfilePictureStatus.failure) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(state.errorMessage ?? "Failed to update profile picture")),
-                            );
+                            UiUtils.showApiErrorPopup(context, state.errorMessage ?? "Failed to update profile picture");
                           }
                         },
                         builder: (context, state) {
@@ -525,9 +524,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   TextButton(
                     onPressed: () async {
                       if (nameController.text.trim().isEmpty) {
-                        ScaffoldMessenger.of(this.context).showSnackBar(
-                          const SnackBar(content: Text('Full Name is required')),
-                        );
+                        UiUtils.showApiErrorPopup(this.context, 'Full Name is required');
                         return;
                       }
 
@@ -595,9 +592,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                       } catch (e) {
                          if (mounted) {
-                           ScaffoldMessenger.of(this.context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
-                           );
+                           UiUtils.showApiErrorPopup(this.context, e.toString());
                          }
                       } finally {
                         if (mounted) {

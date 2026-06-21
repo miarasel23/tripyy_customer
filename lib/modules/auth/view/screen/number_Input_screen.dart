@@ -9,6 +9,7 @@ import '../../../localization/Controller/localization_controller.dart';
 import '../../controller/send_otp_bloc.dart';
 import '../../controller/send_otp_event.dart';
 import '../../controller/send_otp_state.dart';
+import '../../../../core/utils/ui_utils.dart';
 
 class NumberInputScreen extends StatelessWidget {
   NumberInputScreen({super.key});
@@ -24,13 +25,7 @@ class NumberInputScreen extends StatelessWidget {
         return BlocListener<SendOtpBloc, SendOtpState>(
           listener: (context, state) {
             if (state.status == OtpStatus.failure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage ?? "Something went wrong"),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+              UiUtils.showApiErrorPopup(context, state.errorMessage ?? "Something went wrong");
             }
             if (state.status == OtpStatus.success) {
               Navigator.pushNamed(
@@ -41,7 +36,7 @@ class NumberInputScreen extends StatelessWidget {
             }
           },
           child: Scaffold(
-            backgroundColor: const Color(0xFFF8F9FA), // Slight off-white background for contrast against card
+            backgroundColor: Theme.of(context).colorScheme.surface,
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
@@ -74,8 +69,8 @@ class NumberInputScreen extends StatelessWidget {
                       builder: (context, state) {
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.submitButton, // Pathao/inDrive vibrant color
-                            foregroundColor: Theme.of(context).colorScheme.onSurface,
+                            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, // Pathao/inDrive vibrant color
+                            foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                             minimumSize: const Size(double.infinity, 54),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -95,10 +90,10 @@ class NumberInputScreen extends StatelessWidget {
                                 },
                           child: switch (state.status) {
                             OtpStatus.loading =>
-                              const SizedBox(
+                              SizedBox(
                                 height: 24,
                                 width: 24,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, strokeWidth: 2.5),
                               ),
                             OtpStatus.failure => Text(
                               loc.translate("retry") ?? "Retry",
@@ -133,7 +128,7 @@ class NumberInputScreen extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.bold, // Uber's bold header
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
