@@ -3,6 +3,7 @@ import '../store/user_data_store.dart';
 class AppUrls {
   static const String googleApiKey = 'AIzaSyAYf-MPMgwHhXT2h-kKSchXFH5GiwuURcw';
   static const String baseUrl = "http://3.209.161.158/api";
+  static const String imageBaseUrl ="$baseUrl/assets/uploads/images/";
   // customer
   static const String sendOtpCustomer =
       "$baseUrl/v1/customer/send-otp-for-signup-or-login";

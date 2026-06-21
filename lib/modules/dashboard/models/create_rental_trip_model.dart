@@ -133,32 +133,100 @@ class RentalDriverBid {
   }
 }
 
+class LocationModel {
+  final String? uuid;
+  final String? address;
+  
+  LocationModel({this.uuid, this.address});
+
+  factory LocationModel.fromJson(Map<String, dynamic> json) {
+    return LocationModel(
+      uuid: json['uuid'],
+      address: json['address'],
+    );
+  }
+}
+
+class CarCategoryModel {
+  final String? carType;
+
+  CarCategoryModel({this.carType});
+
+  factory CarCategoryModel.fromJson(Map<String, dynamic> json) {
+    return CarCategoryModel(
+      carType: json['car_type'],
+    );
+  }
+}
+
+class PriceInfoModel {
+  final double? minimumBookingPrice;
+  final double? pricePerKm;
+
+  PriceInfoModel({this.minimumBookingPrice, this.pricePerKm});
+
+  factory PriceInfoModel.fromJson(Map<String, dynamic> json) {
+    return PriceInfoModel(
+      minimumBookingPrice: (json['minimum_booking_price'] as num?)?.toDouble(),
+      pricePerKm: (json['price_per_km'] as num?)?.toDouble(),
+    );
+  }
+}
+
+class RentalTrip {
+  final int? id;
+  final String? uuid;
+  final String? serviceName;
+  final CarCategoryModel? carCategory;
+  final PriceInfoModel? priceInfo;
+  final List<LocationModel> pickupLocations;
+  final List<LocationModel> dropoffLocations;
+  final List<RentalDriverBid> drivers;
+
+  RentalTrip({
+    this.id,
+    this.uuid,
+    this.serviceName,
+    this.carCategory,
+    this.priceInfo,
+    this.pickupLocations = const [],
+    this.dropoffLocations = const [],
+    this.drivers = const [],
+  });
+
+  factory RentalTrip.fromJson(Map<String, dynamic> json) {
+    return RentalTrip(
+      id: json['id'],
+      uuid: json['uuid'],
+      serviceName: json['service_name'],
+      carCategory: json['car_category'] != null ? CarCategoryModel.fromJson(json['car_category']) : null,
+      priceInfo: json['price_info'] != null ? PriceInfoModel.fromJson(json['price_info']) : null,
+      pickupLocations: (json['pickup_locations'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e)).toList() ?? [],
+      dropoffLocations: (json['dropoff_locations'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e)).toList() ?? [],
+      drivers: (json['drivers'] as List<dynamic>?)?.map((e) => RentalDriverBid.fromJson(e)).toList() ?? [],
+    );
+  }
+}
+
 class RentalBidListResponse {
   final bool? status;
   final String? message;
-  final List<RentalDriverBid> drivers;
+  final List<RentalTrip> trips;
 
-  RentalBidListResponse({this.status, this.message, this.drivers = const []});
+  RentalBidListResponse({this.status, this.message, this.trips = const []});
 
   factory RentalBidListResponse.fromJson(Map<String, dynamic> json) {
-    List<RentalDriverBid> parsedDrivers = [];
+    List<RentalTrip> parsedTrips = [];
     final data = json['data'];
     
-    if (data is Map<String, dynamic> && data['drivers'] is List) {
-      parsedDrivers = (data['drivers'] as List).map((e) => RentalDriverBid.fromJson(e)).toList();
-    } else if (data is List) {
-      // If data is the list itself (and the driver object is inside)
-      try {
-        parsedDrivers = data.map((e) => RentalDriverBid.fromJson(e)).toList();
-      } catch (_) {}
-    } else if (json['drivers'] is List) {
-      parsedDrivers = (json['drivers'] as List).map((e) => RentalDriverBid.fromJson(e)).toList();
+    if (data is List) {
+      parsedTrips = data.map((e) => RentalTrip.fromJson(e)).toList();
     }
 
     return RentalBidListResponse(
       status: json['status'],
       message: json['message'],
-      drivers: parsedDrivers,
+      trips: parsedTrips,
     );
   }
 }

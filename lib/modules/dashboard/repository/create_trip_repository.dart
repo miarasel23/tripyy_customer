@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../../../../core/network/api_service.dart';
 import '../../../../store/user_data_store.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../utils/custom_map_body_builder.dart';
@@ -81,10 +82,12 @@ class CreateTripRepository {
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
-      final response = await http.get(
+      
+      final response = await ApiService().get(
         uri,
         headers: headers,
       );
+      
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         if (decoded['status'] == false) {
@@ -92,17 +95,6 @@ class CreateTripRepository {
         }
         return RentalBidListResponse.fromJson(decoded);
       } else {
-        String? errorMessage;
-        try {
-          final decoded = jsonDecode(response.body);
-          if (decoded['message'] != null) {
-            errorMessage = decoded['message'];
-          }
-        } catch (_) {}
-        
-        if (errorMessage != null) {
-          throw Exception(errorMessage);
-        }
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
