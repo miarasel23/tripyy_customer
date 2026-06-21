@@ -71,18 +71,8 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
     try {
       final loc = AppLocalizations.of(context);
       
-      String startDatetime;
-      String? endDatetime;
-
-      if (widget.serviceName == "RETURN") {
-        startDatetime = "2026-06-20 23:59:00";
-        endDatetime = "2026-06-20 23:59:00";
-      } else if (widget.serviceName == "RIDE_SHARE") {
-        final now = DateTime.now();
-        startDatetime = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:00";
-      } else {
-        startDatetime = widget.tripReq.startDatetime;
-      }
+      String startDatetime = widget.tripReq.startDatetime;
+      String? endDatetime = widget.tripReq.endDatetime;
 
       final req = CreateRentalTripRequest(
         serviceType: widget.serviceName,

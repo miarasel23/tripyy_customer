@@ -1,23 +1,53 @@
 import 'package:flutter/material.dart';
+import '../../../../core/utils/localization/app_localization.dart';
 
 class DateTimeSelectionDialogs {
-  /// Prompts the user to pick a date and then a time.
-  static Future<DateTime?> pickDateAndTime(BuildContext context, {DateTime? initialDate}) async {
+  static Future<DateTime?> pickDateAndTime(BuildContext context, {DateTime? initialDate, DateTime? minDateTime, String? dateHelpText, String? timeHelpText}) async {
+    final DateTime now = DateTime.now();
+    final DateTime effectiveMinRaw = minDateTime ?? now;
+    final DateTime effectiveMinDateTime = DateTime(effectiveMinRaw.year, effectiveMinRaw.month, effectiveMinRaw.day, effectiveMinRaw.hour, effectiveMinRaw.minute);
+    final DateTime firstDate = DateTime(effectiveMinDateTime.year, effectiveMinDateTime.month, effectiveMinDateTime.day);
+
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: initialDate ?? DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
+      helpText: dateHelpText,
+      initialDate: initialDate != null && initialDate.isAfter(firstDate) ? initialDate : effectiveMinDateTime,
+      firstDate: firstDate,
+      lastDate: firstDate.add(const Duration(days: 365)),
     );
 
     if (date != null) {
-      final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
+      TimeOfDay initialTime = TimeOfDay.fromDateTime(effectiveMinDateTime);
+      while (true) {
+        final TimeOfDay? time = await showTimePicker(
+          context: context,
+          helpText: timeHelpText,
+          initialTime: initialTime,
+        );
 
-      if (time != null) {
-        return DateTime(date.year, date.month, date.day, time.hour, time.minute);
+        if (time != null) {
+          final selectedDateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+          if (selectedDateTime.isBefore(effectiveMinDateTime)) {
+            if (context.mounted) {
+              final loc = AppLocalizations.of(context);
+              final String timePrefix = loc.translate('please_select_time_after') ?? 'Please select a time after';
+              final int hr = effectiveMinDateTime.hour > 12 ? effectiveMinDateTime.hour - 12 : (effectiveMinDateTime.hour == 0 ? 12 : effectiveMinDateTime.hour);
+              final String min = effectiveMinDateTime.minute.toString().padLeft(2, '0');
+              final String amPm = effectiveMinDateTime.hour >= 12 ? "PM" : "AM";
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('$timePrefix $hr:$min $amPm'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          } else {
+            return selectedDateTime;
+          }
+        } else {
+          return null;
+        }
       }
     }
     return null;

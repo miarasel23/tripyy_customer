@@ -9,7 +9,7 @@ class TripPriceDetailsRequest {
   final List<String> pickupLocationUuid;
   final List<String> dropoffLocationUuid;
   final String startDatetime;
-  final String? returnDatetime;
+  final String? endDatetime;
 
   TripPriceDetailsRequest({
     required this.platform,
@@ -20,7 +20,7 @@ class TripPriceDetailsRequest {
     required this.pickupLocationUuid,
     required this.dropoffLocationUuid,
     required this.startDatetime,
-    this.returnDatetime,
+    this.endDatetime,
   });
 
   Map<String, dynamic> toJson() {
@@ -35,8 +35,8 @@ class TripPriceDetailsRequest {
       'dropoff_location_uuid': jsonEncode(dropoffLocationUuid),
     };
     
-    if (returnDatetime != null) {
-      data['return_datetime'] = returnDatetime;
+    if (endDatetime != null) {
+      data['end_datetime'] = endDatetime;
     }
 
     return data;

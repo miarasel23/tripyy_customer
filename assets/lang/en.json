@@ -189,5 +189,10 @@
   "estimated_fare": "Estimated Fare",
   "cancel": "Cancel",
   "submit": "Submit",
-  "pickup_and_dropoff": "Pickup and Dropoff"
+  "pickup_and_dropoff": "Pickup and Dropoff",
+  "select_start_date": "SELECT START DATE",
+  "select_start_time": "SELECT START TIME",
+  "select_return_date": "SELECT RETURN DATE",
+  "select_return_time": "SELECT RETURN TIME",
+  "please_select_time_after": "Please select a time after"
 }

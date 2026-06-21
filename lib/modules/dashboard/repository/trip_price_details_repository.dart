@@ -26,12 +26,22 @@ class TripPriceDetailsRepository {
       );
      print(response.body);
       if (response.statusCode == 200) {
-        return TripPriceDetailsResponse.fromJson(jsonDecode(response.body));
+        final decoded = jsonDecode(response.body);
+        if (decoded['status'] == false) {
+          throw Exception(decoded['message'] ?? "Unknown server error");
+        }
+        return TripPriceDetailsResponse.fromJson(decoded);
       } else {
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded['message'] != null) {
+            throw Exception(decoded['message']);
+          }
+        } catch (_) {}
         throw Exception("Failed to load trip price details: ${response.statusCode}");
       }
     } catch (e) {
-      throw Exception(e.toString());
+      rethrow;
     }
   }
 }

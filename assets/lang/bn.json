@@ -181,5 +181,10 @@
   "estimated_fare": "আনুমানিক ভাড়া",
   "cancel": "বাতিল",
   "submit": "জমা দিন",
-  "pickup_and_dropoff": "পিকআপ এবং ড্রপ-অফ"
+  "pickup_and_dropoff": "পিকআপ এবং ড্রপ-অফ",
+  "select_start_date": "শুরুর তারিখ নির্বাচন করুন",
+  "select_start_time": "শুরুর সময় নির্বাচন করুন",
+  "select_return_date": "ফেরার তারিখ নির্বাচন করুন",
+  "select_return_time": "ফেরার সময় নির্বাচন করুন",
+  "please_select_time_after": "অনুগ্রহ করে এই সময়ের পরের একটি সময় নির্বাচন করুন:"
 }

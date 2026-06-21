@@ -279,11 +279,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     DateTime? returnDateTime;
     String? hoursBooked;
 
+    final loc = AppLocalizations.of(context);
+    
     // 2. Determine Date/Time based on service type
     if (serviceKey == "RIDE_SHARE") {
       startDateTime = DateTime.now();
     } else if (serviceKey == "HOURLY") {
-      final date = await DateTimeSelectionDialogs.pickDateAndTime(context);
+      final minStartDateTime = DateTime.now().add(const Duration(hours: 2));
+      final date = await DateTimeSelectionDialogs.pickDateAndTime(
+        context, 
+        minDateTime: minStartDateTime,
+        dateHelpText: loc.translate('select_start_date') ?? 'SELECT START DATE',
+        timeHelpText: loc.translate('select_start_time') ?? 'SELECT START TIME',
+      );
       if (date == null) return;
       
       final hours = await DateTimeSelectionDialogs.pickHours(context);
@@ -291,20 +299,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
       
       startDateTime = date;
       hoursBooked = hours.toString();
-      // In a real scenario, you'd likely pass `hours` to the API. 
-      // We will append it to actionWhen or handle according to exact backend specs.
     } else if (serviceKey == "RETURN") {
-      final startDate = await DateTimeSelectionDialogs.pickDateAndTime(context);
+      final minStartDateTime = DateTime.now().add(const Duration(hours: 2));
+      final startDate = await DateTimeSelectionDialogs.pickDateAndTime(
+        context, 
+        minDateTime: minStartDateTime,
+        dateHelpText: loc.translate('select_start_date') ?? 'SELECT START DATE',
+        timeHelpText: loc.translate('select_start_time') ?? 'SELECT START TIME',
+      );
       if (startDate == null) return;
       
-      // Assume pickDateAndTime used again for return date
-      final returnDate = await DateTimeSelectionDialogs.pickDateAndTime(context, initialDate: startDate);
+      final minEndDateTime = startDate.add(const Duration(hours: 3));
+      final returnDate = await DateTimeSelectionDialogs.pickDateAndTime(
+        context, 
+        initialDate: minEndDateTime, 
+        minDateTime: minEndDateTime,
+        dateHelpText: loc.translate('select_return_date') ?? 'SELECT RETURN DATE',
+        timeHelpText: loc.translate('select_return_time') ?? 'SELECT RETURN TIME',
+      );
       if (returnDate == null) return;
       
       startDateTime = startDate;
       returnDateTime = returnDate;
     } else {
-      startDateTime = await DateTimeSelectionDialogs.pickDateAndTime(context);
+      final minStartDateTime = DateTime.now().add(const Duration(hours: 2));
+      startDateTime = await DateTimeSelectionDialogs.pickDateAndTime(
+        context, 
+        minDateTime: minStartDateTime,
+        dateHelpText: loc.translate('select_start_date') ?? 'SELECT START DATE',
+        timeHelpText: loc.translate('select_start_time') ?? 'SELECT START TIME',
+      );
       if (startDateTime == null) return;
     }
 
@@ -324,7 +348,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         pickupLocationUuid: [_pickupUuid!],
         dropoffLocationUuid: [_dropoffUuid!],
         startDatetime: "${startDateTime.year}-${startDateTime.month.toString().padLeft(2, '0')}-${startDateTime.day.toString().padLeft(2, '0')} ${startDateTime.hour.toString().padLeft(2, '0')}:${startDateTime.minute.toString().padLeft(2, '0')}:00",
-        returnDatetime: returnDateTime != null ? "${returnDateTime.year}-${returnDateTime.month.toString().padLeft(2, '0')}-${returnDateTime.day.toString().padLeft(2, '0')} ${returnDateTime.hour.toString().padLeft(2, '0')}:${returnDateTime.minute.toString().padLeft(2, '0')}:00" : null,
+        endDatetime: returnDateTime != null ? "${returnDateTime.year}-${returnDateTime.month.toString().padLeft(2, '0')}-${returnDateTime.day.toString().padLeft(2, '0')} ${returnDateTime.hour.toString().padLeft(2, '0')}:${returnDateTime.minute.toString().padLeft(2, '0')}:00" : null,
       );
 
       final repo = TripPriceDetailsRepository();
@@ -395,7 +419,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(e.toString().replaceAll('Exception: ', '').replaceAll('Error: ', '')),
             backgroundColor: Colors.red,
           ),
         );
