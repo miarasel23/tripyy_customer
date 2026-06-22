@@ -303,6 +303,38 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                   color: isDark ? Colors.white : Colors.black,
                                 ),
                               ),
+                              const SizedBox(height: 2),
+                              GestureDetector(
+                                onTap: () {
+                                  if (bid.ratingList != null && bid.ratingList!.isNotEmpty) {
+                                    _showReviewsBottomSheet(context, bid, isDark);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("No reviews available yet.")),
+                                    );
+                                  }
+                                },
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.star, color: Colors.amber, size: 14),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      '${bid.averageRating?.toStringAsFixed(1) ?? "0.0"} (${bid.totalCompletedTrips ?? 0} trips)',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
+                                            ? Colors.blueAccent 
+                                            : (isDark ? Colors.white54 : Colors.black54),
+                                        decoration: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
+                                            ? TextDecoration.underline 
+                                            : TextDecoration.none,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                               const SizedBox(height: 4),
                               Text(
                                 '${AppLocalizations.of(context).translate("total") ?? "Total"}: ' + 
@@ -375,6 +407,130 @@ class _BiddingScreenState extends State<BiddingScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showReviewsBottomSheet(BuildContext context, RentalDriverBid bid, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C1E26) : Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.black12,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "Driver Reviews",
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Divider(color: isDark ? Colors.white12 : Colors.grey.shade200),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: bid.ratingList!.length,
+                  itemBuilder: (context, index) {
+                    final review = bid.ratingList![index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF252833) : Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundImage: review.customerPhoto != null 
+                                  ? NetworkImage("${AppUrls.imageBaseUrl}${review.customerPhoto}")
+                                  : null,
+                                backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                                child: review.customerPhoto == null
+                                  ? Icon(Icons.person, size: 16, color: isDark ? Colors.white54 : Colors.black54)
+                                  : null,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      review.customerName ?? "Customer",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark ? Colors.white : Colors.black,
+                                      ),
+                                    ),
+                                    Text(
+                                      review.createdAt?.split('T').first ?? "",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 10,
+                                        color: isDark ? Colors.white54 : Colors.black54,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Row(
+                                children: List.generate(5, (starIndex) {
+                                  int rating = review.rating ?? 0;
+                                  return Icon(
+                                    starIndex < rating ? Icons.star : Icons.star_border,
+                                    size: 14,
+                                    color: Colors.amber,
+                                  );
+                                }),
+                              ),
+                            ],
+                          ),
+                          if (review.comments != null && review.comments!.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              review.comments!,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: isDark ? Colors.white70 : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

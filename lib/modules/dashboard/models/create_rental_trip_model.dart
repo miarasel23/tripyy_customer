@@ -89,6 +89,35 @@ class CreateRentalTripRequest {
   }
 }
 
+class RatingModel {
+  final String? uuid;
+  final int? rating;
+  final String? comments;
+  final String? customerName;
+  final String? customerPhoto;
+  final String? createdAt;
+
+  RatingModel({
+    this.uuid,
+    this.rating,
+    this.comments,
+    this.customerName,
+    this.customerPhoto,
+    this.createdAt,
+  });
+
+  factory RatingModel.fromJson(Map<String, dynamic> json) {
+    return RatingModel(
+      uuid: json['uuid'],
+      rating: json['rating'],
+      comments: json['comments'],
+      customerName: json['customer_name'],
+      customerPhoto: json['customer_photo'],
+      createdAt: json['created_at'],
+    );
+  }
+}
+
 class RentalDriverBid {
   final String? rentBidUuid;
   final double? bidAmount;
@@ -105,6 +134,9 @@ class RentalDriverBid {
   final String? bidStatus;
   final bool? hasBid;
   final List<String>? carPhotos;
+  final int? totalCompletedTrips;
+  final double? averageRating;
+  final List<RatingModel>? ratingList;
 
   RentalDriverBid({
     this.rentBidUuid,
@@ -122,6 +154,9 @@ class RentalDriverBid {
     this.bidStatus,
     this.hasBid,
     this.carPhotos,
+    this.totalCompletedTrips,
+    this.averageRating,
+    this.ratingList,
   });
 
   factory RentalDriverBid.fromJson(Map<String, dynamic> json) {
@@ -141,6 +176,9 @@ class RentalDriverBid {
       bidStatus: json['bid_status'],
       hasBid: json['has_bid'],
       carPhotos: (json['car_photos'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
+      totalCompletedTrips: json['total_completed_trips'] as int?,
+      averageRating: (json['average_rating'] as num?)?.toDouble(),
+      ratingList: (json['rating_list'] as List<dynamic>?)?.map((e) => RatingModel.fromJson(e)).toList(),
     );
   }
 }
