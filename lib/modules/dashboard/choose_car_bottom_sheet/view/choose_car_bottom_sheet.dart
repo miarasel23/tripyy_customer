@@ -52,7 +52,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
 
   Future<void> _handleCreateTrip(Car selectedCar) async {
     final loc = AppLocalizations.of(context);
-    final confirm = await showDialog<bool>(
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => ConfirmTripDialog(
         selectedCar: selectedCar,
@@ -62,7 +62,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
       ),
     );
 
-    if (confirm != true) return;
+    if (result == null) return;
 
     setState(() {
       _isCreatingTrip = true;
@@ -86,6 +86,8 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
         pickupLocationUuid: widget.tripReq.pickupLocationUuid,
         dropoffLocationUuid: widget.tripReq.dropoffLocationUuid,
         priceSetUuid: selectedCar.priceSetUuid ?? selectedCar.uuid,
+        note: result['note'],
+        offerAmount: result['offerAmount'],
       );
 
       final repo = CreateTripRepository();

@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../../core/utils/localization/app_localization.dart';
 import '../../models/choose_car_model.dart';
 
-class ConfirmTripDialog extends StatelessWidget {
+class ConfirmTripDialog extends StatefulWidget {
   final Car selectedCar;
   final String serviceName;
   final List<String> pickupAddresses;
@@ -16,6 +16,22 @@ class ConfirmTripDialog extends StatelessWidget {
     required this.pickupAddresses,
     required this.dropoffAddresses,
   });
+
+  @override
+  State<ConfirmTripDialog> createState() => _ConfirmTripDialogState();
+}
+
+class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
+  final TextEditingController _noteController = TextEditingController();
+  final TextEditingController _offerPriceController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    _offerPriceController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +50,13 @@ class ConfirmTripDialog extends StatelessWidget {
       elevation: 10,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             Center(
               child: Text(
                 loc.translate("confirm_trip") ?? "Trip Summary",
@@ -72,10 +91,10 @@ class ConfirmTripDialog extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  for (int i = 0; i < pickupAddresses.length; i++)
+                  for (int i = 0; i < widget.pickupAddresses.length; i++)
                     _buildSummaryRow(
-                      pickupAddresses.length > 1 ? "Pickup ${i + 1}" : "Pickup", 
-                      pickupAddresses[i], 
+                      widget.pickupAddresses.length > 1 ? "Pickup ${i + 1}" : "Pickup", 
+                      widget.pickupAddresses[i], 
                       Icons.my_location, 
                       isDark,
                       textColor,
@@ -84,10 +103,10 @@ class ConfirmTripDialog extends StatelessWidget {
                   
                   const SizedBox(height: 12),
                   
-                  for (int i = 0; i < dropoffAddresses.length; i++)
+                  for (int i = 0; i < widget.dropoffAddresses.length; i++)
                     _buildSummaryRow(
-                      dropoffAddresses.length > 1 ? "Dropoff ${i + 1}" : "Dropoff", 
-                      dropoffAddresses[i], 
+                      widget.dropoffAddresses.length > 1 ? "Dropoff ${i + 1}" : "Dropoff", 
+                      widget.dropoffAddresses[i], 
                       Icons.location_on, 
                       isDark,
                       textColor,
@@ -106,7 +125,7 @@ class ConfirmTripDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(loc.translate("service") ?? "Service", style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
-                Text(serviceName.replaceAll('_', ' '), style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
+                Text(widget.serviceName.replaceAll('_', ' '), style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
               ],
             ),
             const SizedBox(height: 12),
@@ -114,7 +133,7 @@ class ConfirmTripDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(loc.translate("vehicle") ?? "Vehicle", style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
-                Text("${selectedCar.carType} (${selectedCar.setCapacity})", style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
+                Text("${widget.selectedCar.carType} (${widget.selectedCar.setCapacity})", style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
               ],
             ),
             const SizedBox(height: 12),
@@ -144,19 +163,87 @@ class ConfirmTripDialog extends StatelessWidget {
                   ),
                   Text(
                     loc.locale.languageCode == 'bn' 
-                        ? '৳${selectedCar.minimumBookingPrice}' 
-                        : 'BDT ${selectedCar.minimumBookingPrice}',
+                        ? '৳${widget.selectedCar.minimumBookingPrice}' 
+                        : 'BDT ${widget.selectedCar.minimumBookingPrice}',
                      style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: textColor)  
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            
+            // Offer Price Field (Required)
+            TextFormField(
+              controller: _offerPriceController,
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.left,
+              style: GoogleFonts.poppins(color: textColor, fontSize: 14),
+              decoration: InputDecoration(
+                labelText: loc.translate("offer_price") ?? "Offer Price",
+                labelStyle: GoogleFonts.poppins(color: subTextColor, fontSize: 14),
+                hintText: loc.translate("enter_offer_price") ?? "Enter your offer price",
+                hintStyle: GoogleFonts.poppins(color: subTextColor?.withOpacity(0.5), fontSize: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: borderColor ?? Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: borderColor ?? Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: const Color(0xFF8C9EFF), width: 2),
+                ),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF1E1E26) : Colors.grey[50],
+                // Remove left padding so error text aligns with the text field border
+                contentPadding: const EdgeInsets.only(left: 0, right: 16, top: 12, bottom: 12),
+                // Use prefixIcon to indent the input and hint text instead
+                prefixIcon: const SizedBox(width: 16),
+                prefixIconConstraints: const BoxConstraints(minWidth: 16, minHeight: 0),
+              ),
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return loc.translate("offer_price_required") ?? "Offer price is required";
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+
+            // Note Field (Optional)
+            TextFormField(
+              controller: _noteController,
+              style: GoogleFonts.poppins(color: textColor, fontSize: 14),
+              decoration: InputDecoration(
+                labelText: loc.translate("note") ?? "Note (Optional)",
+                labelStyle: GoogleFonts.poppins(color: subTextColor, fontSize: 14),
+                hintText: loc.translate("add_note") ?? "Add a note for driver",
+                hintStyle: GoogleFonts.poppins(color: subTextColor?.withOpacity(0.5), fontSize: 14),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: borderColor ?? Colors.grey),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: borderColor ?? Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: const Color(0xFF8C9EFF), width: 2),
+                ),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF1E1E26) : Colors.grey[50],
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 24),
             
             // Actions
             Row(
               children: [
-                Expanded(
+                  Expanded(
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -164,7 +251,7 @@ class ConfirmTripDialog extends StatelessWidget {
                       side: BorderSide(color: isDark ? Colors.white : Colors.black),
                       foregroundColor: isDark ? Colors.white : Colors.black,
                     ),
-                    onPressed: () => Navigator.pop(context, false),
+                    onPressed: () => Navigator.pop(context, null),
                     child: Text(loc.translate("cancel") ?? "Cancel", style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -178,7 +265,14 @@ class ConfirmTripDialog extends StatelessWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
-                    onPressed: () => Navigator.pop(context, true),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        Navigator.pop(context, {
+                          'note': _noteController.text.trim(),
+                          'offerAmount': _offerPriceController.text.trim(),
+                        });
+                      }
+                    },
                     child: Text(loc.translate("submit") ?? "Submit", style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
@@ -186,6 +280,8 @@ class ConfirmTripDialog extends StatelessWidget {
             ),
           ],
         ),
+        ),
+      ),
       ),
     );
   }

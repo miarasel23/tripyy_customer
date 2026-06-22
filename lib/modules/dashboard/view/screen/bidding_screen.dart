@@ -282,12 +282,12 @@ class _BiddingScreenState extends State<BiddingScreen> {
                       children: [
                         CircleAvatar(
                           radius: 25,
-                          backgroundImage: bid.profilePicture != null 
-                            ? NetworkImage("${AppUrls.imageBaseUrl}${bid.profilePicture}") 
+                          backgroundImage: _currentTrip!.carCategory?.carAvatar != null 
+                            ? NetworkImage("${AppUrls.imageBaseUrl}${_currentTrip!.carCategory!.carAvatar}") 
                             : null,
                           backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                          child: bid.profilePicture == null 
-                            ? Icon(Icons.person, color: isDark ? Colors.white : Colors.black54) 
+                          child: _currentTrip!.carCategory?.carAvatar == null 
+                            ? Icon(Icons.directions_car, color: isDark ? Colors.white : Colors.black54) 
                             : null,
                         ),
                         const SizedBox(width: 16),
@@ -380,7 +380,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
   Widget _buildTripDetailsCard(bool isDark) {
     final carType = _currentTrip!.carCategory?.carType ?? "Standard Sedan";
-    final price = _currentTrip!.priceInfo?.minimumBookingPrice?.toStringAsFixed(2) ?? "0.00";
+    final price = _currentTrip!.offerAmount?.toStringAsFixed(2) ?? _currentTrip!.priceInfo?.minimumBookingPrice?.toStringAsFixed(2) ?? "0.00";
+    final hasOffer = _currentTrip!.offerAmount != null;
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -443,7 +444,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${AppLocalizations.of(context).translate("up_to") ?? "Up to"} ' + 
+                      (hasOffer ? '' : '${AppLocalizations.of(context).translate("up_to") ?? "Up to"} ') + 
                       (AppLocalizations.of(context).locale.languageCode == 'bn' 
                           ? '৳$price' 
                           : 'BDT $price'),
@@ -454,7 +455,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
                       ),
                     ),
                     Text(
-                      "Est. total",
+                      hasOffer 
+                        ? (AppLocalizations.of(context).translate("offer_price") ?? "Offer Price")
+                        : "Est. total",
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         color: isDark ? Colors.white54 : Colors.black54,

@@ -33,6 +33,8 @@ class CreateRentalTripRequest {
   final List<String> pickupLocationUuid;
   final List<String> dropoffLocationUuid;
   final String priceSetUuid;
+  final String? note;
+  final String? offerAmount;
 
   CreateRentalTripRequest({
     required this.serviceType,
@@ -48,6 +50,8 @@ class CreateRentalTripRequest {
     required this.pickupLocationUuid,
     required this.dropoffLocationUuid,
     required this.priceSetUuid,
+    this.note,
+    this.offerAmount,
   }) : platform = platform ?? _getPlatformName();
 
   Map<String, dynamic> toJson() {
@@ -71,6 +75,14 @@ class CreateRentalTripRequest {
 
     if (endDatetime != null && serviceType == "RETURN") {
       data['end_datetime'] = endDatetime;
+    }
+
+    if (note != null && note!.isNotEmpty) {
+      data['note'] = note;
+    }
+
+    if (offerAmount != null && offerAmount!.isNotEmpty) {
+      data['offer_ammount'] = offerAmount;
     }
 
     return data;
@@ -149,12 +161,14 @@ class LocationModel {
 
 class CarCategoryModel {
   final String? carType;
+  final String? carAvatar;
 
-  CarCategoryModel({this.carType});
+  CarCategoryModel({this.carType, this.carAvatar});
 
   factory CarCategoryModel.fromJson(Map<String, dynamic> json) {
     return CarCategoryModel(
       carType: json['car_type'],
+      carAvatar: json['car_avatar'],
     );
   }
 }
@@ -182,6 +196,7 @@ class RentalTrip {
   final List<LocationModel> pickupLocations;
   final List<LocationModel> dropoffLocations;
   final List<RentalDriverBid> drivers;
+  final double? offerAmount;
 
   RentalTrip({
     this.id,
@@ -192,6 +207,7 @@ class RentalTrip {
     this.pickupLocations = const [],
     this.dropoffLocations = const [],
     this.drivers = const [],
+    this.offerAmount,
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -204,6 +220,7 @@ class RentalTrip {
       pickupLocations: (json['pickup_locations'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e)).toList() ?? [],
       dropoffLocations: (json['dropoff_locations'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e)).toList() ?? [],
       drivers: (json['drivers'] as List<dynamic>?)?.map((e) => RentalDriverBid.fromJson(e)).toList() ?? [],
+      offerAmount: (json['offer_amount'] as num?)?.toDouble() ?? (json['offer_ammount'] as num?)?.toDouble(),
     );
   }
 }

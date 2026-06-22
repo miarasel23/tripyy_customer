@@ -195,5 +195,10 @@
   "select_return_date": "SELECT RETURN DATE",
   "select_return_time": "SELECT RETURN TIME",
   "please_select_time_after": "Please select a time after",
-  "message": "Message"
+  "message": "Message",
+  "offer_price": "Offer Price",
+  "enter_offer_price": "Enter your offer price",
+  "offer_price_required": "Offer price is required",
+  "note": "Note (Optional)",
+  "add_note": "Add a note for driver"
 }
