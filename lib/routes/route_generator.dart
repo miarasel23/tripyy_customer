@@ -18,6 +18,8 @@ import '../modules/splash/view/splash_screen.dart';
 import '../modules/tripDetails/view/screen/trip_details_screen.dart';
 import '../modules/userLevel/view/screen/user_level.dart';
 import '../modules/voucher/view/screen/voucher_screen.dart';
+import '../modules/dashboard/view/screen/bidding_screen.dart';
+import '../modules/dashboard/view/screen/active_trip_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -70,6 +72,18 @@ class RouteGenerator {
 
       case AppRoutes.error:
         return MaterialPageRoute(builder: (_) => const ErrorScreen());
+
+      case AppRoutes.biddingScreen:
+        final customerUuid = settings.arguments as String? ?? "";
+        return MaterialPageRoute(
+          builder: (_) => BiddingScreen(customerUuid: customerUuid),
+        );
+
+      case AppRoutes.activeTrip:
+        final customerUuid = settings.arguments as String? ?? "";
+        return MaterialPageRoute(
+          builder: (_) => ActiveTripScreen(customerUuid: customerUuid),
+        );
 
       default:
         return MaterialPageRoute(

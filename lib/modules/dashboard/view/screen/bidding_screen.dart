@@ -2,18 +2,17 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/app_colors.dart';
 import '../../models/create_rental_trip_model.dart';
 import '../../repository/create_trip_repository.dart';
 import '../../../../widgets/radar_animation.dart';
-import '../../../../utils/app_urls.dart';
-import '../../../../widgets/full_screen_image_gallery.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import '../../../../main.dart';
 import '../../../../widgets/cancel_trip_dialog.dart';
 import '../widget/bidding_searching_state.dart';
-import 'active_trip_screen.dart';
 import '../widget/bidding_trip_details_card.dart';
 import '../widget/bidding_list_widget.dart';
+import '../../../../routes/app_routes.dart';
 
 class BiddingScreen extends StatefulWidget {
   final String customerUuid;
@@ -25,7 +24,8 @@ class BiddingScreen extends StatefulWidget {
 }
 
 class _BiddingScreenState extends State<BiddingScreen> {
-  late Timer _pollingTimer;
+  // BUG FIX: Use nullable Timer to prevent crash in dispose() if init fails
+  Timer? _pollingTimer;
   final CreateTripRepository _repo = CreateTripRepository();
   bool _isLoading = true;
   RentalTrip? _currentTrip;
@@ -107,13 +107,12 @@ class _BiddingScreenState extends State<BiddingScreen> {
           ),
         );
         
-        _pollingTimer.cancel();
+        _pollingTimer?.cancel(); // null-safe cancel before navigation
         if (mounted) {
-          Navigator.pushReplacement(
+          Navigator.pushReplacementNamed(
             context,
-            MaterialPageRoute(
-              builder: (_) => ActiveTripScreen(customerUuid: widget.customerUuid),
-            ),
+            AppRoutes.activeTrip,
+            arguments: widget.customerUuid,
           );
         }
       } catch (e) {
@@ -156,7 +155,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
           ),
         );
         
-        _pollingTimer.cancel();
+        _pollingTimer?.cancel(); // null-safe cancel before navigation
         if (mounted) {
           Navigator.of(context).pop();
         }
@@ -215,7 +214,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
   @override
   void dispose() {
-    _pollingTimer.cancel();
+    _pollingTimer?.cancel(); // BUG FIX: null-safe cancel
     super.dispose();
   }
 
@@ -275,7 +274,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
   Widget _buildBody(bool isDark) {
     if (_isLoading && _currentTrip == null) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF)));
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     if (_errorMessage != null && _currentTrip == null) {

@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../repository/create_trip_repository.dart';
 import '../../models/create_rental_trip_model.dart';
 import '../../../../core/utils/localization/app_localization.dart';
-import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../utils/app_colors.dart';
 
 class ActiveTripScreen extends StatefulWidget {
   final String customerUuid;
@@ -26,11 +26,23 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
   GoogleMapController? _mapController;
 
+  bool _isInit = false;
+
   @override
   void initState() {
     super.initState();
-    _fetchActiveTrip();
+    // NOTE: _fetchActiveTrip() is called in didChangeDependencies
+    // to safely access context (AppLocalizations).
     _startPolling();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInit) {
+      _isInit = true;
+      _fetchActiveTrip();
+    }
   }
 
   @override
@@ -95,7 +107,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
   Widget _buildBody(bool isDark) {
     if (_isLoading && _activeTrip == null) {
-      return const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF)));
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     if (_errorMessage != null && _activeTrip == null) {

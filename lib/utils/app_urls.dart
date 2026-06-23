@@ -19,6 +19,12 @@ class AppUrls {
   static const String searchLocation = "$baseUrl/v1/global-api/search-location";
   static const String tripPriceDetailsCustomer = "$baseUrl/v1/rental-trip/trip-price-details-customer";
 
+  // Rental Trip - Booking
+  static const String createRentalTrip = "$baseUrl/v1/rental-trip/create-rental-trip";
+  static const String rentalBidTripListForCustomer = "$baseUrl/v1/rental-trip/rental-bid-trip-list_for_customer";
+  static const String acceptTripForCustomer = "$baseUrl/v1/rental-trip/accept_trip_for_customer";
+  static const String cancelTripDriverOrCustomerAdmin = "$baseUrl/v1/rental-trip/cancel-trip-driver-or-customer-admin";
+
   static String? get profileImageUrl {
     final image = UserDataStore.userData?.data?.user?.profilePicture;
 

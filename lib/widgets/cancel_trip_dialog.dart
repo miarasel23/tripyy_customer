@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/utils/localization/app_localization.dart';
+import '../utils/app_colors.dart';
 
 class CancelTripDialog extends StatefulWidget {
   final bool isDark;
@@ -23,16 +24,25 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final List<String> reasons = [
-      AppLocalizations.of(context).translate("waiting_long_time") ?? "Waiting for a long time",
-      AppLocalizations.of(context).translate("driver_asked_cancel") ?? "Driver asked to cancel",
-      AppLocalizations.of(context).translate("changed_mind") ?? "Changed my mind",
-      AppLocalizations.of(context).translate("others") ?? "Others"
+      loc.translate("waiting_long_time") ?? "Waiting for a long time",
+      loc.translate("driver_asked_cancel") ?? "Driver asked to cancel",
+      loc.translate("changed_mind") ?? "Changed my mind",
+      loc.translate("others") ?? "Others"
     ];
+    // Compute once to avoid repeated lookups and mismatch between frames
+    final String othersStr = reasons.last;
 
-    if (!reasons.contains(_selectedReason)) {
-      _selectedReason = reasons.first;
-    }
+    // BUG FIX: Do NOT mutate state directly inside build(). Instead, check
+    // after build and let WidgetsBinding schedule if needed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!reasons.contains(_selectedReason)) {
+        setState(() {
+          _selectedReason = reasons.first;
+        });
+      }
+    });
 
     return Dialog(
       backgroundColor: widget.isDark ? const Color(0xFF1C1E26) : Colors.white,
@@ -77,17 +87,17 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
                 ),
               );
             }).toList(),
-            if (_selectedReason == (AppLocalizations.of(context).translate("others") ?? "Others")) ...[
+            if (_selectedReason == othersStr) ...[
               const SizedBox(height: 8),
               TextField(
                 controller: _otherReasonController,
                 maxLines: 3,
                 style: TextStyle(color: widget.isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context).translate("write_reason") ?? "Please write your reason...",
+                  hintText: loc.translate("write_reason") ?? "Please write your reason...",
                   hintStyle: TextStyle(color: widget.isDark ? Colors.white54 : Colors.black38),
                   filled: true,
-                  fillColor: widget.isDark ? const Color(0xFF252833) : Colors.grey.shade100,
+                  fillColor: widget.isDark ? AppColors.darkCardDeep : Colors.grey.shade100,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -107,7 +117,7 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
                     ),
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
-                      AppLocalizations.of(context).translate("dismiss") ?? "Dismiss",
+                      loc.translate("dismiss") ?? "Dismiss",
                       style: GoogleFonts.poppins(
                         color: widget.isDark ? Colors.white70 : Colors.black54,
                         fontWeight: FontWeight.w600,
@@ -125,16 +135,15 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
                       elevation: 0,
                     ),
                     onPressed: () {
-                      String finalReason = _selectedReason == (AppLocalizations.of(context).translate("others") ?? "Others") 
-                          ? _otherReasonController.text.trim() 
+                      // BUG FIX: Use pre-computed othersStr for consistent comparison
+                      final String finalReason = (_selectedReason == othersStr)
+                          ? _otherReasonController.text.trim()
                           : _selectedReason;
-                      if (_selectedReason == (AppLocalizations.of(context).translate("others") ?? "Others") && finalReason.isEmpty) {
-                        return;
-                      }
+                      if (_selectedReason == othersStr && finalReason.isEmpty) return;
                       Navigator.of(context).pop(finalReason);
                     },
                     child: Text(
-                      AppLocalizations.of(context).translate("submit") ?? "Submit",
+                      loc.translate("submit") ?? "Submit",
                       style: GoogleFonts.poppins(
                         color: widget.isDark ? Colors.black : Colors.white,
                         fontWeight: FontWeight.w600,

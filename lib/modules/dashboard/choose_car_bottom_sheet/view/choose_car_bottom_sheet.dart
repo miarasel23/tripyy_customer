@@ -15,7 +15,7 @@ import '../models/choose_car_model.dart';
 import '../../../../store/user_data_store.dart';
 import '../../models/create_rental_trip_model.dart';
 import '../../repository/create_trip_repository.dart';
-import '../../view/screen/bidding_screen.dart';
+import '../../../../routes/app_routes.dart';
 import 'widget/confirm_trip_dialog.dart';
 
 class CarOption {
@@ -97,13 +97,10 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
         Navigator.pop(context);
         
         // Navigate to Bidding Screen
-        Navigator.push(
+        Navigator.pushNamed(
           context,
-          MaterialPageRoute(
-            builder: (context) => BiddingScreen(
-              customerUuid: UserDataStore.uuid ?? "",
-            ),
-          ),
+          AppRoutes.biddingScreen,
+          arguments: UserDataStore.uuid ?? "",
         );
       }
     } catch (e) {

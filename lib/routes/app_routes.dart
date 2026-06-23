@@ -15,6 +15,8 @@ class AppRoutes {
   static const userLevel = '/user_level';
   static const notification = '/notification';
   static const voucher = '/voucher';
-  static const profile = '/profile';
-  static const error = '/error';
+  static const String profile = '/profile';
+  static const String error = '/error';
+  static const String biddingScreen = '/bidding_screen';
+  static const String activeTrip = '/active_trip';
 }

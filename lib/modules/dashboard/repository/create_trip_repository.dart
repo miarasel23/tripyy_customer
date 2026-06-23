@@ -10,7 +10,7 @@ import '../models/create_rental_trip_model.dart';
 class CreateTripRepository {
   Future<Map<String, dynamic>> createRentalTrip(CreateRentalTripRequest request) async {
     try {
-      final url = Uri.parse('${AppUrls.baseUrl}/v1/rental-trip/create-rental-trip');
+      final url = Uri.parse(AppUrls.createRentalTrip);
       
       final Map<String, String> formFields = request.toJson().map((key, value) => MapEntry(key, value.toString()));
 
@@ -74,7 +74,7 @@ class CreateTripRepository {
           'trip_status': tripStatus,
         },
       ).map((key, value) => MapEntry(key, value.toString()));
-      final uri = Uri.parse('${AppUrls.baseUrl}/v1/rental-trip/rental-bid-trip-list_for_customer').replace(queryParameters: queryParams);
+      final uri = Uri.parse(AppUrls.rentalBidTripListForCustomer).replace(queryParameters: queryParams);
       final token = await UserDataStore.getAccessToken();
       final headers = {
         'Accept': 'application/json',
@@ -109,7 +109,7 @@ class CreateTripRepository {
     required String langCode,
   }) async {
     try {
-      final url = Uri.parse('${AppUrls.baseUrl}/v1/rental-trip/accept_trip_for_customer');
+      final url = Uri.parse(AppUrls.acceptTripForCustomer);
       
       final Map<String, dynamic> bodyData = CustomMapBodyBuilder.build(
         actionWhen: 'accept_trip_for_customer',
@@ -168,7 +168,7 @@ class CreateTripRepository {
     required String langCode,
   }) async {
     try {
-      final url = Uri.parse('${AppUrls.baseUrl}/v1/rental-trip/cancel-trip-driver-or-customer-admin');
+      final url = Uri.parse(AppUrls.cancelTripDriverOrCustomerAdmin);
       
       final Map<String, dynamic> bodyData = CustomMapBodyBuilder.build(
         actionWhen: 'cancel_trip_driver_or_customer_admin',
