@@ -203,5 +203,13 @@
   "add_note": "Add a note for driver",
   "no_reviews": "No reviews available yet.",
   "offer_price_too_low": "Offer price too low",
-  "offer_price_too_high": "Offer price too high"
+  "offer_price_too_high": "Offer price too high",
+  "why_cancel": "Why are you cancelling?",
+  "waiting_long_time": "Waiting for a long time",
+  "driver_asked_cancel": "Driver asked to cancel",
+  "changed_mind": "Changed my mind",
+  "others": "Others",
+  "write_reason": "Please write your reason...",
+  "dismiss": "Dismiss",
+  "submit": "Submit"
 }

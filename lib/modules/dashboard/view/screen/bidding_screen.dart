@@ -9,6 +9,7 @@ import '../../../../utils/app_urls.dart';
 import '../../../../widgets/full_screen_image_gallery.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import '../../../../main.dart';
+import '../../../../widgets/cancel_trip_dialog.dart';
 import '../widget/bidding_searching_state.dart';
 import '../widget/bidding_trip_details_card.dart';
 import '../widget/bidding_list_widget.dart';
@@ -43,6 +44,50 @@ class _BiddingScreenState extends State<BiddingScreen> {
     if (!_isInit) {
       _isInit = true;
       _startPolling();
+    }
+  }
+
+  Future<void> _cancelTrip(BuildContext context, bool isDark) async {
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => CancelTripDialog(isDark: isDark),
+    );
+
+    if (reason != null && reason.isNotEmpty && _currentTrip != null) {
+      try {
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text("Cancelling trip..."), behavior: SnackBarBehavior.floating),
+        );
+        final loc = AppLocalizations.of(context);
+        final response = await _repo.cancelTrip(
+          tripUuid: _currentTrip!.uuid ?? "",
+          comment: reason,
+          langCode: loc.locale.languageCode,
+        );
+
+        globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? "Trip cancelled successfully"),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        
+        _pollingTimer.cancel();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -98,7 +143,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     
     // Determine title text
     String titleText = "Finding your ride";
-    String subtitleText = _currentTrip?.serviceName?.replaceAll('_', ' ') ?? "RAPIDRIDE PREMIUM";
+    String subtitleText = _currentTrip?.serviceName?.replaceAll('_', ' ') ?? "TRIPPY RIDE PREMIUM";
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF13151B) : Colors.white,
@@ -196,7 +241,11 @@ class _BiddingScreenState extends State<BiddingScreen> {
                     ) 
                   : BiddingSearchingState(isDark: isDark),
               ),
-              BiddingTripDetailsCard(isDark: isDark, currentTrip: _currentTrip!),
+              BiddingTripDetailsCard(
+                isDark: isDark, 
+                currentTrip: _currentTrip!,
+                onCancel: () => _cancelTrip(context, isDark),
+              ),
             ],
           ),
         ),

@@ -7,11 +7,13 @@ import '../../../../../utils/app_urls.dart';
 class BiddingTripDetailsCard extends StatelessWidget {
   final bool isDark;
   final RentalTrip currentTrip;
+  final VoidCallback onCancel;
 
   const BiddingTripDetailsCard({
     super.key,
     required this.isDark,
     required this.currentTrip,
+    required this.onCancel,
   });
 
   Widget _buildLocationRow({
@@ -231,7 +233,7 @@ class BiddingTripDetailsCard extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              onPressed: () {},
+              onPressed: onCancel,
               child: Text(
                 "Cancel Request",
                 style: GoogleFonts.poppins(
@@ -246,7 +248,7 @@ class BiddingTripDetailsCard extends StatelessWidget {
           const SizedBox(height: 16),
           Center(
             child: Text(
-              "SECURE MATCHING BY RAPIDRIDE AI",
+              "SECURE MATCHING BY TRIPPY RIDE",
               style: GoogleFonts.poppins(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
