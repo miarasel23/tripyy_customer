@@ -8,6 +8,7 @@ import '../../../../widgets/radar_animation.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../widgets/full_screen_image_gallery.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
+import '../../../../main.dart';
 
 class BiddingScreen extends StatefulWidget {
   final String customerUuid;
@@ -326,8 +327,16 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                 if (bid.ratingList != null && bid.ratingList!.isNotEmpty) {
                                   _showReviewsBottomSheet(context, bid, isDark);
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("No reviews available yet.")),
+                                  globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+                                  globalScaffoldMessengerKey.currentState?.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        AppLocalizations.of(context).translate("no_reviews") ?? "No reviews available yet.",
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                      backgroundColor: Colors.redAccent,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
                                   );
                                 }
                               },

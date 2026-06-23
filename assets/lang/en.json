@@ -200,5 +200,6 @@
   "enter_offer_price": "Enter your offer price",
   "offer_price_required": "Offer price is required",
   "note": "Note (Optional)",
-  "add_note": "Add a note for driver"
+  "add_note": "Add a note for driver",
+  "no_reviews": "No reviews available yet."
 }
