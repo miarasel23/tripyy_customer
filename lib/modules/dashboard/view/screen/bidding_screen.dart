@@ -303,41 +303,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
                                   color: isDark ? Colors.white : Colors.black,
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              GestureDetector(
-                                onTap: () {
-                                  if (bid.ratingList != null && bid.ratingList!.isNotEmpty) {
-                                    _showReviewsBottomSheet(context, bid, isDark);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("No reviews available yet.")),
-                                    );
-                                  }
-                                },
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.star, color: Colors.amber, size: 14),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${bid.averageRating?.toStringAsFixed(1) ?? "0.0"} (${bid.totalCompletedTrips ?? 0} trips)',
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                        color: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
-                                            ? Colors.blueAccent 
-                                            : (isDark ? Colors.white54 : Colors.black54),
-                                        decoration: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
-                                            ? TextDecoration.underline 
-                                            : TextDecoration.none,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                               const SizedBox(height: 4),
                               Text(
-                                '${AppLocalizations.of(context).translate("total") ?? "Total"}: ' + 
+                                '${(AppLocalizations.of(context).translate("total") ?? "Total").toUpperCase()}: ' + 
                                 (AppLocalizations.of(context).locale.languageCode == 'bn' 
                                     ? '৳${bid.totalAmount ?? bid.bidAmount ?? '0.00'}' 
                                     : 'BDT ${bid.totalAmount ?? bid.bidAmount ?? '0.00'}'),
@@ -350,19 +318,56 @@ class _BiddingScreenState extends State<BiddingScreen> {
                             ],
                           ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: isDark ? Colors.white : Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                if (bid.ratingList != null && bid.ratingList!.isNotEmpty) {
+                                  _showReviewsBottomSheet(context, bid, isDark);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text("No reviews available yet.")),
+                                  );
+                                }
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.star, color: Colors.amber, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${bid.averageRating?.toStringAsFixed(1) ?? "0.0"} (${bid.totalCompletedTrips ?? 0} trips)',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
+                                          ? Colors.blueAccent 
+                                          : (isDark ? Colors.white54 : Colors.black54),
+                                      decoration: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
+                                          ? TextDecoration.underline 
+                                          : TextDecoration.none,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          onPressed: () {
-                            _pollingTimer.cancel();
-                            // Accept Bid Logic
-                            // e.g. Navigator.push(...)
-                          },
-                          child: Text("Accept", style: GoogleFonts.poppins(color: isDark ? Colors.black : Colors.white)),
+                            const SizedBox(height: 5),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDark ? Colors.white : Colors.black,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () {
+                                _pollingTimer.cancel();
+                                // Accept Bid Logic
+                                // e.g. Navigator.push(...)
+                              },
+                              child: Text("Accept", style: GoogleFonts.poppins(color: isDark ? Colors.black : Colors.white)),
+                            ),
+                          ],
                         ),
                       ],
                     ),

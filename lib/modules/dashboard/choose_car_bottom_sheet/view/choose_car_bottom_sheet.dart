@@ -81,7 +81,6 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
         customerUuid: await UserDataStore.getUuid() ?? "",
         countryCode: "BD",
         actionWhen: "create_rental_trip",
-        platform: "web",
         languageCode: loc.locale.languageCode,
         pickupLocationUuid: widget.tripReq.pickupLocationUuid,
         dropoffLocationUuid: widget.tripReq.dropoffLocationUuid,

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 String _getPlatformName() {
-  if (kIsWeb) return 'web';
   switch (defaultTargetPlatform) {
     case TargetPlatform.android:
       return 'android';
