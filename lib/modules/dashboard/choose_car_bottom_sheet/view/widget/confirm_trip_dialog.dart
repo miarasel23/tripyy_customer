@@ -175,6 +175,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
             // Offer Price Field (Required)
             TextFormField(
               controller: _offerPriceController,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.left,
               style: GoogleFonts.poppins(color: textColor, fontSize: 14),
@@ -207,6 +208,20 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
                 if (value == null || value.trim().isEmpty) {
                   return loc.translate("offer_price_required") ?? "Offer price is required";
                 }
+                
+                final num? offerPrice = num.tryParse(value);
+                final num? estFare = widget.selectedCar.minimumBookingPrice;
+                
+                if (offerPrice != null && estFare != null) {
+                  final num minAllowedOffer = estFare * 0.85;
+                  if (offerPrice < minAllowedOffer) {
+                    return loc.translate("offer_price_too_low") ?? "Offer price too low";
+                  }
+                  if (offerPrice > estFare) {
+                    return loc.translate("offer_price_too_high") ?? "Offer price too high";
+                  }
+                }
+                
                 return null;
               },
             ),
@@ -215,8 +230,11 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
             // Note Field (Optional)
             TextFormField(
               controller: _noteController,
+              maxLines: 3,
+              keyboardType: TextInputType.multiline,
               style: GoogleFonts.poppins(color: textColor, fontSize: 14),
               decoration: InputDecoration(
+                alignLabelWithHint: true,
                 labelText: loc.translate("note") ?? "Note (Optional)",
                 labelStyle: GoogleFonts.poppins(color: subTextColor, fontSize: 14),
                 hintText: loc.translate("add_note") ?? "Add a note for driver",

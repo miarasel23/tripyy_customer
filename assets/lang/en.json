@@ -201,5 +201,7 @@
   "offer_price_required": "Offer price is required",
   "note": "Note (Optional)",
   "add_note": "Add a note for driver",
-  "no_reviews": "No reviews available yet."
+  "no_reviews": "No reviews available yet.",
+  "offer_price_too_low": "Offer price too low",
+  "offer_price_too_high": "Offer price too high"
 }
