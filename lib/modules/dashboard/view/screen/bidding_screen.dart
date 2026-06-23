@@ -254,7 +254,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
         ),
         const SizedBox(height: 10),
         Text(
-          "Drivers Found!",
+          "Drivers Found! (${_currentTrip!.totalBids ?? _currentTrip!.drivers.length})",
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w600,
@@ -282,12 +282,12 @@ class _BiddingScreenState extends State<BiddingScreen> {
                       children: [
                         CircleAvatar(
                           radius: 25,
-                          backgroundImage: _currentTrip!.carCategory?.carAvatar != null 
-                            ? NetworkImage("${AppUrls.imageBaseUrl}${_currentTrip!.carCategory!.carAvatar}") 
+                          backgroundImage: bid.profilePicture != null 
+                            ? NetworkImage("${AppUrls.imageBaseUrl}${bid.profilePicture}") 
                             : null,
                           backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                          child: _currentTrip!.carCategory?.carAvatar == null 
-                            ? Icon(Icons.directions_car, color: isDark ? Colors.white : Colors.black54) 
+                          child: bid.profilePicture == null 
+                            ? Icon(Icons.person, color: isDark ? Colors.white : Colors.black54) 
                             : null,
                         ),
                         const SizedBox(width: 16),
@@ -576,7 +576,13 @@ class _BiddingScreenState extends State<BiddingScreen> {
                     color: const Color(0xFF6C63FF).withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.directions_car, color: Color(0xFF6C63FF)),
+                  child: _currentTrip!.carCategory?.carAvatar != null
+                      ? Image.network(
+                          "${AppUrls.imageBaseUrl}${_currentTrip!.carCategory!.carAvatar}",
+                          width: 24,
+                          height: 24,
+                        )
+                      : const Icon(Icons.directions_car, color: Color(0xFF6C63FF)),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

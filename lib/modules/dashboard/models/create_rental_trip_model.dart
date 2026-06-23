@@ -234,6 +234,7 @@ class RentalTrip {
   final List<LocationModel> dropoffLocations;
   final List<RentalDriverBid> drivers;
   final double? offerAmount;
+  final int? totalBids;
 
   RentalTrip({
     this.id,
@@ -245,6 +246,7 @@ class RentalTrip {
     this.dropoffLocations = const [],
     this.drivers = const [],
     this.offerAmount,
+    this.totalBids,
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -258,6 +260,7 @@ class RentalTrip {
       dropoffLocations: (json['dropoff_locations'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e)).toList() ?? [],
       drivers: (json['drivers'] as List<dynamic>?)?.map((e) => RentalDriverBid.fromJson(e)).toList() ?? [],
       offerAmount: (json['offer_amount'] as num?)?.toDouble() ?? (json['offer_ammount'] as num?)?.toDouble(),
+      totalBids: json['total_bids'] as int?,
     );
   }
 }
