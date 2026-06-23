@@ -103,6 +103,65 @@ class CreateTripRepository {
     }
   }
 
+  Future<Map<String, dynamic>> acceptTrip({
+    required String customerUuid,
+    required String bidUuid,
+    required String langCode,
+  }) async {
+    try {
+      final url = Uri.parse('${AppUrls.baseUrl}/v1/rental-trip/accept_trip_for_customer');
+      
+      final Map<String, dynamic> bodyData = CustomMapBodyBuilder.build(
+        actionWhen: 'accept_trip_for_customer',
+        languageCode: langCode,
+        data: {
+          'customer_uuid': customerUuid,
+          'bid_uuid': bidUuid,
+        },
+      );
+      
+      final Map<String, String> formFields = bodyData.map((key, value) => MapEntry(key, value.toString()));
+
+      final token = await UserDataStore.getAccessToken();
+      final headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+      };
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      
+      final response = await http.post(
+        url,
+        headers: headers,
+        body: formFields,
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 400) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['status'] == false) {
+          throw Exception(decoded['message'] ?? "Unknown server error");
+        }
+        return decoded;
+      } else {
+        String? errorMessage;
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded['message'] != null) {
+            errorMessage = decoded['message'];
+          }
+        } catch (_) {}
+        if (errorMessage != null) {
+          throw Exception(errorMessage);
+        }
+        throw Exception("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Error accepting trip: $e");
+      rethrow;
+    }
+  }
+
   Future<Map<String, dynamic>> cancelTrip({
     required String tripUuid,
     required String comment,

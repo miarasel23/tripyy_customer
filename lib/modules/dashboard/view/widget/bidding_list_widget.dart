@@ -10,7 +10,7 @@ import '../../../../../main.dart';
 class BiddingListWidget extends StatelessWidget {
   final bool isDark;
   final RentalTrip currentTrip;
-  final VoidCallback onAcceptBid;
+  final Function(RentalDriverBid bid) onAcceptBid;
 
   const BiddingListWidget({
     super.key,
@@ -276,7 +276,7 @@ class BiddingListWidget extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: onAcceptBid,
+                              onPressed: () => onAcceptBid(bid),
                               child: Text("Accept", style: GoogleFonts.poppins(color: isDark ? Colors.black : Colors.white)),
                             ),
                           ],

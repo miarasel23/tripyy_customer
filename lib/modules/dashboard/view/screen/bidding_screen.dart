@@ -11,6 +11,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import '../../../../main.dart';
 import '../../../../widgets/cancel_trip_dialog.dart';
 import '../widget/bidding_searching_state.dart';
+import 'active_trip_screen.dart';
 import '../widget/bidding_trip_details_card.dart';
 import '../widget/bidding_list_widget.dart';
 
@@ -44,6 +45,87 @@ class _BiddingScreenState extends State<BiddingScreen> {
     if (!_isInit) {
       _isInit = true;
       _startPolling();
+    }
+  }
+
+  Future<void> _acceptTrip(BuildContext context, bool isDark, RentalDriverBid bid) async {
+    final loc = AppLocalizations.of(context);
+    
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: isDark ? const Color(0xFF1C1E26) : Colors.white,
+        title: Text(
+          loc.translate("accept_trip_confirm") ?? "Are you sure you want to accept this trip?",
+          style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black, fontSize: 16),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(loc.translate("no") ?? "No", style: const TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isDark ? Colors.white : Colors.black,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: BorderSide(color: isDark ? Colors.white : Colors.black),
+              ),
+              elevation: 0,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(
+              loc.translate("yes") ?? "Yes", 
+              style: GoogleFonts.poppins(
+                color: isDark ? Colors.black : Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && _currentTrip != null) {
+      try {
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text("Accepting trip..."), behavior: SnackBarBehavior.floating),
+        );
+        
+        final response = await _repo.acceptTrip(
+          customerUuid: widget.customerUuid,
+          bidUuid: bid.rentBidUuid ?? "",
+          langCode: loc.locale.languageCode,
+        );
+
+        globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? "Trip accepted successfully"),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        
+        _pollingTimer.cancel();
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ActiveTripScreen(customerUuid: widget.customerUuid),
+            ),
+          );
+        }
+      } catch (e) {
+        globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -234,10 +316,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
                   ? BiddingListWidget(
                       isDark: isDark, 
                       currentTrip: _currentTrip!, 
-                      onAcceptBid: () {
-                        _pollingTimer.cancel();
-                        // Accept Bid Logic
-                      },
+                      onAcceptBid: (bid) => _acceptTrip(context, isDark, bid),
                     ) 
                   : BiddingSearchingState(isDark: isDark),
               ),

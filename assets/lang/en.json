@@ -211,5 +211,8 @@
   "others": "Others",
   "write_reason": "Please write your reason...",
   "dismiss": "Dismiss",
-  "submit": "Submit"
+  "submit": "Submit",
+  "accept_trip_confirm": "Are you sure you want to accept this trip?",
+  "yes": "Yes",
+  "no": "No"
 }

@@ -54,6 +54,7 @@ dependencies:
   flutter_polyline_points: ^2.0.1
   geocoding: ^3.0.0
   flutter_ringtone_player: ^4.0.0+4
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
