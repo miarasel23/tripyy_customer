@@ -357,35 +357,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {
     // Validate pickup
     if (_pickups.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a pickup location.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      UiUtils.showAppSnackBar(context, 'Please select a pickup location.', type: 'error');
       return;
     }
 
     // Validate pickup has a valid UUID (location confirmed by the backend)
     final invalidPickup = _pickups.any((p) => p.uuid == null || p.uuid!.isEmpty);
     if (invalidPickup) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Pickup location could not be confirmed. Please drag the map to re-select.'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      UiUtils.showAppSnackBar(context, 'Pickup location could not be confirmed. Please drag the map to re-select.', type: 'error');
       return;
     }
 
     // Validate dropoff
     if (_dropoffUuid == null || _dropoffUuid!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a drop-off location.'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      UiUtils.showAppSnackBar(context, 'Please select a drop-off location.', type: 'error');
       return;
     }
 
@@ -493,12 +478,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         // Show Vehicle Details in bottom sheet
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Trip details loaded successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          UiUtils.showAppSnackBar(context, 'Trip details loaded successfully!', type: 'success');
           
           showModalBottomSheet(
             context: context,
@@ -520,23 +500,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response.message ?? 'Failed to get trip price details'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          UiUtils.showAppSnackBar(context, response.message ?? 'Failed to get trip price details', type: 'error');
         }
       }
     } catch (e) {
       if (mounted) Navigator.pop(context); // Hide loading
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '').replaceAll('Error: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
+        UiUtils.showAppSnackBar(context, e.toString().replaceAll('Exception: ', '').replaceAll('Error: ', ''), type: 'error');
       }
     }
   }
