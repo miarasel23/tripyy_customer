@@ -124,10 +124,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     }
 
     if (routePoints.length > 1) {
-      final isDark = Theme.of(context).brightness == Brightness.dark;
       final polylines = await MapHelper.getRouteBetweenMultipleCoordinates(
         routePoints, 
-        color: isDark ? Colors.white : Colors.black,
+        color: Colors.green,
       );
       if (mounted) {
         setState(() {
@@ -196,32 +195,31 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     List<LatLng> routePoints = [];
     Set<Marker> markers = {};
 
-    for (int i = 0; i < trip.pickupLocations.length; i++) {
-      final loc = trip.pickupLocations[i];
-      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
-      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
-      final point = LatLng(lat, lng);
-      routePoints.add(point);
-      markers.add(
-        Marker(
-          markerId: MarkerId('pickup_$i'),
-          position: point,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        ),
-      );
-    }
+    List<LocationModel> allLocations = [];
+    allLocations.addAll(trip.pickupLocations);
+    allLocations.addAll(trip.dropoffLocations);
 
-    for (int i = 0; i < trip.dropoffLocations.length; i++) {
-      final loc = trip.dropoffLocations[i];
+    for (int i = 0; i < allLocations.length; i++) {
+      final loc = allLocations[i];
       final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
       final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
       final point = LatLng(lat, lng);
       routePoints.add(point);
+      
+      double hue;
+      if (i == 0) {
+        hue = BitmapDescriptor.hueGreen;
+      } else if (i == allLocations.length - 1) {
+        hue = BitmapDescriptor.hueRed;
+      } else {
+        hue = BitmapDescriptor.hueYellow;
+      }
+
       markers.add(
         Marker(
-          markerId: MarkerId('dropoff_$i'),
+          markerId: MarkerId('loc_$i'),
           position: point,
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+          icon: BitmapDescriptor.defaultMarkerWithHue(hue),
         ),
       );
     }
@@ -237,12 +235,40 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               target: initialCameraPosition,
               zoom: 14.0,
             ),
-            zoomControlsEnabled: false,
+            zoomControlsEnabled: true,
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
             onMapCreated: (controller) {
               _mapController = controller;
-              // Map style can be added here
+              if (routePoints.isNotEmpty) {
+                if (routePoints.length == 1) {
+                  _mapController!.animateCamera(CameraUpdate.newLatLngZoom(routePoints.first, 14.0));
+                } else {
+                  double minLat = routePoints.first.latitude;
+                  double maxLat = routePoints.first.latitude;
+                  double minLng = routePoints.first.longitude;
+                  double maxLng = routePoints.first.longitude;
+
+                  for (var point in routePoints) {
+                    if (point.latitude < minLat) minLat = point.latitude;
+                    if (point.latitude > maxLat) maxLat = point.latitude;
+                    if (point.longitude < minLng) minLng = point.longitude;
+                    if (point.longitude > maxLng) maxLng = point.longitude;
+                  }
+
+                  final bounds = LatLngBounds(
+                    southwest: LatLng(minLat, minLng),
+                    northeast: LatLng(maxLat, maxLng),
+                  );
+
+                  // Delay slightly to ensure map is fully loaded before animating bounds
+                  Future.delayed(const Duration(milliseconds: 300), () {
+                    if (mounted && _mapController != null) {
+                      _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
+                    }
+                  });
+                }
+              }
             },
             polylines: _polylines,
             markers: markers,
