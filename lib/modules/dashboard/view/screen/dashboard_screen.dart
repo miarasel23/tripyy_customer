@@ -39,6 +39,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Current camera center (updated as user drags map)
   LatLng _cameraCenter = const LatLng(23.8103, 90.4125);
   bool _isCameraMoving = false;
+  bool _isProgrammaticCameraMove = false;
 
   /// List of pickup locations
   List<SearchLocationData> _pickups = [];
@@ -77,7 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     super.dispose();
   }
 
-  Future<void> _getCurrentLocation() async {
+  Future<void> _getCurrentLocation({bool forcePopulatePickup = false}) async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return;
 
@@ -97,11 +98,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _cameraCenter = latLng;
     });
 
+    _isProgrammaticCameraMove = true;
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(target: latLng, zoom: 15.0),
     ));
 
-    _handleCameraIdle(latLng);
+    _handleCameraIdle(latLng, forcePopulatePickup: forcePopulatePickup);
   }
 
 
@@ -109,7 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   /// Debounced reverse geocoding & route redrawing.
   /// ONLY Google Geocoding API is used — native geocoding is removed to prevent
   /// fake/mismatched addresses from appearing in the text field or on the map.
-  void _handleCameraIdle(LatLng position) {
+  void _handleCameraIdle(LatLng position, {bool forcePopulatePickup = false}) {
     _mapIdleDebounce?.cancel();
     _mapIdleDebounce = Timer(const Duration(milliseconds: 600), () async {
       final isDropFocused = _searchCardKey.currentState?.isDropFocused ?? false;
@@ -167,30 +169,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           setState(() {
             if (isDropFocused) {
-              _dropoffUuid = locData.uuid;
-              _dropoffAddress = locData.address;
-              _dropLatLng = position;
+              if (_dropoffUuid != null && _dropoffUuid!.isNotEmpty) {
+                _dropoffUuid = locData.uuid;
+                _dropoffAddress = locData.address;
+                _dropLatLng = position;
+                _searchCardKey.currentState?.setLocationFromMapDrag(locData);
+              }
             } else {
               int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
+              // Only allow updating from map drag if the user has ALREADY selected a location from the dropdown
               if (pIndex >= 0 && pIndex < _pickups.length) {
                 _pickups[pIndex] = locData;
-              } else if (_pickups.isEmpty) {
-                _pickups.add(locData);
+                _searchCardKey.currentState?.setLocationFromMapDrag(locData);
+              } else if (forcePopulatePickup && pIndex == 0) {
+                if (_pickups.isEmpty) {
+                  _pickups.add(locData);
+                } else {
+                  _pickups[0] = locData;
+                }
+                _searchCardKey.currentState?.setLocationFromMapDrag(locData);
               }
             }
           });
-
-          _searchCardKey.currentState?.setLocationFromMapDrag(locData);
         } else {
           // Backend returned no UUID — clear the field so user knows to retry.
           setState(() {
             if (isDropFocused) {
-              _dropoffUuid = null;
-              _dropoffAddress = null;
-              _dropLatLng = null;
+              if (_dropoffUuid != null && _dropoffUuid!.isNotEmpty) {
+                _dropoffUuid = null;
+                _dropoffAddress = null;
+                _dropLatLng = null;
+                _searchCardKey.currentState?.updateActiveFieldText('');
+              }
+            } else {
+              int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
+              if (pIndex >= 0 && pIndex < _pickups.length) {
+                _searchCardKey.currentState?.updateActiveFieldText('');
+              }
             }
           });
-          _searchCardKey.currentState?.updateActiveFieldText('');
         }
       } catch (e) {
         debugPrint('Failed to fetch UUID for map location: $e');
@@ -223,12 +240,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Use a closer zoom (17) for drop so user can fine-tune the pin precisely
     if (isDropFocused) {
       final targetLatLng = _dropLatLng ?? _cameraCenter;
+      _isProgrammaticCameraMove = true;
       _mapController?.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(target: targetLatLng, zoom: 17.0),
       ));
     } else if (_pickups.isNotEmpty) {
       final first = _pickups.first;
       if (first.latitude != null && first.longitude != null) {
+        _isProgrammaticCameraMove = true;
         _mapController?.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(first.latitude!, first.longitude!), zoom: 15.0),
         ));
@@ -248,6 +267,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (_pickups.isNotEmpty) {
       final last = _pickups.last;
       if (last.latitude != null && last.longitude != null) {
+        _isProgrammaticCameraMove = true;
         _mapController?.animateCamera(CameraUpdate.newCameraPosition(
           CameraPosition(target: LatLng(last.latitude!, last.longitude!), zoom: 15.0),
         ));
@@ -271,6 +291,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     // Zoom into the DROP location at street level (zoom 18) so the customer
     // can clearly see and confirm the pin position — and adjust it if needed.
+    _isProgrammaticCameraMove = true;
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(target: latLng, zoom: 18.0),
     ));
@@ -539,11 +560,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     },
                     onCameraIdle: () {
                       setState(() => _isCameraMoving = false);
-                      _handleCameraIdle(_cameraCenter);
+                      if (_isProgrammaticCameraMove) {
+                        _isProgrammaticCameraMove = false;
+                      } else {
+                        _handleCameraIdle(_cameraCenter);
+                      }
                     },
                     onMapCreated: (GoogleMapController controller) {
                       _mapController = controller;
                       // Animate to initial camera center once map is ready
+                      _isProgrammaticCameraMove = true;
                       controller.animateCamera(CameraUpdate.newCameraPosition(
                         CameraPosition(target: _cameraCenter, zoom: 15.0),
                       ));
@@ -644,6 +670,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   onPickupsUpdated: _onPickupsUpdated,
                   onDestinationSelected: _onDestinationSelected,
                   onFocusChanged: _onSearchFieldFocusChanged,
+                  onMyLocationTapped: () => _getCurrentLocation(forcePopulatePickup: true),
                 ),
               ],
             ),

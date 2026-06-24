@@ -11,6 +11,7 @@ class SearchAndSavedCardWidget extends StatefulWidget {
   final Function(List<SearchLocationData>) onPickupsUpdated;
   final Function(SearchLocationData)? onDestinationSelected;
   final Function(bool isDropFocused)? onFocusChanged;
+  final VoidCallback? onMyLocationTapped;
 
   const SearchAndSavedCardWidget({
     super.key,
@@ -18,6 +19,7 @@ class SearchAndSavedCardWidget extends StatefulWidget {
     required this.onPickupsUpdated,
     this.onDestinationSelected,
     this.onFocusChanged,
+    this.onMyLocationTapped,
   });
 
   @override
@@ -320,23 +322,14 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                 if (i == 0) ...[
                                   const SizedBox(width: 8),
                                   GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        final newController = TextEditingController();
-                                        final newNode = FocusNode();
-                                        _setupFocusListener(newNode);
-                                        _pickupControllers.add(newController);
-                                        _pickupFocusNodes.add(newNode);
-                                        _selectedPickups.add(null);
-                                      });
-                                    },
+                                    onTap: widget.onMyLocationTapped,
                                     child: Container(
                                       padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface, size: 18),
+                                      child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 18),
                                     ),
                                   ),
                                 ] else ...[
@@ -372,13 +365,25 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                  shape: BoxShape.circle,
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    final newController = TextEditingController();
+                                    final newNode = FocusNode();
+                                    _setupFocusListener(newNode);
+                                    _pickupControllers.add(newController);
+                                    _pickupFocusNodes.add(newNode);
+                                    _selectedPickups.add(null);
+                                  });
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface, size: 18),
                                 ),
-                                child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 18),
                               ),
                             ],
                           ),
