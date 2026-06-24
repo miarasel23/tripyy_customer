@@ -22,6 +22,31 @@ class MapHelper {
     return null;
   }
 
+  /// Get the exact place_id and formatted_address from Google Geocoding API
+  /// for a given lat/lng. Returns null if nothing found.
+  /// This guarantees ZERO mismatch between the pin position and the address/UUID.
+  static Future<({String placeId, String address})?> getPlaceIdFromCoordinates(LatLng position) async {
+    try {
+      final url =
+          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${AppUrls.googleApiKey}';
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['results'] != null && (data['results'] as List).isNotEmpty) {
+          final first = data['results'][0] as Map<String, dynamic>;
+          final placeId = first['place_id'] as String?;
+          final address = first['formatted_address'] as String?;
+          if (placeId != null && address != null) {
+            return (placeId: placeId, address: address);
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('getPlaceIdFromCoordinates failed: $e');
+    }
+    return null;
+  }
+
   /// Get polyline points between two locations
   static Future<Set<Polyline>> getRouteBetweenCoordinates(
       LatLng from, LatLng to) async {

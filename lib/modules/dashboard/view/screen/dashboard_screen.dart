@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/ui_utils.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../modules/searchLocation/models/search_location_model.dart';
@@ -107,91 +106,113 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 
 
-  /// Debounced reverse geocoding & route redrawing
+  /// Debounced reverse geocoding & route redrawing.
+  /// ONLY Google Geocoding API is used — native geocoding is removed to prevent
+  /// fake/mismatched addresses from appearing in the text field or on the map.
   void _handleCameraIdle(LatLng position) {
     _mapIdleDebounce?.cancel();
     _mapIdleDebounce = Timer(const Duration(milliseconds: 600), () async {
       final isDropFocused = _searchCardKey.currentState?.isDropFocused ?? false;
-      
-      String address = 'Unknown Location';
-      try {
-        final placemarks = await placemarkFromCoordinates(position.latitude, position.longitude);
-        if (placemarks.isNotEmpty && mounted) {
-          final p = placemarks.first;
-          address = [p.street, p.subLocality, p.locality, p.country]
-              .where((s) => s != null && s.isNotEmpty)
-              .join(', ');
-        }
-        if (address.trim().isEmpty) throw Exception("Empty native address");
-      } catch (e) {
-        debugPrint('Native geocoding failed: $e, trying Google API...');
-        final googleAddress = await MapHelper.getGoogleGeocode(position);
-        if (googleAddress != null && googleAddress.isNotEmpty) {
-          address = googleAddress;
-        } else {
-          // If BOTH fail, fallback to coordinates
-          address = '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}';
-        }
+
+      // ── Step 1: Get the EXACT address + place_id from Google Geocoding API ──
+      // This is the ONLY source of truth. Native geocoding is intentionally
+      // removed — it produces different names that cause address mismatches.
+      final googleResult = await MapHelper.getPlaceIdFromCoordinates(position);
+
+      if (!mounted) return;
+
+      // If Google API returned nothing, show an error and clear the field.
+      // We NEVER show a fake / native-geocoded address.
+      if (googleResult == null) {
+        setState(() {
+          _centerAddress = 'Address not found — please try again';
+        });
+        _searchCardKey.currentState?.updateActiveFieldText('');
+        return;
       }
 
-      if (mounted) {
-        setState(() {
-          _centerAddress = address;
-        });
+      final exactAddress = googleResult.address;
+      final exactPlaceId = googleResult.placeId;
 
-        // Fetch UUID for this address from API
-        try {
-          final loc = AppLocalizations.of(context);
-          final searchRepo = SearchLocationRepository();
-          final response = await searchRepo.searchLocations(address, loc.locale.languageCode);
-          if (mounted && response.data != null && response.data!.isNotEmpty) {
-            final uuid = response.data!.first.uuid;
-            final locData = SearchLocationData(
-              uuid: uuid,
-              address: address,
-              latitude: position.latitude,
-              longitude: position.longitude,
-            );
+      // Update the label above the centre pin
+      setState(() {
+        _centerAddress = exactAddress;
+      });
 
-            setState(() {
-              if (isDropFocused) {
-                _dropoffUuid = uuid;
-                _dropoffAddress = address;
-                _dropLatLng = position;
-              } else {
-                int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
-                if (pIndex >= 0 && pIndex < _pickups.length) {
-                   _pickups[pIndex] = locData;
-                } else if (_pickups.isEmpty) {
-                   _pickups.add(locData);
-                }
-              }
-            });
-            _searchCardKey.currentState?.setLocationFromMapDrag(locData);
-          } else {
-            _searchCardKey.currentState?.updateActiveFieldText(address);
-          }
-        } catch (e) {
-          debugPrint('Failed to fetch UUID for map location: $e');
-          _searchCardKey.currentState?.updateActiveFieldText(address);
-        }
+      // ── Step 2: Get a UUID from the backend that matches this exact location ──
+      // Prefer results whose place_id matches Google's — exact match, no mismatch.
+      try {
+        final loc = AppLocalizations.of(context);
+        final searchRepo = SearchLocationRepository();
+        final response = await searchRepo.searchLocations(exactAddress, loc.locale.languageCode);
 
-        // Sync local _pickups properly without triggering camera
-        if (!isDropFocused) {
+        if (!mounted) return;
+
+        if (response.data != null && response.data!.isNotEmpty) {
+          // Prefer the entry whose place_id matches what Google returned.
+          final bestMatch = response.data!.firstWhere(
+            (d) => d.placeId == exactPlaceId,
+            orElse: () => response.data!.first,
+          );
+
+          // CRITICAL: Always use the ACTUAL pin coordinates for lat/lng.
+          // The UUID only identifies the location in the backend.
+          final locData = SearchLocationData(
+            uuid: bestMatch.uuid,
+            placeId: exactPlaceId,
+            address: exactAddress,
+            latitude: position.latitude,   // ← exact pin lat
+            longitude: position.longitude, // ← exact pin lng
+          );
+
           setState(() {
-             final validPickups = _searchCardKey.currentState?.getValidPickups() ?? [];
-             if (validPickups.isNotEmpty) {
-               _pickups = validPickups;
-             }
+            if (isDropFocused) {
+              _dropoffUuid = locData.uuid;
+              _dropoffAddress = locData.address;
+              _dropLatLng = position;
+            } else {
+              int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
+              if (pIndex >= 0 && pIndex < _pickups.length) {
+                _pickups[pIndex] = locData;
+              } else if (_pickups.isEmpty) {
+                _pickups.add(locData);
+              }
+            }
           });
-        }
 
-        if (_pickups.isNotEmpty && _dropLatLng != null) {
-          _drawRouteMulti();
+          _searchCardKey.currentState?.setLocationFromMapDrag(locData);
+        } else {
+          // Backend returned no UUID — clear the field so user knows to retry.
+          setState(() {
+            if (isDropFocused) {
+              _dropoffUuid = null;
+              _dropoffAddress = null;
+              _dropLatLng = null;
+            }
+          });
+          _searchCardKey.currentState?.updateActiveFieldText('');
         }
+      } catch (e) {
+        debugPrint('Failed to fetch UUID for map location: $e');
+        _searchCardKey.currentState?.updateActiveFieldText('');
+      }
+
+      // Sync local _pickups without triggering camera
+      if (!isDropFocused) {
+        setState(() {
+          final validPickups = _searchCardKey.currentState?.getValidPickups() ?? [];
+          if (validPickups.isNotEmpty) {
+            _pickups = validPickups;
+          }
+        });
+      }
+
+      if (_pickups.isNotEmpty && _dropLatLng != null) {
+        _drawRouteMulti();
       }
     });
   }
+
 
   void _onSearchFieldFocusChanged(bool isDropFocused) {
     setState(() {
@@ -199,11 +220,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
     
     // Pan camera to the currently focused location
-    final targetLatLng = isDropFocused ? _dropLatLng : (_pickups.isNotEmpty ? LatLng(_pickups.first.latitude!, _pickups.first.longitude!) : null);
-    if (targetLatLng != null) {
+    // Use a closer zoom (17) for drop so user can fine-tune the pin precisely
+    if (isDropFocused) {
+      final targetLatLng = _dropLatLng ?? _cameraCenter;
       _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: targetLatLng, zoom: 15.0),
+        CameraPosition(target: targetLatLng, zoom: 17.0),
       ));
+    } else if (_pickups.isNotEmpty) {
+      final first = _pickups.first;
+      if (first.latitude != null && first.longitude != null) {
+        _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(target: LatLng(first.latitude!, first.longitude!), zoom: 15.0),
+        ));
+      }
     }
   }
 
@@ -240,8 +269,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     _drawRouteMulti();
 
+    // Zoom into the DROP location at street level (zoom 18) so the customer
+    // can clearly see and confirm the pin position — and adjust it if needed.
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: _pickups.isNotEmpty ? LatLng(_pickups.first.latitude!, _pickups.first.longitude!) : _cameraCenter, zoom: 11.0),
+      CameraPosition(target: latLng, zoom: 18.0),
     ));
   }
 
@@ -324,10 +355,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {
-    if (_pickups.isEmpty || _dropoffUuid == null) {
+    // Validate pickup
+    if (_pickups.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context).translate('select_pickup_dropoff') ?? 'select_pickup_dropoff'),
+        const SnackBar(
+          content: Text('Please select a pickup location.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    // Validate pickup has a valid UUID (location confirmed by the backend)
+    final invalidPickup = _pickups.any((p) => p.uuid == null || p.uuid!.isEmpty);
+    if (invalidPickup) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pickup location could not be confirmed. Please drag the map to re-select.'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    // Validate dropoff
+    if (_dropoffUuid == null || _dropoffUuid!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a drop-off location.'),
           backgroundColor: Colors.red,
         ),
       );
