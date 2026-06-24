@@ -13,4 +13,5 @@ class TripStatus {
   static const String givenBidCancelled = 'GIVEN_BID_CANCELLED';
   static const String acceptedBidCancelled = 'ACCEPTED_BID_CANCELLED';
   static const String givenRating = 'GIVEN_RATING';
+  static const String all = 'ALL';
 }

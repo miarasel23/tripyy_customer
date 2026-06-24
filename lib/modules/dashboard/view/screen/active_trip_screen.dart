@@ -34,6 +34,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   Set<Polyline> _polylines = {};
 
   bool _isInit = false;
+  bool _isRouteExpanded = false;
 
   @override
   void initState() {
@@ -71,7 +72,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       final response = await _repo.fetchBids(
         customerUuid: widget.customerUuid,
         langCode: loc.locale.languageCode,
-        tripStatus: TripStatus.accepted,
+        tripStatus: TripStatus.all,
       );
 
       if (mounted) {
@@ -155,6 +156,19 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         );
       }
     }
+  }
+
+  IconData _getVehicleIcon(String? carType) {
+    if (carType == null) return Icons.directions_car;
+    final lower = carType.toLowerCase();
+    if (lower.contains('bike') || lower.contains('motor')) {
+      return Icons.motorcycle;
+    } else if (lower.contains('cng') || lower.contains('auto')) {
+      return Icons.electric_rickshaw;
+    } else if (lower.contains('micro') || lower.contains('van') || lower.contains('bus')) {
+      return Icons.airport_shuttle;
+    }
+    return Icons.directions_car;
   }
 
   @override
@@ -298,62 +312,6 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
           ),
         ),
 
-        // Navigation Info overlay
-        Positioned(
-          top: 50,
-          left: 80,
-          right: 16,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1E26) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                )
-              ],
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.white : Colors.black,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(Icons.turn_right, color: isDark ? Colors.black : Colors.white),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.translate('heading_to') == 'heading_to' ? "Heading to" : loc.translate('heading_to'),
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white70 : Colors.black54,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        trip.dropoffLocations.isNotEmpty ? (trip.dropoffLocations.first.address ?? (loc.translate('destination') == 'destination' ? "Destination" : loc.translate('destination'))) : (loc.translate('destination') == 'destination' ? "Destination" : loc.translate('destination')),
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
         // Bottom Sheet
         Positioned(
           bottom: 0,
@@ -384,55 +342,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: isDark ? Colors.white24 : Colors.grey.shade300,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
           const SizedBox(height: 16),
           
-          // Header (Locations)
+          // The merged Route Progress
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.my_location, color: Colors.green, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        trip.pickupLocations.isNotEmpty ? (trip.pickupLocations.first.address ?? (loc.translate('unknown_pickup') == 'unknown_pickup' ? "Unknown Pickup" : loc.translate('unknown_pickup'))) : (loc.translate('unknown_pickup') == 'unknown_pickup' ? "Unknown Pickup" : loc.translate('unknown_pickup')),
-                        style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black, fontSize: 13),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, color: Colors.red, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        trip.dropoffLocations.isNotEmpty ? (trip.dropoffLocations.first.address ?? (loc.translate('unknown_dropoff') == 'unknown_dropoff' ? "Unknown Dropoff" : loc.translate('unknown_dropoff'))) : (loc.translate('unknown_dropoff') == 'unknown_dropoff' ? "Unknown Dropoff" : loc.translate('unknown_dropoff')),
-                        style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black, fontSize: 13),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildRouteProgress(isDark, trip, loc),
           ),
-          
           const SizedBox(height: 16),
 
           // Driver Info Card
@@ -502,16 +418,16 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                         ),
                         const SizedBox(height: 2),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: isDark ? Colors.white12 : Colors.black12,
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             driver?.carRegNumber ?? (loc.translate('n_a') == 'n_a' ? "N/A" : loc.translate('n_a')),
                             style: GoogleFonts.poppins(
                               color: isDark ? Colors.white : Colors.black,
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -648,5 +564,190 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         );
       }
     }
+  }
+
+  Widget _buildRouteProgress(bool isDark, RentalTrip trip, AppLocalizations loc) {
+    List<LocationModel> allLocations = [];
+    allLocations.addAll(trip.pickupLocations);
+    allLocations.addAll(trip.dropoffLocations);
+    
+    if (allLocations.isEmpty) return const SizedBox();
+
+    return GestureDetector(
+      onVerticalDragUpdate: (details) {
+        if (details.delta.dy > 0 && _isRouteExpanded) {
+          // Drag down to minimize
+          setState(() {
+            _isRouteExpanded = false;
+          });
+        } else if (details.delta.dy < 0 && !_isRouteExpanded) {
+          // Drag up to open
+          setState(() {
+            _isRouteExpanded = true;
+          });
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1C1E26) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+            )
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white24 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                Icon(_getVehicleIcon(trip.carCategory?.carType), color: AppColors.primary, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  loc.translate('trip_route') == 'trip_route' ? "Trip Route" : loc.translate('trip_route'),
+                  style: GoogleFonts.poppins(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            // Horizontal Progress Bar
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  height: 4,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(allLocations.length, (index) {
+                    final isLast = index == allLocations.length - 1;
+                    final isFirst = index == 0;
+                    Color dotColor = isFirst ? Colors.green : (isLast ? Colors.red : Colors.yellow.shade700);
+                    return Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: dotColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: isDark ? const Color(0xFF1C1E26) : Colors.white, width: 2),
+                      ),
+                    );
+                  }),
+                ),
+                Align(
+                  alignment: const Alignment(-0.5, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white : Colors.black,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(_getVehicleIcon(trip.carCategory?.carType), color: isDark ? Colors.black : Colors.white, size: 16),
+                  ),
+                ),
+              ],
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: _isRouteExpanded
+                  ? Column(
+                      children: [
+                        const SizedBox(height: 24),
+                        // Vertical List of Locations
+                        ...List.generate(allLocations.length, (index) {
+                          final isLast = index == allLocations.length - 1;
+                          final isFirst = index == 0;
+                          Color dotColor = isFirst ? Colors.green : (isLast ? Colors.red : Colors.yellow.shade700);
+
+                          String label;
+                          if (isFirst) {
+                            label = loc.translate('pickup') == 'pickup' ? "Pickup" : loc.translate('pickup');
+                          } else if (isLast) {
+                            label = loc.translate('dropoff') == 'dropoff' ? "Dropoff" : loc.translate('dropoff');
+                          } else {
+                            label = "${loc.translate('stop') == 'stop' ? 'Stop' : loc.translate('stop')} $index";
+                          }
+
+                          return IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Column(
+                                  children: [
+                                    Icon(isLast ? Icons.location_on : Icons.my_location, color: dotColor, size: 20),
+                                    if (!isLast)
+                                      Expanded(
+                                        child: Container(
+                                          width: 2,
+                                          color: Colors.grey.withOpacity(0.3),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        label,
+                                        style: GoogleFonts.poppins(
+                                          color: isDark ? Colors.white54 : Colors.black54,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        allLocations[index].address ?? "Unknown",
+                                        style: GoogleFonts.poppins(
+                                          color: isDark ? Colors.white : Colors.black,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      if (!isLast) const SizedBox(height: 16),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
