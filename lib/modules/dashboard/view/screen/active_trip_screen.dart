@@ -2,11 +2,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../repository/create_trip_repository.dart';
 import '../../models/create_rental_trip_model.dart';
+import '../../models/trip_status.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/app_colors.dart';
+import '../../../../utils/app_urls.dart';
+import '../../../../main.dart';
+import '../../../../widgets/cancel_trip_dialog.dart';
+import '../../helpers/map_helper.dart';
 
 class ActiveTripScreen extends StatefulWidget {
   final String customerUuid;
@@ -22,9 +27,11 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   RentalTrip? _activeTrip;
   bool _isLoading = true;
   String? _errorMessage;
+  bool _hasShownNoTripToast = false;
   Timer? _pollingTimer;
 
   GoogleMapController? _mapController;
+  Set<Polyline> _polylines = {};
 
   bool _isInit = false;
 
@@ -64,16 +71,26 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       final response = await _repo.fetchBids(
         customerUuid: widget.customerUuid,
         langCode: loc.locale.languageCode,
-        tripStatus: "ACCEPTED",
+        tripStatus: TripStatus.accepted,
       );
 
       if (mounted) {
         setState(() {
           if (response.trips.isNotEmpty) {
+            final oldTrip = _activeTrip;
             _activeTrip = response.trips.first;
+            if (oldTrip?.uuid != _activeTrip?.uuid) {
+              _fetchRoutePolylines();
+            }
           } else {
             // No accepted trip found, might have ended
-            _errorMessage = "No active trip found.";
+            _errorMessage = loc.translate('no_active_trip_found') == 'no_active_trip_found' ? "No active trip found." : loc.translate('no_active_trip_found');
+            if (!_hasShownNoTripToast) {
+              _hasShownNoTripToast = true;
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(_errorMessage!)),
+              );
+            }
           }
           _isLoading = false;
         });
@@ -88,33 +105,87 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     }
   }
 
+  Future<void> _fetchRoutePolylines() async {
+    if (_activeTrip == null) return;
+    final trip = _activeTrip!;
+    
+    List<LatLng> routePoints = [];
+    for (int i = 0; i < trip.pickupLocations.length; i++) {
+      final loc = trip.pickupLocations[i];
+      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
+      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
+      routePoints.add(LatLng(lat, lng));
+    }
+    for (int i = 0; i < trip.dropoffLocations.length; i++) {
+      final loc = trip.dropoffLocations[i];
+      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
+      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
+      routePoints.add(LatLng(lat, lng));
+    }
+
+    if (routePoints.length > 1) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final polylines = await MapHelper.getRouteBetweenMultipleCoordinates(
+        routePoints, 
+        color: isDark ? Colors.white : Colors.black,
+      );
+      if (mounted) {
+        setState(() {
+          _polylines = polylines;
+        });
+      }
+    }
+  }
+
   Future<void> _launchUrl(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri)) {
-      debugPrint("Could not launch $url");
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text("Action Unavailable"),
+            content: Text("Cannot launch $url."),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text("OK"),
+              ),
+            ],
+          ),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF13151B) : Colors.white,
-      body: _buildBody(isDark),
+      body: _buildBody(isDark, loc),
     );
   }
 
-  Widget _buildBody(bool isDark) {
+  Widget _buildBody(bool isDark, AppLocalizations loc) {
     if (_isLoading && _activeTrip == null) {
       return const Center(child: CircularProgressIndicator(color: AppColors.primary));
     }
 
     if (_errorMessage != null && _activeTrip == null) {
       return Center(
-        child: Text(
-          _errorMessage!,
-          style: const TextStyle(color: Colors.redAccent),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.directions_car_filled_outlined, size: 80, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              _errorMessage!,
+              style: const TextStyle(color: Colors.grey, fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
       );
     }
@@ -122,8 +193,40 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     final trip = _activeTrip!;
     final driver = trip.drivers.isNotEmpty ? trip.drivers.first : null;
     
-    // Default location (e.g. Dhaka)
-    final LatLng initialCameraPosition = const LatLng(23.8103, 90.4125);
+    List<LatLng> routePoints = [];
+    Set<Marker> markers = {};
+
+    for (int i = 0; i < trip.pickupLocations.length; i++) {
+      final loc = trip.pickupLocations[i];
+      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
+      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
+      final point = LatLng(lat, lng);
+      routePoints.add(point);
+      markers.add(
+        Marker(
+          markerId: MarkerId('pickup_$i'),
+          position: point,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+        ),
+      );
+    }
+
+    for (int i = 0; i < trip.dropoffLocations.length; i++) {
+      final loc = trip.dropoffLocations[i];
+      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
+      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
+      final point = LatLng(lat, lng);
+      routePoints.add(point);
+      markers.add(
+        Marker(
+          markerId: MarkerId('dropoff_$i'),
+          position: point,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ),
+      );
+    }
+
+    LatLng initialCameraPosition = routePoints.isNotEmpty ? routePoints.first : const LatLng(23.8103, 90.4125);
 
     return Stack(
       children: [
@@ -141,12 +244,8 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               _mapController = controller;
               // Map style can be added here
             },
-            markers: {
-              Marker(
-                markerId: const MarkerId('pickup'),
-                position: initialCameraPosition,
-              ),
-            },
+            polylines: _polylines,
+            markers: markers,
           ),
         ),
 
@@ -195,10 +294,10 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF6C63FF),
+                    color: isDark ? Colors.white : Colors.black,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.turn_right, color: Colors.white),
+                  child: Icon(Icons.turn_right, color: isDark ? Colors.black : Colors.white),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -206,18 +305,20 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Heading to Destination",
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        "Follow the route",
+                        loc.translate('heading_to') == 'heading_to' ? "Heading to" : loc.translate('heading_to'),
                         style: GoogleFonts.poppins(
                           color: isDark ? Colors.white70 : Colors.black54,
                           fontSize: 12,
                         ),
+                      ),
+                      Text(
+                        trip.dropoffLocations.isNotEmpty ? (trip.dropoffLocations.first.address ?? (loc.translate('destination') == 'destination' ? "Destination" : loc.translate('destination'))) : (loc.translate('destination') == 'destination' ? "Destination" : loc.translate('destination')),
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -232,13 +333,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
           bottom: 0,
           left: 0,
           right: 0,
-          child: _buildBottomSheet(isDark, driver),
+          child: _buildBottomSheet(isDark, trip, driver, loc),
         ),
       ],
     );
   }
 
-  Widget _buildBottomSheet(bool isDark, RentalDriverBid? driver) {
+  Widget _buildBottomSheet(bool isDark, RentalTrip trip, RentalDriverBid? driver, AppLocalizations loc) {
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1E26) : Colors.white,
@@ -268,34 +369,39 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
           ),
           const SizedBox(height: 16),
           
-          // Header
+          // Header (Locations)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
+            child: Column(
               children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6C63FF),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF6C63FF).withOpacity(0.5),
-                        blurRadius: 8,
-                      )
-                    ],
-                  ),
+                Row(
+                  children: [
+                    const Icon(Icons.my_location, color: Colors.green, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        trip.pickupLocations.isNotEmpty ? (trip.pickupLocations.first.address ?? (loc.translate('unknown_pickup') == 'unknown_pickup' ? "Unknown Pickup" : loc.translate('unknown_pickup'))) : (loc.translate('unknown_pickup') == 'unknown_pickup' ? "Unknown Pickup" : loc.translate('unknown_pickup')),
+                        style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black, fontSize: 13),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(
-                  "HEADING TO DESTINATION",
-                  style: GoogleFonts.poppins(
-                    color: isDark ? Colors.white70 : Colors.black54,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.red, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        trip.dropoffLocations.isNotEmpty ? (trip.dropoffLocations.first.address ?? (loc.translate('unknown_dropoff') == 'unknown_dropoff' ? "Unknown Dropoff" : loc.translate('unknown_dropoff'))) : (loc.translate('unknown_dropoff') == 'unknown_dropoff' ? "Unknown Dropoff" : loc.translate('unknown_dropoff')),
+                        style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black, fontSize: 13),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -320,11 +426,11 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     children: [
                       CircleAvatar(
                         radius: 30,
-                        backgroundImage: driver?.profilePicture != null 
-                            ? NetworkImage(driver!.profilePicture!) 
+                        backgroundImage: (driver?.profilePicture != null && AppUrls.getImageUrl(driver!.profilePicture) != null)
+                            ? NetworkImage(AppUrls.getImageUrl(driver!.profilePicture)!)
                             : null,
                         backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                        child: driver?.profilePicture == null 
+                        child: (driver?.profilePicture == null || AppUrls.getImageUrl(driver!.profilePicture) == null)
                             ? Icon(Icons.person, color: isDark ? Colors.white70 : Colors.black54)
                             : null,
                       ),
@@ -335,7 +441,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF6C63FF),
+                            color: isDark ? Colors.white : Colors.black,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -344,9 +450,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                             children: [
                               Text(
                                 driver?.averageRating?.toStringAsFixed(1) ?? "0.0",
-                                style: GoogleFonts.poppins(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                style: GoogleFonts.poppins(color: isDark ? Colors.black : Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                               ),
-                              const Icon(Icons.star, color: Colors.white, size: 10),
+                              Icon(Icons.star, color: isDark ? Colors.black : Colors.white, size: 10),
                             ],
                           ),
                         ),
@@ -361,15 +467,32 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          driver?.name ?? "Unknown Driver",
+                          driver?.name ?? (loc.translate('n_a') == 'n_a' ? "N/A" : loc.translate('n_a')),
                           style: GoogleFonts.poppins(
                             color: isDark ? Colors.white : Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
+                        const SizedBox(height: 2),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white12 : Colors.black12,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            driver?.carRegNumber ?? (loc.translate('n_a') == 'n_a' ? "N/A" : loc.translate('n_a')),
+                            style: GoogleFonts.poppins(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
                         Text(
-                          "Top-rated Partner",
+                          "${loc.translate('trips') == 'trips' ? 'trips' : loc.translate('trips')} (${driver?.totalCompletedTrips ?? 0})",
                           style: GoogleFonts.poppins(
                             color: isDark ? Colors.white54 : Colors.black54,
                             fontSize: 12,
@@ -384,26 +507,34 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        _activeTrip?.carCategory?.carType ?? "Toyota Camry",
+                        _activeTrip?.carCategory?.carType ?? "",
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF6C63FF),
+                          color: isDark ? Colors.white : Colors.black,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.white12 : Colors.black12,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          "White • CAL 7X42", // Hardcoded for UI showcase, would be from API
-                          style: GoogleFonts.poppins(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      const SizedBox(height: 15),
+                      GestureDetector(
+                        onTap: () {
+                          if (driver?.phone != null) {
+                            _launchUrl("tel:${driver!.phone}");
+                          }
+                        },
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.call, color: isDark ? Colors.white : Colors.black, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
+                              style: GoogleFonts.poppins(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -415,54 +546,31 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
           const SizedBox(height: 24),
 
-          // Action Buttons
+          // Cancel Trip Button
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildActionButton(Icons.call, "Call", () {
-                  if (driver?.phone != null) {
-                    _launchUrl("tel:${driver!.phone}");
-                  }
-                }, isDark),
-                _buildActionButton(Icons.chat_bubble_outline, "Message", () {
-                  if (driver?.phone != null) {
-                    _launchUrl("sms:${driver!.phone}");
-                  }
-                }, isDark),
-                _buildActionButton(Icons.ios_share, "Share", () {}, isDark),
-                _buildActionButton(Icons.warning_amber_rounded, "SOS", () {}, isDark, isSos: true),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Trip Details Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF6C63FF).withOpacity(isDark ? 0.2 : 0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Trip Details",
-                    style: GoogleFonts.poppins(
-                      color: const Color(0xFF6C63FF),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+            child: GestureDetector(
+              onTap: () => _cancelTrip(context, isDark),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.white : Colors.black,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      loc.translate('cancel_trip') == 'cancel_trip' ? "Cancel Trip" : loc.translate('cancel_trip'),
+                      style: GoogleFonts.poppins(
+                        color: isDark ? Colors.black : Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(Icons.keyboard_arrow_up, color: Color(0xFF6C63FF)),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -472,41 +580,47 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label, VoidCallback onTap, bool isDark, {bool isSos = false}) {
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              color: isSos 
-                  ? Colors.red.withOpacity(0.1) 
-                  : (isDark ? const Color(0xFF252833) : Colors.grey.shade100),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(
-              icon,
-              color: isSos 
-                  ? Colors.redAccent 
-                  : (isDark ? Colors.white70 : Colors.black54),
-              size: 24,
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            color: isSos 
-                  ? Colors.redAccent 
-                  : (isDark ? Colors.white70 : Colors.black54),
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
+  Future<void> _cancelTrip(BuildContext context, bool isDark) async {
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (_) => CancelTripDialog(isDark: isDark),
     );
+
+    if (reason != null && reason.isNotEmpty && _activeTrip != null) {
+      try {
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          const SnackBar(content: Text("Cancelling trip..."), behavior: SnackBarBehavior.floating),
+        );
+        final loc = AppLocalizations.of(context);
+        final response = await _repo.cancelTrip(
+          tripUuid: _activeTrip!.uuid ?? "",
+          comment: reason,
+          langCode: loc.locale.languageCode,
+        );
+
+        globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? "Trip cancelled successfully"),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        
+        _pollingTimer?.cancel();
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } catch (e) {
+        globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+        globalScaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }

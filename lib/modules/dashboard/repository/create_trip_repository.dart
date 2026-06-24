@@ -6,6 +6,7 @@ import '../../../../store/user_data_store.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../utils/custom_map_body_builder.dart';
 import '../models/create_rental_trip_model.dart';
+import '../models/trip_status.dart';
 
 class CreateTripRepository {
   Future<Map<String, dynamic>> createRentalTrip(CreateRentalTripRequest request) async {
@@ -27,7 +28,7 @@ class CreateTripRepository {
       print("header: $headers");
       print("formFields: $formFields");
 
-      final response = await http.post(
+      final response = await ApiService().post(
         url,
         headers: headers,
         body: formFields,
@@ -63,7 +64,7 @@ class CreateTripRepository {
     required String customerUuid,
     required String langCode,
     String? platform,
-    String tripStatus = "REQUESTED",
+    String tripStatus = TripStatus.requested,
   }) async {
     try {
       final queryParams = CustomMapBodyBuilder.build(
@@ -131,7 +132,7 @@ class CreateTripRepository {
         headers['Authorization'] = 'Bearer $token';
       }
       
-      final response = await http.post(
+      final response = await ApiService().post(
         url,
         headers: headers,
         body: formFields,
@@ -190,7 +191,7 @@ class CreateTripRepository {
         headers['Authorization'] = 'Bearer $token';
       }
       
-      final response = await http.post(
+      final response = await ApiService().post(
         url,
         headers: headers,
         body: formFields,

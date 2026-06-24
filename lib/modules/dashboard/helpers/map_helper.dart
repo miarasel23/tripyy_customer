@@ -49,4 +49,39 @@ class MapHelper {
     }
     return {};
   }
+
+  /// Get polyline points across multiple locations
+  static Future<Set<Polyline>> getRouteBetweenMultipleCoordinates(
+      List<LatLng> points, {Color color = Colors.blue}) async {
+    if (points.length < 2) return {};
+
+    final origin = points.first;
+    final destination = points.last;
+    final wayPoints = points.sublist(1, points.length - 1).map((p) => PolylineWayPoint(location: '${p.latitude},${p.longitude}')).toList();
+
+    final polylinePoints = PolylinePoints();
+    final result = await polylinePoints.getRouteBetweenCoordinates(
+      googleApiKey: AppUrls.googleApiKey,
+      request: PolylineRequest(
+        origin: PointLatLng(origin.latitude, origin.longitude),
+        destination: PointLatLng(destination.latitude, destination.longitude),
+        wayPoints: wayPoints,
+        mode: TravelMode.driving,
+      ),
+    );
+
+    if (result.points.isNotEmpty) {
+      final coords =
+          result.points.map((p) => LatLng(p.latitude, p.longitude)).toList();
+      return {
+        Polyline(
+          polylineId: const PolylineId('route'),
+          points: coords,
+          color: color,
+          width: 5,
+        ),
+      };
+    }
+    return {};
+  }
 }

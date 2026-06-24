@@ -136,6 +136,7 @@ class RentalDriverBid {
   final int? totalCompletedTrips;
   final double? averageRating;
   final List<RatingModel>? ratingList;
+  final String? carRegNumber;
 
   RentalDriverBid({
     this.rentBidUuid,
@@ -156,6 +157,7 @@ class RentalDriverBid {
     this.totalCompletedTrips,
     this.averageRating,
     this.ratingList,
+    this.carRegNumber,
   });
 
   factory RentalDriverBid.fromJson(Map<String, dynamic> json) {
@@ -178,6 +180,7 @@ class RentalDriverBid {
       totalCompletedTrips: json['total_completed_trips'] as int?,
       averageRating: (json['average_rating'] as num?)?.toDouble(),
       ratingList: (json['rating_list'] as List<dynamic>?)?.map((e) => RatingModel.fromJson(e)).toList(),
+      carRegNumber: json['car_reg_number']?.toString(),
     );
   }
 }
@@ -185,13 +188,25 @@ class RentalDriverBid {
 class LocationModel {
   final String? uuid;
   final String? address;
+  final String? latitude;
+  final String? longitude;
+  final String? placeId;
   
-  LocationModel({this.uuid, this.address});
+  LocationModel({
+    this.uuid, 
+    this.address,
+    this.latitude,
+    this.longitude,
+    this.placeId,
+  });
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
     return LocationModel(
-      uuid: json['uuid'],
-      address: json['address'],
+      uuid: json['uuid']?.toString(),
+      address: json['address']?.toString(),
+      latitude: json['latitude']?.toString(),
+      longitude: json['longitude']?.toString(),
+      placeId: json['place_id']?.toString(),
     );
   }
 }
