@@ -169,12 +169,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           setState(() {
             if (isDropFocused) {
-              if (_dropoffUuid != null && _dropoffUuid!.isNotEmpty) {
-                _dropoffUuid = locData.uuid;
-                _dropoffAddress = locData.address;
-                _dropLatLng = position;
-                _searchCardKey.currentState?.setLocationFromMapDrag(locData);
-              }
+              _dropoffUuid = locData.uuid;
+              _dropoffAddress = locData.address;
+              _dropLatLng = position;
+              _searchCardKey.currentState?.setLocationFromMapDrag(locData);
             } else {
               int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
               // Only allow updating from map drag if the user has ALREADY selected a location from the dropdown
@@ -195,12 +193,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           // Backend returned no UUID — clear the field so user knows to retry.
           setState(() {
             if (isDropFocused) {
-              if (_dropoffUuid != null && _dropoffUuid!.isNotEmpty) {
-                _dropoffUuid = null;
-                _dropoffAddress = null;
-                _dropLatLng = null;
-                _searchCardKey.currentState?.updateActiveFieldText('');
-              }
+              _dropoffUuid = null;
+              _dropoffAddress = null;
+              _dropLatLng = null;
+              _searchCardKey.currentState?.updateActiveFieldText('');
             } else {
               int pIndex = _searchCardKey.currentState?.getActivePickupIndex() ?? 0;
               if (pIndex >= 0 && pIndex < _pickups.length) {
