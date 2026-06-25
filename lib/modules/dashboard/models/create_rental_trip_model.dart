@@ -250,6 +250,7 @@ class RentalTrip {
   final List<RentalDriverBid> drivers;
   final double? offerAmount;
   final int? totalBids;
+  final String? tripStatus;
 
   RentalTrip({
     this.id,
@@ -262,6 +263,7 @@ class RentalTrip {
     this.drivers = const [],
     this.offerAmount,
     this.totalBids,
+    this.tripStatus,
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -276,6 +278,7 @@ class RentalTrip {
       drivers: (json['drivers'] as List<dynamic>?)?.map((e) => RentalDriverBid.fromJson(e)).toList() ?? [],
       offerAmount: (json['offer_amount'] as num?)?.toDouble() ?? (json['offer_ammount'] as num?)?.toDouble(),
       totalBids: json['total_bids'] as int?,
+      tripStatus: json['trip_status']?.toString(),
     );
   }
 }

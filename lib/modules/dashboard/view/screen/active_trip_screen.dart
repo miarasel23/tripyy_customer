@@ -488,34 +488,87 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
           const SizedBox(height: 24),
 
-          // Cancel Trip Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: GestureDetector(
-              onTap: () => _cancelTrip(context, isDark),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white : Colors.black,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Stack(
                   children: [
-                    Text(
-                      loc.translate('cancel_trip') == 'cancel_trip' ? "Cancel Trip" : loc.translate('cancel_trip'),
-                      style: GoogleFonts.poppins(
-                        color: isDark ? Colors.black : Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    // Background
+                    Container(
+                      width: double.infinity,
+                      height: 56, // Standard button height
+                      color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                    ),
+                    // Progress fill
+                    Positioned.fill(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          // Dummy progress calculation (update with real data from backend when available)
+                          double progress = 0.0;
+                          if (trip.tripStatus == TripStatus.rideStarted) progress = 0.2;
+                          if (trip.tripStatus == TripStatus.inProgress) progress = 0.6;
+                          
+                          return AnimatedContainer(
+                            duration: const Duration(seconds: 1),
+                            curve: Curves.easeInOut,
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              width: constraints.maxWidth * progress,
+                              color: AppColors.primary.withOpacity(0.3),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    // Text
+                    Container(
+                      width: double.infinity,
+                      height: 56,
+                      alignment: Alignment.center,
+                      child: Text(
+                        loc.translate('in_progress') == 'in_progress' ? "In Progress..." : loc.translate('in_progress'),
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.white : Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
+            )
+          else
+            // Cancel Trip Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: GestureDetector(
+                onTap: () => _cancelTrip(context, isDark),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white : Colors.black,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        loc.translate('cancel_trip') == 'cancel_trip' ? "Cancel Trip" : loc.translate('cancel_trip'),
+                        style: GoogleFonts.poppins(
+                          color: isDark ? Colors.black : Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
           const SizedBox(height: 32),
         ],
       ),
@@ -660,7 +713,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                   }),
                 ),
                 Align(
-                  alignment: const Alignment(-0.5, 0),
+                  alignment: trip.tripStatus == TripStatus.accepted ? const Alignment(-1.0, 0) : const Alignment(-0.5, 0),
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
