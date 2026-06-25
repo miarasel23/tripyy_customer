@@ -221,4 +221,67 @@ class CreateTripRepository {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> giveReview({
+    required String tripUuid,
+    required String customerUuid,
+    required String driverUuid,
+    required double rating,
+    required String comments,
+    required String langCode,
+  }) async {
+    try {
+      final url = Uri.parse(AppUrls.rentalTripGiveReview);
+      
+      final Map<String, String> formFields = {
+        'platform': CustomMapBodyBuilder.getPlatform(),
+        'language_code': langCode,
+        'action_when': 'give_review',
+        'trip_uuid': tripUuid,
+        'customer_uuid': customerUuid,
+        'driver_uuid': driverUuid,
+        'rating': rating.toString(),
+        'comments': comments,
+        'given_by': 'CUSTOMER',
+      };
+
+      final token = await UserDataStore.getAccessToken();
+      final headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+      };
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      
+      final response = await ApiService().post(
+        url,
+        headers: headers,
+        body: formFields,
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 400) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['status'] == false) {
+          throw Exception(decoded['message'] ?? "Unknown server error");
+        }
+        return decoded;
+      } else {
+        String? errorMessage;
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded['message'] != null) {
+            errorMessage = decoded['message'];
+          }
+        } catch (_) {}
+        if (errorMessage != null) {
+          throw Exception(errorMessage);
+        }
+        throw Exception("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Error submitting review: $e");
+      rethrow;
+    }
+  }
 }

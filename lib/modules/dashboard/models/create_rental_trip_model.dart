@@ -251,6 +251,10 @@ class RentalTrip {
   final double? offerAmount;
   final int? totalBids;
   final String? tripStatus;
+  final String? paymentMethod;
+  final String? startDatetime;
+  final String? endDatetime;
+  final bool? givenReview;
 
   RentalTrip({
     this.id,
@@ -264,6 +268,10 @@ class RentalTrip {
     this.offerAmount,
     this.totalBids,
     this.tripStatus,
+    this.paymentMethod,
+    this.startDatetime,
+    this.endDatetime,
+    this.givenReview,
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -279,6 +287,10 @@ class RentalTrip {
       offerAmount: (json['offer_amount'] as num?)?.toDouble() ?? (json['offer_ammount'] as num?)?.toDouble(),
       totalBids: json['total_bids'] as int?,
       tripStatus: json['trip_status']?.toString(),
+      paymentMethod: json['payment_method']?.toString(),
+      startDatetime: json['start_datetime']?.toString(),
+      endDatetime: json['end_datetime']?.toString(),
+      givenReview: json['given_review'] as bool?,
     );
   }
 }

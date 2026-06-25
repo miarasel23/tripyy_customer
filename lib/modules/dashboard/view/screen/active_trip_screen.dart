@@ -12,6 +12,8 @@ import '../../../../utils/app_urls.dart';
 import '../../../../main.dart';
 import '../../../../widgets/cancel_trip_dialog.dart';
 import '../../helpers/map_helper.dart';
+import '../widget/trip_review_bottom_sheet.dart';
+import '../../../../routes/app_routes.dart';
 
 class ActiveTripScreen extends StatefulWidget {
   final String customerUuid;
@@ -35,6 +37,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
   bool _isInit = false;
   bool _isRouteExpanded = false;
+  bool _isReviewSheetShown = false;
 
   @override
   void initState() {
@@ -43,6 +46,39 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     // to safely access context (AppLocalizations).
     _startPolling();
   }
+
+  Future<void> _showReviewBottomSheet() async {
+    if (_activeTrip == null) return;
+    
+    // Find the accepted driver if any
+    RentalDriverBid? driver;
+    if (_activeTrip!.drivers.isNotEmpty) {
+      driver = _activeTrip!.drivers.firstWhere(
+        (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+        orElse: () => _activeTrip!.drivers.first,
+      );
+    }
+
+    final result = await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
+      builder: (ctx) => TripReviewBottomSheet(
+        trip: _activeTrip!,
+        driver: driver,
+        customerUuid: widget.customerUuid,
+      ),
+    );
+
+    if (result == true) {
+      if (mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.bottomNav, (route) => false);
+      }
+    }
+  }
+
 
   @override
   void didChangeDependencies() {
@@ -83,6 +119,16 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             if (oldTrip?.uuid != _activeTrip?.uuid) {
               _fetchRoutePolylines();
             }
+            
+            if (_activeTrip?.tripStatus == TripStatus.completed && _activeTrip?.givenReview == false) {
+              if (!_isReviewSheetShown) {
+                _isReviewSheetShown = true;
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _showReviewBottomSheet();
+                });
+              }
+            }
+            
           } else {
             // No accepted trip found, might have ended
             _errorMessage = loc.translate('no_active_trip_found') == 'no_active_trip_found' ? "No active trip found." : loc.translate('no_active_trip_found');
