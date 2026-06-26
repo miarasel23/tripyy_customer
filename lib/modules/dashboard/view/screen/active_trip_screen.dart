@@ -34,6 +34,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
   GoogleMapController? _mapController;
   Set<Polyline> _polylines = {};
+  // Cached so they are NOT rebuilt on every 5-second setState
+  Set<Marker> _markers = {};
+  List<LatLng> _routePoints = [];
 
   bool _isInit = false;
   bool _isRouteExpanded = false;
@@ -128,6 +131,12 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                 });
               }
             }
+
+            // Stop polling once the trip is in a terminal state — no need to keep hammering the server
+            final terminalStatuses = [TripStatus.completed, TripStatus.cancelled];
+            if (terminalStatuses.contains(_activeTrip?.tripStatus)) {
+              _pollingTimer?.cancel();
+            }
             
           } else {
             // No accepted trip found, might have ended
@@ -156,30 +165,55 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     if (_activeTrip == null) return;
     final trip = _activeTrip!;
     
-    List<LatLng> routePoints = [];
-    for (int i = 0; i < trip.pickupLocations.length; i++) {
-      final loc = trip.pickupLocations[i];
+    // Rebuild markers and route points here (once per trip change)
+    List<LatLng> newRoutePoints = [];
+    Set<Marker> newMarkers = {};
+
+    List<LocationModel> allLocations = [];
+    allLocations.addAll(trip.pickupLocations);
+    allLocations.addAll(trip.dropoffLocations);
+
+    for (int i = 0; i < allLocations.length; i++) {
+      final loc = allLocations[i];
       final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
       final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
-      routePoints.add(LatLng(lat, lng));
-    }
-    for (int i = 0; i < trip.dropoffLocations.length; i++) {
-      final loc = trip.dropoffLocations[i];
-      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
-      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
-      routePoints.add(LatLng(lat, lng));
+      final point = LatLng(lat, lng);
+      newRoutePoints.add(point);
+
+      double hue;
+      if (i == 0) {
+        hue = BitmapDescriptor.hueGreen;
+      } else if (i == allLocations.length - 1) {
+        hue = BitmapDescriptor.hueRed;
+      } else {
+        hue = BitmapDescriptor.hueYellow;
+      }
+      newMarkers.add(
+        Marker(
+          markerId: MarkerId('loc_$i'),
+          position: point,
+          icon: BitmapDescriptor.defaultMarkerWithHue(hue),
+        ),
+      );
     }
 
-    if (routePoints.length > 1) {
+    if (newRoutePoints.length > 1) {
       final polylines = await MapHelper.getRouteBetweenMultipleCoordinates(
-        routePoints, 
+        newRoutePoints,
         color: Colors.green,
       );
-      if (mounted) {
-        setState(() {
-          _polylines = polylines;
-        });
-      }
+      if (!mounted) return;
+      setState(() {
+        _routePoints = newRoutePoints;
+        _markers = newMarkers;
+        _polylines = polylines;
+      });
+    } else {
+      if (!mounted) return;
+      setState(() {
+        _routePoints = newRoutePoints;
+        _markers = newMarkers;
+      });
     }
   }
 
@@ -251,40 +285,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
     final trip = _activeTrip!;
     final driver = trip.drivers.isNotEmpty ? trip.drivers.first : null;
-    
-    List<LatLng> routePoints = [];
-    Set<Marker> markers = {};
 
-    List<LocationModel> allLocations = [];
-    allLocations.addAll(trip.pickupLocations);
-    allLocations.addAll(trip.dropoffLocations);
-
-    for (int i = 0; i < allLocations.length; i++) {
-      final loc = allLocations[i];
-      final lat = double.tryParse(loc.latitude ?? '') ?? 23.8103;
-      final lng = double.tryParse(loc.longitude ?? '') ?? 90.4125;
-      final point = LatLng(lat, lng);
-      routePoints.add(point);
-      
-      double hue;
-      if (i == 0) {
-        hue = BitmapDescriptor.hueGreen;
-      } else if (i == allLocations.length - 1) {
-        hue = BitmapDescriptor.hueRed;
-      } else {
-        hue = BitmapDescriptor.hueYellow;
-      }
-
-      markers.add(
-        Marker(
-          markerId: MarkerId('loc_$i'),
-          position: point,
-          icon: BitmapDescriptor.defaultMarkerWithHue(hue),
-        ),
-      );
-    }
-
-    LatLng initialCameraPosition = routePoints.isNotEmpty ? routePoints.first : const LatLng(23.8103, 90.4125);
+    // Use pre-computed, cached markers/route points (only rebuilt when trip changes)
+    final LatLng initialCameraPosition = _routePoints.isNotEmpty ? _routePoints.first : const LatLng(23.8103, 90.4125);
 
     return Stack(
       children: [
@@ -300,6 +303,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             myLocationButtonEnabled: false,
             onMapCreated: (controller) {
               _mapController = controller;
+              final routePoints = _routePoints;
               if (routePoints.isNotEmpty) {
                 if (routePoints.length == 1) {
                   _mapController!.animateCamera(CameraUpdate.newLatLngZoom(routePoints.first, 14.0));
@@ -331,7 +335,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               }
             },
             polylines: _polylines,
-            markers: markers,
+            markers: _markers,
           ),
         ),
 

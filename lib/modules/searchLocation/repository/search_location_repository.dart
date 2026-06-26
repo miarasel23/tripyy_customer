@@ -23,7 +23,7 @@ class SearchLocationRepository {
           "action_when": "search_locations",
           "search_location": query,
         },
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode == 200) {
         return SearchLocationResponse.fromJson(jsonDecode(response.body));

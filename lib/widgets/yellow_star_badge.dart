@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../utils/colors_code.dart';
 
 class YellowStarBadge extends StatelessWidget {
   const YellowStarBadge({super.key, required this.iconSize});

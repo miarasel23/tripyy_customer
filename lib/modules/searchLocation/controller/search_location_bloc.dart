@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/search_location_model.dart';
 import '../repository/search_location_repository.dart';
@@ -33,13 +34,27 @@ class SearchLocationFailure extends SearchLocationState {
 
 class SearchLocationBloc extends Bloc<SearchLocationEvent, SearchLocationState> {
   final SearchLocationRepository repository;
+  Timer? _debounce;
 
   SearchLocationBloc(this.repository) : super(SearchLocationInitial()) {
     on<SearchQueryChanged>((event, emit) async {
       if (event.query.isEmpty) {
+        _debounce?.cancel();
         emit(SearchLocationInitial());
         return;
       }
+
+      // Cancel any previous debounce timer so rapid keystrokes don't each fire a request
+      _debounce?.cancel();
+
+      // Pause 400ms before actually searching; if the user types again in that time,
+      // this timer is cancelled and rescheduled.
+      final completer = Completer<void>();
+      _debounce = Timer(const Duration(milliseconds: 400), completer.complete);
+      await completer.future;
+
+      if (isClosed) return;
+
       emit(SearchLocationLoading());
       try {
         final response = await repository.searchLocations(event.query, event.languageCode);
@@ -48,5 +63,11 @@ class SearchLocationBloc extends Bloc<SearchLocationEvent, SearchLocationState> 
         emit(SearchLocationFailure(e.toString()));
       }
     });
+  }
+
+  @override
+  Future<void> close() {
+    _debounce?.cancel();
+    return super.close();
   }
 }

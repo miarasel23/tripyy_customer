@@ -36,7 +36,7 @@ class ApiService {
           arguments: errorMessage,
         );
       } else {
-        print('Error navigation failed: globalNavigatorKey state is null');
+        debugPrint('Error navigation failed: globalNavigatorKey state is null');
       }
     }
   }

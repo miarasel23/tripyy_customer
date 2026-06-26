@@ -188,7 +188,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
 
   void _startPolling() {
     _fetchBids(); // Initial fetch
-    _pollingTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
       _fetchBids();
     });
   }

@@ -337,47 +337,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _drawRouteMulti() async {
     if (_pickups.isEmpty || _dropLatLng == null) return;
 
-    List<LatLng> allRoutePoints = [];
-    
-    // Pickups sequentially
-    for (int i = 0; i < _pickups.length - 1; i++) {
-      final p1 = _pickups[i];
-      final p2 = _pickups[i + 1];
-      if (p1.latitude != null && p1.longitude != null && p2.latitude != null && p2.longitude != null) {
-        final r = await MapHelper.getRouteBetweenCoordinates(
-          LatLng(p1.latitude!, p1.longitude!),
-          LatLng(p2.latitude!, p2.longitude!),
-        );
-        if (r.isNotEmpty) {
-          allRoutePoints.addAll(r.first.points);
-        }
+    // Build the ordered list: all pickups → dropoff
+    final List<LatLng> allPoints = [];
+    for (final p in _pickups) {
+      if (p.latitude != null && p.longitude != null) {
+        allPoints.add(LatLng(p.latitude!, p.longitude!));
       }
     }
-    
-    // Last pickup to dropoff
-    final lastPickup = _pickups.last;
-    if (lastPickup.latitude != null && lastPickup.longitude != null) {
-      final r = await MapHelper.getRouteBetweenCoordinates(
-        LatLng(lastPickup.latitude!, lastPickup.longitude!),
-        _dropLatLng!,
-      );
-      if (r.isNotEmpty) {
-        allRoutePoints.addAll(r.first.points);
-      }
-    }
+    allPoints.add(_dropLatLng!);
 
-    if (mounted) {
-      setState(() {
-        _polylines = {
-          Polyline(
-            polylineId: const PolylineId('route'),
-            points: allRoutePoints,
-            color: const Color(0xFF6C63FF),
-            width: 5,
-          )
-        };
-      });
-    }
+    if (allPoints.length < 2) return;
+
+    // Single optimised API call (uses Google Directions with waypoints)
+    final polylines = await MapHelper.getRouteBetweenMultipleCoordinates(
+      allPoints,
+      color: const Color(0xFF6C63FF),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _polylines = polylines;
+    });
   }
 
   Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {

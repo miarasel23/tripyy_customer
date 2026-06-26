@@ -6,21 +6,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import '../../../../utils/app_urls.dart';
 
 class MapHelper {
-  /// Fallback Google Maps Geocoding API if native fails
-  static Future<String?> getGoogleGeocode(LatLng position) async {
-    try {
-      final url =
-          'https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${AppUrls.googleApiKey}';
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['results'] != null && data['results'].isNotEmpty) {
-          return data['results'][0]['formatted_address'];
-        }
-      }
-    } catch (_) {}
-    return null;
-  }
 
   /// Get the exact place_id and formatted_address from Google Geocoding API
   /// for a given lat/lng. Returns null if nothing found.

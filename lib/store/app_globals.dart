@@ -18,7 +18,7 @@ class AppGlobals {
         countryCode = localeName.split('_').last;
       }
     } catch (e) {
-      print("Failed to get platform/locale: $e");
+      debugPrint('AppGlobals: $e');
     }
   }
 }
