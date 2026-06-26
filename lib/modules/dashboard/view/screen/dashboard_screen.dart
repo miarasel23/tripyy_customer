@@ -230,6 +230,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _onSearchFieldFocusChanged(bool isDropFocused) {
     setState(() {
       _rebuildMarkers();
+      if (isDropFocused && _dropoffAddress != null) {
+        _centerAddress = _dropoffAddress;
+      } else if (!isDropFocused && _pickups.isNotEmpty && _pickups.first.address != null) {
+        _centerAddress = _pickups.first.address;
+      }
     });
     
     // Pan camera to the currently focused location
@@ -255,6 +260,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _onPickupsUpdated(List<SearchLocationData> locations) {
     setState(() {
       _pickups = List.from(locations);
+      if (_pickups.isNotEmpty && _pickups.last.address != null) {
+        _centerAddress = _pickups.last.address;
+      }
       _rebuildMarkers();
     });
 
@@ -280,6 +288,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _dropLatLng = latLng;
       _dropoffUuid = location.uuid;
       _dropoffAddress = location.address;
+      _centerAddress = location.address;
       _rebuildMarkers();
     });
 
@@ -586,7 +595,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 2))],
                         ),
                         child: Text(
-                          _isCameraMoving ? 'Move to pick location' : (_centerAddress ?? 'Loading...'),
+                          _isCameraMoving 
+                              ? ((_searchCardKey.currentState?.isDropFocused ?? false) ? 'Move drop-off location' : 'Move pick-up location') 
+                              : (_centerAddress ?? 'Loading...'),
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
