@@ -239,9 +239,9 @@ class BiddingListWidget extends StatelessWidget {
                                     SnackBar(
                                       content: Text(
                                         AppLocalizations.of(context).translate("no_reviews") ?? "No reviews available yet.",
-                                        style: const TextStyle(color: Colors.white),
+                                        style: TextStyle(color: isDark ? Colors.black : Colors.white),
                                       ),
-                                      backgroundColor: Colors.redAccent,
+                                      backgroundColor: isDark ? Colors.white : Colors.black,
                                       behavior: SnackBarBehavior.floating,
                                     ),
                                   );
@@ -260,9 +260,6 @@ class BiddingListWidget extends StatelessWidget {
                                       color: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
                                           ? Colors.blueAccent 
                                           : (isDark ? Colors.white54 : Colors.black54),
-                                      decoration: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
-                                          ? TextDecoration.underline 
-                                          : TextDecoration.none,
                                     ),
                                   ),
                                 ],

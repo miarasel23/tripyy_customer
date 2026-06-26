@@ -79,12 +79,16 @@ class _MyAppState extends State<MyApp> {
       backOnlineStr = loc.translate("back_online") ?? backOnlineStr;
     }
 
+    final isDark = context != null && Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? Colors.white : Colors.black;
+    final textColor = isDark ? Colors.black : Colors.white;
+
     if (!hasInternet) {
       globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
       globalScaffoldMessengerKey.currentState?.showSnackBar(
         SnackBar(
-          content: Text(noInternetStr),
-          backgroundColor: Colors.red,
+          content: Text(noInternetStr, style: TextStyle(color: textColor)),
+          backgroundColor: bgColor,
           behavior: SnackBarBehavior.floating,
           duration: const Duration(days: 1),
         ),
@@ -93,8 +97,8 @@ class _MyAppState extends State<MyApp> {
       globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
       globalScaffoldMessengerKey.currentState?.showSnackBar(
         SnackBar(
-          content: Text(backOnlineStr),
-          backgroundColor: Colors.green,
+          content: Text(backOnlineStr, style: TextStyle(color: textColor)),
+          backgroundColor: bgColor,
           behavior: SnackBarBehavior.floating,
         ),
       );

@@ -628,9 +628,17 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     );
 
     if (reason != null && reason.isNotEmpty && _activeTrip != null) {
+      final bool isDark = Theme.of(context).brightness == Brightness.dark;
+      final Color bgColor = isDark ? Colors.white : Colors.black;
+      final Color textColor = isDark ? Colors.black : Colors.white;
       try {
+
         globalScaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(content: Text("Cancelling trip..."), behavior: SnackBarBehavior.floating),
+          SnackBar(
+            content: Text("Cancelling trip...", style: TextStyle(color: textColor)), 
+            backgroundColor: bgColor,
+            behavior: SnackBarBehavior.floating
+          ),
         );
         final loc = AppLocalizations.of(context);
         final response = await _repo.cancelTrip(
@@ -642,8 +650,8 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(response['message'] ?? "Trip cancelled successfully"),
-            backgroundColor: Colors.green,
+            content: Text(response['message'] ?? "Trip cancelled successfully", style: TextStyle(color: textColor)),
+            backgroundColor: bgColor,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -656,8 +664,8 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
+            content: Text(e.toString().replaceAll('Exception: ', ''), style: TextStyle(color: textColor)),
+            backgroundColor: bgColor,
             behavior: SnackBarBehavior.floating,
           ),
         );

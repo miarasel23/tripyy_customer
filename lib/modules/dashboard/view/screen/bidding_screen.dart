@@ -87,9 +87,16 @@ class _BiddingScreenState extends State<BiddingScreen> {
     );
 
     if (confirm == true && _currentTrip != null) {
+      final bgColor = isDark ? Colors.white : Colors.black;
+      final textColor = isDark ? Colors.black : Colors.white;
       try {
+
         globalScaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(content: Text("Accepting trip..."), behavior: SnackBarBehavior.floating),
+          SnackBar(
+            content: Text("Accepting trip...", style: TextStyle(color: textColor)), 
+            backgroundColor: bgColor,
+            behavior: SnackBarBehavior.floating
+          ),
         );
         
         final response = await _repo.acceptTrip(
@@ -101,8 +108,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(response['message'] ?? "Trip accepted successfully"),
-            backgroundColor: Colors.green,
+            content: Text(response['message'] ?? "Trip accepted successfully", style: TextStyle(color: textColor)),
+            backgroundColor: bgColor,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -119,8 +126,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.redAccent,
+            content: Text(e.toString().replaceAll('Exception: ', ''), style: TextStyle(color: textColor)),
+            backgroundColor: bgColor,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -135,9 +142,16 @@ class _BiddingScreenState extends State<BiddingScreen> {
     );
 
     if (reason != null && reason.isNotEmpty && _currentTrip != null) {
+      final bgColor = isDark ? Colors.white : Colors.black;
+      final textColor = isDark ? Colors.black : Colors.white;
       try {
+
         globalScaffoldMessengerKey.currentState?.showSnackBar(
-          const SnackBar(content: Text("Cancelling trip..."), behavior: SnackBarBehavior.floating),
+          SnackBar(
+            content: Text("Cancelling trip...", style: TextStyle(color: textColor)), 
+            backgroundColor: bgColor,
+            behavior: SnackBarBehavior.floating
+          ),
         );
         final loc = AppLocalizations.of(context);
         final response = await _repo.cancelTrip(
@@ -149,8 +163,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(response['message'] ?? "Trip cancelled successfully"),
-            backgroundColor: Colors.green,
+            content: Text(response['message'] ?? "Trip cancelled successfully", style: TextStyle(color: textColor)),
+            backgroundColor: bgColor,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -163,8 +177,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.redAccent,
+            content: Text(e.toString().replaceAll('Exception: ', ''), style: TextStyle(color: textColor)),
+            backgroundColor: bgColor,
             behavior: SnackBarBehavior.floating,
           ),
         );
