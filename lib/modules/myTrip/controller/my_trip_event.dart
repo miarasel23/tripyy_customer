@@ -11,3 +11,11 @@ class ChangePackageEvent extends MyTripEvent {
 
   ChangePackageEvent({required this.index});
 }
+
+class FetchTripsEvent extends MyTripEvent {
+  final String tripStatus;
+  final String languageCode;
+  final bool isSilent;
+
+  FetchTripsEvent({required this.tripStatus, required this.languageCode, this.isSilent = false});
+}

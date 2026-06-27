@@ -74,9 +74,20 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => const ErrorScreen());
 
       case AppRoutes.biddingScreen:
-        final customerUuid = settings.arguments as String? ?? "";
+        final args = settings.arguments;
+        String customerUuid = "";
+        String tripUuid = "";
+        if (args is Map<String, dynamic>) {
+          customerUuid = args['customerUuid'] as String? ?? "";
+          tripUuid = args['tripUuid'] as String? ?? "";
+        } else if (args is String) {
+          customerUuid = args;
+        }
         return MaterialPageRoute(
-          builder: (_) => BiddingScreen(customerUuid: customerUuid),
+          builder: (_) => BiddingScreen(
+            customerUuid: customerUuid,
+            tripUuid: tripUuid,
+          ),
         );
 
       case AppRoutes.activeTrip:

@@ -215,6 +215,35 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         _markers = newMarkers;
       });
     }
+    // Animate camera to fit the trip area after data is ready
+    _fitMapToBounds(newRoutePoints);
+  }
+
+  void _fitMapToBounds(List<LatLng> points) {
+    if (_mapController == null || points.isEmpty) return;
+    if (points.length == 1) {
+      _mapController!.animateCamera(CameraUpdate.newLatLngZoom(points.first, 15.0));
+      return;
+    }
+    double minLat = points.first.latitude;
+    double maxLat = points.first.latitude;
+    double minLng = points.first.longitude;
+    double maxLng = points.first.longitude;
+    for (final p in points) {
+      if (p.latitude < minLat) minLat = p.latitude;
+      if (p.latitude > maxLat) maxLat = p.latitude;
+      if (p.longitude < minLng) minLng = p.longitude;
+      if (p.longitude > maxLng) maxLng = p.longitude;
+    }
+    final bounds = LatLngBounds(
+      southwest: LatLng(minLat, minLng),
+      northeast: LatLng(maxLat, maxLng),
+    );
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted && _mapController != null) {
+        _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 60.0));
+      }
+    });
   }
 
   Future<void> _launchUrl(String url) async {
@@ -303,35 +332,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             myLocationButtonEnabled: false,
             onMapCreated: (controller) {
               _mapController = controller;
-              final routePoints = _routePoints;
-              if (routePoints.isNotEmpty) {
-                if (routePoints.length == 1) {
-                  _mapController!.animateCamera(CameraUpdate.newLatLngZoom(routePoints.first, 14.0));
-                } else {
-                  double minLat = routePoints.first.latitude;
-                  double maxLat = routePoints.first.latitude;
-                  double minLng = routePoints.first.longitude;
-                  double maxLng = routePoints.first.longitude;
-
-                  for (var point in routePoints) {
-                    if (point.latitude < minLat) minLat = point.latitude;
-                    if (point.latitude > maxLat) maxLat = point.latitude;
-                    if (point.longitude < minLng) minLng = point.longitude;
-                    if (point.longitude > maxLng) maxLng = point.longitude;
-                  }
-
-                  final bounds = LatLngBounds(
-                    southwest: LatLng(minLat, minLng),
-                    northeast: LatLng(maxLat, maxLng),
-                  );
-
-                  // Delay slightly to ensure map is fully loaded before animating bounds
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    if (mounted && _mapController != null) {
-                      _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50.0));
-                    }
-                  });
-                }
+              // Fit to bounds if route is already loaded (e.g. re-entering screen)
+              if (_routePoints.isNotEmpty) {
+                _fitMapToBounds(_routePoints);
               }
             },
             polylines: _polylines,

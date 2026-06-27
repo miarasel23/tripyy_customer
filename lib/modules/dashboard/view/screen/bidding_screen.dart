@@ -16,8 +16,9 @@ import '../../../../routes/app_routes.dart';
 
 class BiddingScreen extends StatefulWidget {
   final String customerUuid;
+  final String tripUuid;
 
-  const BiddingScreen({super.key, required this.customerUuid});
+  const BiddingScreen({super.key, required this.customerUuid, this.tripUuid = ""});
 
   @override
   State<BiddingScreen> createState() => _BiddingScreenState();
@@ -204,11 +205,29 @@ class _BiddingScreenState extends State<BiddingScreen> {
       if (mounted) {
         setState(() {
           if (response.trips.isNotEmpty) {
-            _currentTrip = response.trips.first;
+            if (widget.tripUuid.isNotEmpty) {
+              try {
+                _currentTrip = response.trips.firstWhere((t) => t.uuid == widget.tripUuid);
+              } catch (_) {
+                _currentTrip = response.trips.first;
+              }
+            } else {
+              _currentTrip = response.trips.first;
+            }
             
             int currentDriverCount = _currentTrip!.drivers.length;
             if (currentDriverCount > _previousDriverCount) {
-              FlutterRingtonePlayer().playNotification();
+              FlutterRingtonePlayer().play(
+                fromAsset: "assets/sounds/ride_request.wav",
+                looping: true,
+                volume: 1.0,
+                asAlarm: true,
+              );
+              // Stop the sound after 10 seconds
+              Future.delayed(const Duration(seconds: 10), () {
+                FlutterRingtonePlayer().stop();
+              });
+              
               _previousDriverCount = currentDriverCount;
             }
           }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'core/services/background_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -29,9 +30,10 @@ import 'store/app_globals.dart';
 import 'core/utils/theme/app_theme.dart';
 import 'modules/theme/controller/theme_bloc.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppGlobals.init();
+  await initializeBackgroundService();
   runApp(MyApp());
 }
 
