@@ -75,10 +75,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       ),
     );
 
-    if (result == true) {
-      if (mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, AppRoutes.bottomNav, (route) => false);
-      }
+    if (result == true && mounted) {
+      // Mark review as given locally so the UI updates immediately to thank-you banner
+      setState(() {
+        if (_activeTrip != null) {
+          _activeTrip = _activeTrip!.copyWith(givenReview: true);
+        }
+      });
     }
   }
 
@@ -126,6 +129,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               TripStatus.rideStarted,
               TripStatus.inProgress,
               TripStatus.firstCompleted,
+              TripStatus.completed, // Include completed so we can show the Give Review UI
             ];
             final found = response.trips.where((t) => activeStatuses.contains(t.tripStatus)).toList();
             final oldTrip = _activeTrip;
@@ -581,7 +585,77 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
           const SizedBox(height: 24),
 
-          if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress || trip.tripStatus == TripStatus.firstCompleted)
+          // ── COMPLETED: Give Review or Already Reviewed banner ──
+          if (trip.tripStatus == TripStatus.completed)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: trip.givenReview == true
+                  // Already reviewed — show a thank-you banner
+                  ? Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.green.shade400, width: 1.5),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Trip Completed — Thank you for your review!",
+                            style: GoogleFonts.poppins(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  // Not yet reviewed — show Give Review button
+                  : GestureDetector(
+                      onTap: () => _showReviewBottomSheet(),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppColors.primary, AppColors.primary.withOpacity(0.8)],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.35),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.star_rounded, color: Colors.white, size: 22),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Give Review",
+                              style: GoogleFonts.poppins(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+            )
+          // ── IN PROGRESS: animated progress bar ──
+          else if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress || trip.tripStatus == TripStatus.firstCompleted)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ClipRRect(

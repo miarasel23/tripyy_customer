@@ -293,6 +293,42 @@ class RentalTrip {
       givenReview: json['given_review'] as bool?,
     );
   }
+
+  RentalTrip copyWith({
+    int? id,
+    String? uuid,
+    String? serviceName,
+    CarCategoryModel? carCategory,
+    PriceInfoModel? priceInfo,
+    List<LocationModel>? pickupLocations,
+    List<LocationModel>? dropoffLocations,
+    List<RentalDriverBid>? drivers,
+    double? offerAmount,
+    int? totalBids,
+    String? tripStatus,
+    String? paymentMethod,
+    String? startDatetime,
+    String? endDatetime,
+    bool? givenReview,
+  }) {
+    return RentalTrip(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      serviceName: serviceName ?? this.serviceName,
+      carCategory: carCategory ?? this.carCategory,
+      priceInfo: priceInfo ?? this.priceInfo,
+      pickupLocations: pickupLocations ?? this.pickupLocations,
+      dropoffLocations: dropoffLocations ?? this.dropoffLocations,
+      drivers: drivers ?? this.drivers,
+      offerAmount: offerAmount ?? this.offerAmount,
+      totalBids: totalBids ?? this.totalBids,
+      tripStatus: tripStatus ?? this.tripStatus,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      startDatetime: startDatetime ?? this.startDatetime,
+      endDatetime: endDatetime ?? this.endDatetime,
+      givenReview: givenReview ?? this.givenReview,
+    );
+  }
 }
 
 class RentalBidListResponse {

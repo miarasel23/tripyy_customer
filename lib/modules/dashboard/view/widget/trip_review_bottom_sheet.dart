@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_urls.dart';
+import '../../../../routes/app_routes.dart';
 import '../../models/create_rental_trip_model.dart';
 import '../../repository/create_trip_repository.dart';
 
@@ -76,9 +77,12 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
       );
 
       if (mounted) {
-        Navigator.of(context).pop(true); // Return true indicating success
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(loc.translate('review_submitted') == 'review_submitted' ? 'Review submitted successfully!' : loc.translate('review_submitted'))),
+        );
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.bottomNav,
+          (route) => false,
         );
       }
     } catch (e) {
@@ -181,18 +185,18 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF7C83FD).withOpacity(0.2),
+                      color: isDark ? Colors.white24 : Colors.black12,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
                       child: Container(
                         width: 40,
                         height: 40,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF7C83FD),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white : Colors.black,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.check, color: Colors.white),
+                        child: Icon(Icons.check, color: isDark ? Colors.black : Colors.white),
                       ),
                     ),
                   ),
@@ -201,7 +205,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                   Text(
                     loc.translate('trip_completed') == 'trip_completed' ? "Trip Completed" : loc.translate('trip_completed'),
                     style: GoogleFonts.poppins(
-                      color: const Color(0xFF7C83FD),
+                      color: isDark ? Colors.white : Colors.black,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -332,7 +336,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                                   width: 12,
                                   height: 12,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF7C83FD),
+                                    color: isDark ? Colors.white : Colors.black,
                                     shape: BoxShape.circle,
                                     border: Border.all(color: isDark ? const Color(0xFF1C1E26) : Colors.white, width: 2),
                                   ),
@@ -400,7 +404,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                           height: 80,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: const Color(0xFF7C83FD), width: 2),
+                            border: Border.all(color: isDark ? Colors.white : Colors.black, width: 2),
                             image: DecorationImage(
                               image: (driver?.profilePicture != null
                                   ? NetworkImage(AppUrls.getImageUrl(driver!.profilePicture!) ?? '')
@@ -448,7 +452,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                                 padding: const EdgeInsets.symmetric(horizontal: 4),
                                 child: Icon(
                                   index < _selectedRating ? Icons.star : Icons.star_border,
-                                  color: index < _selectedRating ? Colors.amber : (isDark ? Colors.white24 : Colors.black26),
+                                  color: index < _selectedRating ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.white24 : Colors.black26),
                                   size: 36,
                                 ),
                               ),
@@ -496,16 +500,16 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? const Color(0xFF7C83FD).withOpacity(0.2) : Colors.transparent,
+                                  color: isSelected ? (isDark ? Colors.white24 : Colors.black12) : Colors.transparent,
                                   border: Border.all(
-                                    color: isSelected ? const Color(0xFF7C83FD) : (isDark ? Colors.white24 : Colors.black26),
+                                    color: isSelected ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.white24 : Colors.black26),
                                   ),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
                                   displayCompliment,
                                   style: GoogleFonts.poppins(
-                                    color: isSelected ? const Color(0xFF7C83FD) : (isDark ? Colors.white70 : Colors.black87),
+                                    color: isSelected ? (isDark ? Colors.white : Colors.black) : (isDark ? Colors.white70 : Colors.black87),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -534,7 +538,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: Color(0xFF7C83FD)),
+                                borderSide: BorderSide(color: isDark ? Colors.white : Colors.black),
                               ),
                             ),
                             maxLines: 3,
