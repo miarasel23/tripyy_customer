@@ -18,7 +18,7 @@ class MainBottomNavBarScreen extends StatefulWidget {
 }
 
 class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
-  final List<Widget> _screens = const [
+  List<Widget> get _screens => const [
     DashboardScreen(),
     MytripScreen(),
     ProfileScreen(),
