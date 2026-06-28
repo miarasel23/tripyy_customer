@@ -117,30 +117,58 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       if (mounted) {
         setState(() {
           if (response.trips.isNotEmpty) {
+            // BUG FIX #1: Must find the active trip by status, not just take first in list.
+            // The API returns ALL trips (including completed/cancelled); we need the active one.
+            final activeStatuses = [
+              TripStatus.accepted,
+              TripStatus.booked,
+              TripStatus.arrivedPickupLocation,
+              TripStatus.rideStarted,
+              TripStatus.inProgress,
+              TripStatus.firstCompleted,
+            ];
+            final found = response.trips.where((t) => activeStatuses.contains(t.tripStatus)).toList();
             final oldTrip = _activeTrip;
-            _activeTrip = response.trips.first;
-            if (oldTrip?.uuid != _activeTrip?.uuid) {
-              _fetchRoutePolylines();
-            }
-            
-            if (_activeTrip?.tripStatus == TripStatus.completed && _activeTrip?.givenReview == false) {
-              if (!_isReviewSheetShown) {
-                _isReviewSheetShown = true;
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  _showReviewBottomSheet();
-                });
+
+            if (found.isNotEmpty) {
+              _activeTrip = found.first;
+              if (oldTrip?.uuid != _activeTrip?.uuid) {
+                _fetchRoutePolylines();
+              }
+
+              if (_activeTrip?.tripStatus == TripStatus.completed && _activeTrip?.givenReview == false) {
+                if (!_isReviewSheetShown) {
+                  _isReviewSheetShown = true;
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _showReviewBottomSheet();
+                  });
+                }
+              }
+
+              // Stop polling once the trip is in a terminal state
+              final terminalStatuses = [TripStatus.completed, TripStatus.cancelled];
+              if (terminalStatuses.contains(_activeTrip?.tripStatus)) {
+                _pollingTimer?.cancel();
+              }
+            } else {
+              // No active trip in the list — all trips are in terminal state
+              _activeTrip = null;
+              _errorMessage = loc.translate('no_active_trip_found') == 'no_active_trip_found'
+                  ? "No active trip found."
+                  : loc.translate('no_active_trip_found');
+              if (!_hasShownNoTripToast) {
+                _hasShownNoTripToast = true;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(_errorMessage!)),
+                );
               }
             }
-
-            // Stop polling once the trip is in a terminal state — no need to keep hammering the server
-            final terminalStatuses = [TripStatus.completed, TripStatus.cancelled];
-            if (terminalStatuses.contains(_activeTrip?.tripStatus)) {
-              _pollingTimer?.cancel();
-            }
-            
           } else {
-            // No accepted trip found, might have ended
-            _errorMessage = loc.translate('no_active_trip_found') == 'no_active_trip_found' ? "No active trip found." : loc.translate('no_active_trip_found');
+            // No trips at all
+            _activeTrip = null;
+            _errorMessage = loc.translate('no_active_trip_found') == 'no_active_trip_found'
+                ? "No active trip found."
+                : loc.translate('no_active_trip_found');
             if (!_hasShownNoTripToast) {
               _hasShownNoTripToast = true;
               ScaffoldMessenger.of(context).showSnackBar(
@@ -317,8 +345,18 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       );
     }
 
+    // BUG FIX #5: Guard against _activeTrip being null when neither loading nor error is set.
+    // This can happen on first frame before the first fetch completes.
+    if (_activeTrip == null) {
+      return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+    }
+
     final trip = _activeTrip!;
-    final driver = trip.drivers.isNotEmpty ? trip.drivers.first : null;
+    final driver = trip.drivers.isNotEmpty
+        ? trip.drivers.firstWhere(
+            (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+            orElse: () => trip.drivers.first)
+        : null;
 
     // Use pre-computed, cached markers/route points (only rebuilt when trip changes)
     final LatLng initialCameraPosition = _routePoints.isNotEmpty ? _routePoints.first : const LatLng(23.8103, 90.4125);
@@ -502,7 +540,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     ),
                   ),
 
-                  // Car Info
+                  // BUG FIX #2: Only show call button if driver has a real phone number (not null/empty/N/A)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -515,28 +553,25 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      GestureDetector(
-                        onTap: () {
-                          if (driver?.phone != null) {
-                            _launchUrl("tel:${driver!.phone}");
-                          }
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.call, color: isDark ? Colors.white : Colors.black, size: 16),
-                            const SizedBox(width: 4),
-                            Text(
-                              loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
-                              style: GoogleFonts.poppins(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
+                      if (driver?.phone != null && driver!.phone!.isNotEmpty && driver.phone != 'N/A')
+                        GestureDetector(
+                          onTap: () => _launchUrl("tel:${driver.phone}"),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.call, color: isDark ? Colors.white : Colors.black, size: 16),
+                              const SizedBox(width: 4),
+                              Text(
+                                loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
+                                style: GoogleFonts.poppins(
+                                  color: isDark ? Colors.white : Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -563,11 +598,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     Positioned.fill(
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          // Dummy progress calculation (update with real data from backend when available)
-                          double progress = 0.0;
-                          if (trip.tripStatus == TripStatus.rideStarted) progress = 0.2;
-                          if (trip.tripStatus == TripStatus.firstCompleted) progress = 0.5;
+                          // BUG FIX #4: Progress values were using wrong statuses.
+                          // accepted/booked = approaching, rideStarted = started, firstCompleted = half done.
+                          double progress = 0.1;
+                          if (trip.tripStatus == TripStatus.arrivedPickupLocation) progress = 0.2;
+                          if (trip.tripStatus == TripStatus.rideStarted) progress = 0.4;
                           if (trip.tripStatus == TripStatus.inProgress) progress = 0.6;
+                          if (trip.tripStatus == TripStatus.firstCompleted) progress = 0.75;
                           
                           return AnimatedContainer(
                             duration: const Duration(seconds: 1),
@@ -599,7 +636,12 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                 ),
               ),
             )
-          else
+          // BUG FIX #3: Cancel button should NOT appear when trip is already COMPLETED or CANCELLED
+          else if (trip.tripStatus != TripStatus.completed &&
+              trip.tripStatus != TripStatus.cancelled &&
+              trip.tripStatus != TripStatus.rideStarted &&
+              trip.tripStatus != TripStatus.inProgress &&
+              trip.tripStatus != TripStatus.firstCompleted)
             // Cancel Trip Button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),

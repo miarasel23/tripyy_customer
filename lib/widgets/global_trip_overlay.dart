@@ -68,13 +68,13 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       if (mounted) {
         setState(() {
           if (response.trips.isNotEmpty) {
-            final firstTrip = response.trips.first;
-            if (firstTrip.tripStatus == TripStatus.rideStarted || 
-                firstTrip.tripStatus == TripStatus.firstCompleted) {
-              _activeTrip = firstTrip;
-            } else {
-              _activeTrip = null; // hide for other statuses
-            }
+            // BUG FIX: Search for an active trip by status rather than blindly taking first
+            final activeStatuses = [
+              TripStatus.rideStarted,
+              TripStatus.firstCompleted,
+            ];
+            final found = response.trips.where((t) => activeStatuses.contains(t.tripStatus)).toList();
+            _activeTrip = found.isNotEmpty ? found.first : null;
           } else {
             _activeTrip = null;
           }
@@ -212,7 +212,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                     Text(
                       loc.translate('trip_route') == 'trip_route' ? "Trip Route" : loc.translate('trip_route'),
                       style: GoogleFonts.poppins(
-                        color: Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),
@@ -242,15 +242,15 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                         }
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black,
+                        backgroundColor: isDark ? Colors.white : Colors.black,
+                        foregroundColor: isDark ? Colors.black : Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         minimumSize: const Size(0, 32),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
                       child: Text(
                         loc.translate('view') == 'view' ? "View" : loc.translate('view'),
-                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black),
+                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.black : Colors.white),
                       ),
                     ),
                   ],

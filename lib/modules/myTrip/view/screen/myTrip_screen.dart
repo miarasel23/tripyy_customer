@@ -14,7 +14,6 @@ import '../../../dashboard/models/create_rental_trip_model.dart';
 import '../../../../main.dart';
 import '../../../../widgets/cancel_trip_dialog.dart';
 import '../../../dashboard/repository/create_trip_repository.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MytripScreen extends StatefulWidget {
   const MytripScreen({super.key});
@@ -426,8 +425,8 @@ class _MytripScreenState extends State<MytripScreen> {
                         ),
                       ),
                     ),
-                  // Showing number of bids below price as requested (highlighted)
-                  if (!isAccepted && !isHistory && bidsCount >= 0)
+                  // Show bids count only on Requested tab, and only when there are actual bids
+                  if (!isAccepted && !isHistory && bidsCount > 0)
                     Container(
                       margin: EdgeInsets.only(top: 4),
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
