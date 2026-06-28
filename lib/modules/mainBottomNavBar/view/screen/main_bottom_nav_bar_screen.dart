@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../dashboard/view/screen/dashboard_screen.dart';
 import '../../../myTrip/view/screen/myTrip_screen.dart';
-import '../../../offer/view/screen/offer_screen.dart';
 import '../../../profile/view/screen/profile_screen.dart';
 
 
@@ -22,7 +21,6 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
   final List<Widget> _screens = const [
     DashboardScreen(),
     MytripScreen(),
-    OfferScreen(),
     ProfileScreen(),
   ];
   @override
@@ -83,17 +81,6 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                           ? Colors.blue
                           : Colors.grey,
                     ),
-                    child: Icon(Icons.home_outlined),
-                  ),
-                  label: loc.translate("offers"),
-                ),
-                BottomNavigationBarItem(
-                  icon: IconTheme(
-                    data: IconThemeData(
-                      color: state.selectedIndex == 3
-                          ? Colors.blue
-                          : Colors.grey,
-                    ),
                     child: Icon(Icons.person),
                   ),
                   label: loc.translate("profile"),
@@ -103,23 +90,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
           },
         ),
       ),
-      // bottomNavigationBar: NavigationBar(
-      //   indicatorColor: Colors.transparent,
-      //   backgroundColor: Colors.white,
-      //   selectedIndex: _selectedIndex,
-      //   destinations: const [
-      //     NavigationDestination(icon: Icon(Icons.home_outlined,), label: 'Home'),
-      //     NavigationDestination(
-      //       icon: Icon(Icons.train_sharp),
-      //       label: 'My Trip',
-      //     ),
-      //     NavigationDestination(
-      //       icon: Icon(Icons.home_outlined),
-      //       label: 'Offers',
-      //     ),
-      //     NavigationDestination(icon: Icon(Icons.person), label: 'Profile'),
-      //   ],
-      // ),
+
     );
   }
 }
