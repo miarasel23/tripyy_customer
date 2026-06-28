@@ -170,8 +170,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     Set<Marker> newMarkers = {};
 
     List<LocationModel> allLocations = [];
-    allLocations.addAll(trip.pickupLocations);
-    allLocations.addAll(trip.dropoffLocations);
+    if (trip.tripStatus == TripStatus.firstCompleted) {
+      allLocations.addAll(trip.dropoffLocations);
+      allLocations.addAll(trip.pickupLocations);
+    } else {
+      allLocations.addAll(trip.pickupLocations);
+      allLocations.addAll(trip.dropoffLocations);
+    }
 
     for (int i = 0; i < allLocations.length; i++) {
       final loc = allLocations[i];
@@ -541,7 +546,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
           const SizedBox(height: 24),
 
-          if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress)
+          if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress || trip.tripStatus == TripStatus.firstCompleted)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ClipRRect(
@@ -561,6 +566,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                           // Dummy progress calculation (update with real data from backend when available)
                           double progress = 0.0;
                           if (trip.tripStatus == TripStatus.rideStarted) progress = 0.2;
+                          if (trip.tripStatus == TripStatus.firstCompleted) progress = 0.5;
                           if (trip.tripStatus == TripStatus.inProgress) progress = 0.6;
                           
                           return AnimatedContainer(
@@ -680,10 +686,29 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     }
   }
 
+  String _formatDate(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return "N/A";
+    try {
+      final dt = DateTime.parse(dateStr);
+      final months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      final amPm = dt.hour >= 12 ? "PM" : "AM";
+      final hour12 = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+      final minute = dt.minute.toString().padLeft(2, '0');
+      return "${dt.day} ${months[dt.month - 1]}, ${dt.year} - $hour12:$minute $amPm";
+    } catch (e) {
+      return dateStr;
+    }
+  }
+
   Widget _buildRouteProgress(bool isDark, RentalTrip trip, AppLocalizations loc) {
     List<LocationModel> allLocations = [];
-    allLocations.addAll(trip.pickupLocations);
-    allLocations.addAll(trip.dropoffLocations);
+    if (trip.tripStatus == TripStatus.firstCompleted) {
+      allLocations.addAll(trip.dropoffLocations);
+      allLocations.addAll(trip.pickupLocations);
+    } else {
+      allLocations.addAll(trip.pickupLocations);
+      allLocations.addAll(trip.dropoffLocations);
+    }
     
     if (allLocations.isEmpty) return const SizedBox();
 
@@ -742,6 +767,62 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                 ),
               ],
             ),
+            
+            // Date Time Info
+            if (trip.serviceName != 'RIDE_SHARE' && trip.serviceName != 'RIDE_SHOW')
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Pickup Date & Time",
+                            style: GoogleFonts.poppins(
+                              color: isDark ? Colors.white54 : Colors.black54,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            _formatDate(trip.tripStatus == TripStatus.firstCompleted ? trip.endDatetime : trip.startDatetime),
+                            style: GoogleFonts.poppins(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (trip.serviceName == 'RETURN' && trip.tripStatus != TripStatus.firstCompleted)
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Return Time",
+                              style: GoogleFonts.poppins(
+                                color: isDark ? Colors.white54 : Colors.black54,
+                                fontSize: 12,
+                              ),
+                            ),
+                            Text(
+                              _formatDate(trip.endDatetime),
+                              style: GoogleFonts.poppins(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
             const SizedBox(height: 16),
             
             // Horizontal Progress Bar
