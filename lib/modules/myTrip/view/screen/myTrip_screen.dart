@@ -270,7 +270,17 @@ class _MytripScreenState extends State<MytripScreen> {
     final String carType = trip.carCategory?.carType ?? "Car";
     final String carAvatar = trip.carCategory?.carAvatar ?? "";
     
-    final double price = trip.offerAmount ?? 0.0;
+    double price = trip.offerAmount ?? 0.0;
+    double? discountAmount;
+
+    if (isAccepted && trip.drivers.isNotEmpty) {
+      final acceptedDriverIdx = trip.drivers.indexWhere((driver) => driver.bidStatus == "ACCEPTED");
+      final acceptedDriver = acceptedDriverIdx >= 0 ? trip.drivers[acceptedDriverIdx] : trip.drivers.first;
+      
+      price = acceptedDriver.totalAmount ?? price;
+      discountAmount = acceptedDriver.customerDiscountAmount;
+    }
+
     final int bidsCount = trip.totalBids ?? 0;
     final bool hasBids = bidsCount > 0;
     
@@ -361,6 +371,16 @@ class _MytripScreenState extends State<MytripScreen> {
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
+                  if (discountAmount != null && discountAmount > 0.0)
+                    Text(
+                      "\$${(price + discountAmount).toStringAsFixed(2)}",
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                        decoration: TextDecoration.lineThrough,
+                      ),
+                    ),
                   Text(
                     "\$${price.toStringAsFixed(2)}",
                     style: GoogleFonts.poppins(
@@ -369,6 +389,23 @@ class _MytripScreenState extends State<MytripScreen> {
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
+                  if (discountAmount != null && discountAmount > 0.0)
+                    Container(
+                      margin: EdgeInsets.only(top: 2),
+                      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        "Discount \$${discountAmount.toStringAsFixed(2)}",
+                        style: GoogleFonts.poppins(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
                   // Showing number of bids below price as requested (highlighted)
                   if (bidsCount > 0 || !isAccepted)
                     Container(
