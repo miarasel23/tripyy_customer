@@ -32,8 +32,8 @@ class ServicesSectionWidget extends StatelessWidget {
             },
             child: Container(
               margin: EdgeInsets.only(right: 12),
-              width: 100,
-              height: 130,
+              width: 120,
+              height: 160,
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
               decoration: BoxDecoration(
                 color: isLight ? Colors.white : Color(0xFF2A2F3D),
@@ -90,8 +90,8 @@ class ServicesSectionWidget extends StatelessWidget {
     if (avatar != null && avatar.isNotEmpty) {
       final imageUrl = AppUrls.getImageUrl(avatar);
       return SizedBox(
-        height: 50,
-        width: 50,
+        height: 80,
+        width: 80,
         child: Image.network(
           imageUrl!,
           fit: BoxFit.contain,
@@ -101,8 +101,8 @@ class ServicesSectionWidget extends StatelessWidget {
               baseColor: isLight ? Colors.grey[300]! : Colors.grey[700]!,
               highlightColor: isLight ? Colors.grey[100]! : Colors.grey[500]!,
               child: Container(
-                width: 50,
-                height: 50,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
                   color: isLight ? Colors.white : Colors.black,
                   borderRadius: BorderRadius.circular(8),
@@ -111,12 +111,12 @@ class ServicesSectionWidget extends StatelessWidget {
             );
           },
           errorBuilder: (context, error, stackTrace) {
-            return Icon(Icons.car_crash, color: iconColor, size: 50);
+            return Icon(Icons.car_crash, color: iconColor, size: 80);
           },
         ),
       );
     }
-    return Icon(Icons.directions_car, color: iconColor, size: 50);
+    return Icon(Icons.directions_car, color: iconColor, size: 80);
   }
 
   String _formatServiceName(String? key) {
