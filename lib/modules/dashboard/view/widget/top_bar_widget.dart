@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../utils/app_urls.dart';
+import '../../../../store/user_data_store.dart';
 
 class TopBarWidget extends StatelessWidget {
   const TopBarWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final profileImage = AppUrls.profileImageUrl;
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -32,7 +36,10 @@ class TopBarWidget extends StatelessWidget {
           CircleAvatar(
             radius: 16,
             backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            child: Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface, size: 20),
+            backgroundImage: profileImage != null ? NetworkImage(profileImage) : null,
+            child: profileImage == null 
+                ? Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface, size: 20)
+                : null,
           ),
         ],
       ),

@@ -14,6 +14,7 @@ import '../../../dashboard/models/create_rental_trip_model.dart';
 import '../../../../main.dart';
 import '../../../../widgets/cancel_trip_dialog.dart';
 import '../../../dashboard/repository/create_trip_repository.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MytripScreen extends StatefulWidget {
   const MytripScreen({super.key});
@@ -42,7 +43,7 @@ class _MytripScreenState extends State<MytripScreen> {
     final loc = AppLocalizations.of(context);
     final index = context.read<MyTripBloc>().state.selectedIndex;
 
-    final statusMap = {0: "REQUESTED", 1: "ACCEPTED", 2: "HISTORY"};
+    final statusMap = {0: "REQUESTED", 1: "ACCEPTED", 2: "ALL"};
     final tripStatus = statusMap[index] ?? "REQUESTED";
 
     context.read<MyTripBloc>().add(
@@ -133,9 +134,15 @@ class _MytripScreenState extends State<MytripScreen> {
               _buildSegmentedControl(context, state.selectedIndex, loc),
               Expanded(
                 child: switch (state.selectedIndex) {
-                  0 => _buildTripsList(context, state, state.requestedTrips, loc, isAccepted: false),
-                  1 => _buildTripsList(context, state, state.acceptedTrips, loc, isAccepted: true),
-                  2 => _buildTripsList(context, state, state.historyTrips, loc, isAccepted: false),
+                  0 => _buildTripsList(context, state, state.requestedTrips, loc, isAccepted: false, isHistory: false),
+                  1 => _buildTripsList(context, state, state.acceptedTrips, loc, isAccepted: true, isHistory: false),
+                  2 => _buildTripsList(
+                      context,
+                      state,
+                      state.historyTrips.where((trip) => trip.tripStatus == 'COMPLETED' || trip.tripStatus == 'CANCELLED').toList(),
+                      loc,
+                      isAccepted: false,
+                      isHistory: true),
                   _ => SizedBox.shrink(),
                 },
               ),
@@ -197,7 +204,7 @@ class _MytripScreenState extends State<MytripScreen> {
           context.read<MyTripBloc>().add(ChangePackageEvent(index: index));
           if (!mounted) return;
           final loc = AppLocalizations.of(context);
-          final statusMap = {0: "REQUESTED", 1: "ACCEPTED", 2: "HISTORY"};
+          final statusMap = {0: "REQUESTED", 1: "ACCEPTED", 2: "ALL"};
           final tripStatus = statusMap[index] ?? "REQUESTED";
           context.read<MyTripBloc>().add(
             FetchTripsEvent(tripStatus: tripStatus, languageCode: loc.locale.languageCode, isSilent: false),
@@ -223,7 +230,7 @@ class _MytripScreenState extends State<MytripScreen> {
     );
   }
 
-  Widget _buildTripsList(BuildContext context, MyTripState state, List<RentalTrip> trips, AppLocalizations loc, {bool isAccepted = false}) {
+  Widget _buildTripsList(BuildContext context, MyTripState state, List<RentalTrip> trips, AppLocalizations loc, {bool isAccepted = false, bool isHistory = false}) {
     if (state.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
@@ -240,28 +247,20 @@ class _MytripScreenState extends State<MytripScreen> {
 
     return ListView.builder(
       padding: EdgeInsets.all(18),
-      itemCount: isAccepted ? trips.length : trips.length + 1,
+      itemCount: trips.length,
       itemBuilder: (context, index) {
-        if (!isAccepted && index == trips.length) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 20),
-            child: _buildInfoBanner(context, loc),
-          );
-        }
-        
         final trip = trips[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
-          child: _buildTripCard(context, trip, loc, isAccepted: isAccepted),
+          child: _buildTripCard(context, trip, loc, isAccepted: isAccepted, isHistory: isHistory),
         );
       },
     );
   }
 
-  Widget _buildTripCard(BuildContext context, RentalTrip trip, AppLocalizations loc, {bool isAccepted = false}) {
+  Widget _buildTripCard(BuildContext context, RentalTrip trip, AppLocalizations loc, {bool isAccepted = false, bool isHistory = false}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    // As per user request: "all text should be black and white also button according them active ness"
     final activeBgColor = isDark ? Colors.white : Colors.black;
     final activeTextColor = isDark ? Colors.black : Colors.white;
 
@@ -273,12 +272,13 @@ class _MytripScreenState extends State<MytripScreen> {
     double price = trip.offerAmount ?? 0.0;
     double? discountAmount;
 
-    if (isAccepted && trip.drivers.isNotEmpty) {
-      final acceptedDriverIdx = trip.drivers.indexWhere((driver) => driver.bidStatus == "ACCEPTED");
-      final acceptedDriver = acceptedDriverIdx >= 0 ? trip.drivers[acceptedDriverIdx] : trip.drivers.first;
+    RentalDriverBid? driver;
+    if ((isAccepted || isHistory) && trip.drivers.isNotEmpty) {
+      final acceptedDriverIdx = trip.drivers.indexWhere((d) => d.bidStatus == "ACCEPTED" || d.bidStatus == "COMPLETED");
+      driver = acceptedDriverIdx >= 0 ? trip.drivers[acceptedDriverIdx] : trip.drivers.first;
       
-      price = acceptedDriver.totalAmount ?? price;
-      discountAmount = acceptedDriver.customerDiscountAmount;
+      price = driver.totalAmount ?? price;
+      discountAmount = driver.customerDiscountAmount;
     }
 
     final int bidsCount = trip.totalBids ?? 0;
@@ -286,6 +286,26 @@ class _MytripScreenState extends State<MytripScreen> {
     
     final pickup = trip.pickupLocations.isNotEmpty ? trip.pickupLocations.first.address ?? "Pickup Location" : "Pickup Location";
     final dropoff = trip.dropoffLocations.isNotEmpty ? trip.dropoffLocations.first.address ?? "Drop-off Location" : "Drop-off Location";
+
+    String statusText = "";
+    Color statusColor = Colors.grey;
+    if (isHistory) {
+       statusText = trip.tripStatus?.replaceAll('_', ' ') ?? "UNKNOWN";
+       if (trip.tripStatus == 'COMPLETED') statusColor = Colors.green;
+       else if (trip.tripStatus == 'CANCELLED') statusColor = Colors.red;
+       else statusColor = Color(0xFF2F66F6);
+    } else if (isAccepted) {
+       statusText = loc.translate("accepted");
+       statusColor = Colors.green;
+    } else if (hasBids) {
+       statusText = loc.translate("pending_bids");
+       statusColor = Colors.grey;
+    } else {
+       statusText = loc.translate("searching");
+       statusColor = Color(0xFF2F66F6);
+    }
+
+    final bool canCancel = trip.tripStatus != 'COMPLETED' && trip.tripStatus != 'CANCELLED' && trip.tripStatus != 'NO_SHOW';
 
     return Container(
       padding: EdgeInsets.all(16),
@@ -342,17 +362,17 @@ class _MytripScreenState extends State<MytripScreen> {
                           width: 6,
                           height: 6,
                           decoration: BoxDecoration(
-                            color: isAccepted ? Colors.green : (hasBids ? Colors.grey : Color(0xFF2F66F6)),
+                            color: statusColor,
                             shape: BoxShape.circle,
                           ),
                         ),
                         SizedBox(width: 6),
                         Text(
-                          isAccepted ? loc.translate("accepted") : (hasBids ? loc.translate("pending_bids") : loc.translate("searching")),
+                          statusText,
                           style: GoogleFonts.poppins(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: isAccepted ? Colors.green : (hasBids ? Colors.grey : Color(0xFF2F66F6)),
+                            color: statusColor,
                           ),
                         ),
                       ],
@@ -407,7 +427,7 @@ class _MytripScreenState extends State<MytripScreen> {
                       ),
                     ),
                   // Showing number of bids below price as requested (highlighted)
-                  if (bidsCount > 0 || !isAccepted)
+                  if (!isAccepted && !isHistory && bidsCount >= 0)
                     Container(
                       margin: EdgeInsets.only(top: 4),
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -430,8 +450,50 @@ class _MytripScreenState extends State<MytripScreen> {
           ),
           SizedBox(height: 16),
           _buildTimeline(context, pickup, dropoff, loc),
-          SizedBox(height: 20),
-          if (hasBids)
+          SizedBox(height: 16),
+          
+          if (driver != null) ...[
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: isDark ? Color(0xFF252833) : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: (driver.profilePicture != null && AppUrls.getImageUrl(driver.profilePicture) != null)
+                        ? NetworkImage(AppUrls.getImageUrl(driver.profilePicture)!)
+                        : null,
+                    backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                    child: (driver.profilePicture == null || AppUrls.getImageUrl(driver.profilePicture) == null)
+                        ? Icon(Icons.person, color: isDark ? Colors.white70 : Colors.black54)
+                        : null,
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          driver.name ?? "N/A",
+                          style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        Text(
+                          driver.carRegNumber ?? "N/A",
+                          style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6), fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+          ],
+
+          if (hasBids && !isHistory)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -458,48 +520,51 @@ class _MytripScreenState extends State<MytripScreen> {
                 ),
               ),
             )
-          else
+          else if (!isHistory || canCancel)
             Row(
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      final customerUuid = UserDataStore.userData?.data?.user?.uuid ?? "";
-                      if (isAccepted) {
-                        Navigator.pushNamed(context, AppRoutes.activeTrip, arguments: customerUuid);
-                      } else {
-                        Navigator.pushNamed(context, AppRoutes.biddingScreen, arguments: {
-                          'customerUuid': customerUuid,
-                          'tripUuid': trip.uuid ?? "",
-                        });
-                      }
-                    },
-                    icon: Icon(Icons.visibility_outlined, size: 18, color: activeTextColor),
-                    label: Text(loc.translate("view"), style: GoogleFonts.poppins(color: activeTextColor)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: activeBgColor,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                if (!isHistory)
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        final customerUuid = UserDataStore.userData?.data?.user?.uuid ?? "";
+                        if (isAccepted || isHistory) {
+                          Navigator.pushNamed(context, AppRoutes.activeTrip, arguments: customerUuid);
+                        } else {
+                          Navigator.pushNamed(context, AppRoutes.biddingScreen, arguments: {
+                            'customerUuid': customerUuid,
+                            'tripUuid': trip.uuid ?? "",
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.visibility_outlined, size: 18, color: activeTextColor),
+                      label: Text(loc.translate("view"), style: GoogleFonts.poppins(color: activeTextColor)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: activeBgColor,
+                        elevation: 0,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      _cancelTrip(context, isDark, trip.uuid ?? "");
-                    },
-                    icon: Icon(Icons.close, size: 18, color: activeTextColor),
-                    label: Text(loc.translate("cancel"), style: GoogleFonts.poppins(color: activeTextColor)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: activeBgColor,
-                      elevation: 0,
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                if (canCancel) ...[
+                  if (!isHistory) SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        _cancelTrip(context, isDark, trip.uuid ?? "");
+                      },
+                      icon: Icon(Icons.close, size: 18, color: activeTextColor),
+                      label: Text(loc.translate("cancel"), style: GoogleFonts.poppins(color: activeTextColor)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: activeBgColor,
+                        elevation: 0,
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             )
         ],
@@ -627,46 +692,4 @@ class _MytripScreenState extends State<MytripScreen> {
       ),
     );
   }
-
-  Widget _buildInfoBanner(BuildContext context, AppLocalizations loc) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isDark ? Color(0xFF1E2433) : Color(0xFFF0F5FF),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark ? Colors.transparent : Color(0xFFD9E2FF),
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(Icons.info_outline, color: Color(0xFF2F66F6), size: 28),
-          SizedBox(height: 8),
-          Text(
-            loc.translate("drivers_found_info"),
-            textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          SizedBox(height: 4),
-          GestureDetector(
-            onTap: () {},
-            child: Text(
-              loc.translate("learn_about_bidding"),
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF2F66F6),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
-
