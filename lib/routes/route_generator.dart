@@ -26,52 +26,54 @@ class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case AppRoutes.splash:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const SplashScreen());
 
       case AppRoutes.numberInput:
-        return MaterialPageRoute(builder: (_) => NumberInputScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => NumberInputScreen());
 
       case AppRoutes.otp:
         final number = settings.arguments as String? ?? "";
-        return MaterialPageRoute(builder: (_) => OtpSignIn(number: number));
+        return MaterialPageRoute(settings: settings, builder: (_) => OtpSignIn(number: number));
 
       case AppRoutes.dashboard:
-        return MaterialPageRoute(builder: (_) => const DashboardScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const DashboardScreen());
 
       case AppRoutes.editProfile:
-        return MaterialPageRoute(builder: (_) => const EditprofileScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const EditprofileScreen());
 
       case AppRoutes.helpCenter:
-        return MaterialPageRoute(builder: (_) => const HelpcenterScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const HelpcenterScreen());
       case AppRoutes.bottomNav:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const MainBottomNavBarScreen(),
         );
       case AppRoutes.savedLoc:
-        return MaterialPageRoute(builder: (_) => const SavedlocationScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const SavedlocationScreen());
       case AppRoutes.savedRoute:
-        return MaterialPageRoute(builder: (_) => const SavedroutesScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const SavedroutesScreen());
       case AppRoutes.viewDetails:
-        return MaterialPageRoute(builder: (_) => const OfferdetailsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const OfferdetailsScreen());
       case AppRoutes.additionalService:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => const AdditionalserviceScreen(),
         );
       case AppRoutes.tripDetails:
-        return MaterialPageRoute(builder: (_) => const TripDetailsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const TripDetailsScreen());
       case AppRoutes.points:
-        return MaterialPageRoute(builder: (_) => const PointsScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const PointsScreen());
       case AppRoutes.userLevel:
-        return MaterialPageRoute(builder: (_) => const UserLevel());
+        return MaterialPageRoute(settings: settings, builder: (_) => const UserLevel());
       case AppRoutes.notification:
-        return MaterialPageRoute(builder: (_) => const NotificationScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const NotificationScreen());
       case AppRoutes.voucher:
-        return MaterialPageRoute(builder: (_) => const VoucherScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const VoucherScreen());
       case AppRoutes.profile:
-        return MaterialPageRoute(builder: (_) => const ProfileScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const ProfileScreen());
 
       case AppRoutes.error:
-        return MaterialPageRoute(builder: (_) => const ErrorScreen());
+        return MaterialPageRoute(settings: settings, builder: (_) => const ErrorScreen());
 
       case AppRoutes.biddingScreen:
         final args = settings.arguments;
@@ -84,6 +86,7 @@ class RouteGenerator {
           customerUuid = args;
         }
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => BiddingScreen(
             customerUuid: customerUuid,
             tripUuid: tripUuid,
@@ -93,11 +96,13 @@ class RouteGenerator {
       case AppRoutes.activeTrip:
         final customerUuid = settings.arguments as String? ?? "";
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) => ActiveTripScreen(customerUuid: customerUuid),
         );
 
       default:
         return MaterialPageRoute(
+          settings: settings,
           builder: (_) =>
               const Scaffold(body: Center(child: Text("Route not found"))),
         );

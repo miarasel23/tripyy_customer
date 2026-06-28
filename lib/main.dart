@@ -29,6 +29,7 @@ import 'modules/dashboard/choose_car_bottom_sheet/repository/choose_car_bottom_s
 import 'store/app_globals.dart';
 import 'core/utils/theme/app_theme.dart';
 import 'modules/theme/controller/theme_bloc.dart';
+import 'widgets/global_trip_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +40,31 @@ void main() async {
 
 final GlobalKey<ScaffoldMessengerState> globalScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 final GlobalKey<NavigatorState> globalNavigatorKey = GlobalKey<NavigatorState>();
+
+class MyRouteObserver extends NavigatorObserver {
+  String? currentRoute;
+  final ValueNotifier<String?> routeNotifier = ValueNotifier<String?>(null);
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    currentRoute = route.settings.name;
+    routeNotifier.value = currentRoute;
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    currentRoute = previousRoute?.settings.name;
+    routeNotifier.value = currentRoute;
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    currentRoute = newRoute?.settings.name;
+    routeNotifier.value = currentRoute;
+  }
+}
+
+final MyRouteObserver globalRouteObserver = MyRouteObserver();
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -163,6 +189,10 @@ class _MyAppState extends State<MyApp> {
             // 🔥 ROUTING
             initialRoute: AppRoutes.splash,
             onGenerateRoute: RouteGenerator.generateRoute,
+            navigatorObservers: [globalRouteObserver],
+            builder: (context, child) {
+              return GlobalTripOverlay(child: child!);
+            },
           );
         },
       );
