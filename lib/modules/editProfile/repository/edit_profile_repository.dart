@@ -66,6 +66,7 @@ class EditProfileRepository {
       platform = "ios";
     }
     final response = await request.send();
+    print('response.statusCode: ${response.statusCode}');
     if (response.statusCode == 200) {
      final uri = Uri.parse(AppUrls.getCurrentCustomerUser).replace(
           queryParameters: {
@@ -89,7 +90,7 @@ class EditProfileRepository {
           return null;
         } else {
           return "Failed to sync user info: ${responseCurrentData.statusCode}";
-        }
+        }    
       }
     } on SocketException {
       return "No Internet connection";

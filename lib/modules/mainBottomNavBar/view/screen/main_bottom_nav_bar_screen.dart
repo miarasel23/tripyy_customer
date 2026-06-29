@@ -19,9 +19,9 @@ class MainBottomNavBarScreen extends StatefulWidget {
 
 class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
   List<Widget> get _screens => const [
-    DashboardScreen(),
-    MytripScreen(),
     ProfileScreen(),
+    MytripScreen(),
+    DashboardScreen(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -59,9 +59,9 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                           ? Colors.blue
                           : Colors.grey,
                     ),
-                    child: Icon(Icons.home_outlined),
+                    child: Icon(Icons.person),
                   ),
-                  label: loc.translate("home"),
+                  label: loc.translate("profile"),
                 ),
                 BottomNavigationBarItem(
                   icon: IconTheme(
@@ -81,9 +81,9 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                           ? Colors.blue
                           : Colors.grey,
                     ),
-                    child: Icon(Icons.person),
+                    child: Icon(Icons.home_outlined),
                   ),
-                  label: loc.translate("profile"),
+                  label: loc.translate("home"),
                 ),
               ],
             );

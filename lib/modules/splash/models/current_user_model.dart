@@ -50,6 +50,8 @@ class User {
   String? nidNumber;
   Role? role;
   List<Permissions>? permissions;
+  bool? isNotificationEnabled;
+  String? deviceTokenForNotification;
 
   User(
       {this.uuid,
@@ -60,7 +62,9 @@ class User {
       this.isActive,
       this.nidNumber,
       this.role,
-      this.permissions});
+      this.permissions,
+      this.isNotificationEnabled,
+      this.deviceTokenForNotification});
 
   User.fromJson(Map<String, dynamic> json) {
     uuid = json['uuid'];
@@ -70,6 +74,8 @@ class User {
     profilePicture = json['profile_picture'];
     isActive = json['is_active'];
     nidNumber = json['nid_number'];
+    isNotificationEnabled = json['is_notification_enabled'];
+    deviceTokenForNotification = json['device_token_for_notification'];
     role = json['role'] != null ? Role.fromJson(json['role']) : null;
     if (json['permissions'] != null) {
       permissions = <Permissions>[];
@@ -88,6 +94,8 @@ class User {
     data['profile_picture'] = profilePicture;
     data['is_active'] = isActive;
     data['nid_number'] = nidNumber;
+    data['is_notification_enabled'] = isNotificationEnabled;
+    data['device_token_for_notification'] = deviceTokenForNotification;
     if (role != null) {
       data['role'] = role!.toJson();
     }

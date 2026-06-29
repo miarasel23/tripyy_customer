@@ -33,6 +33,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isNotifLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -78,35 +79,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.star, size: 14, color: Theme.of(context).colorScheme.onSurface),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      loc.translate("5"),
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w600,
-                                        color: Theme.of(context).colorScheme.onSurface,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12),
+                              // Container(
+                              //   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              //   decoration: BoxDecoration(
+                              //     color: Theme.of(context).colorScheme.surfaceContainer,
+                              //     borderRadius: BorderRadius.circular(16),
+                              //   ),
+                              //   child: Row(
+                              //     children: [
+                              //       Icon(Icons.star, size: 14, color: Theme.of(context).colorScheme.onSurface),
+                              //       const SizedBox(width: 4),
+                              //       Text(
+                              //         loc.translate("5"),
+                              //         style: GoogleFonts.poppins(
+                              //           fontSize: 14,
+                              //           fontWeight: FontWeight.w600,
+                              //           color: Theme.of(context).colorScheme.onSurface,
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                              // const SizedBox(width: 12),
                               InkWell(
                                 onTap: () => _showProfilePopup(context, name, email, phone, loc.locale.languageCode),
                                 child: Text(
                                   loc.translate("view_profile"),
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
-                                    color: Colors.blue.shade700,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -174,13 +175,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Container(
                                   padding: const EdgeInsets.all(4),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.shade700,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 2),
+                                    border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.edit,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.surface,
                                     size: 14,
                                   ),
                                 ),
@@ -195,70 +196,70 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
 
               // POINTS & VOUCHERS (Horizontal Cards)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, AppRoutes.points),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainer,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.wallet_giftcard, color: Theme.of(context).colorScheme.onSurface, size: 28),
-                              const SizedBox(height: 12),
-                              Text(
-                                loc.translate("points"),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => Navigator.pushNamed(context, AppRoutes.voucher),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainer,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(Icons.local_offer_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
-                              const SizedBox(height: 12),
-                              Text(
-                                loc.translate("voucher"),
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Theme.of(context).colorScheme.onSurface,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Divider(),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 24),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: GestureDetector(
+              //           onTap: () => Navigator.pushNamed(context, AppRoutes.points),
+              //           child: Container(
+              //             padding: const EdgeInsets.all(16),
+              //             decoration: BoxDecoration(
+              //               color: Theme.of(context).colorScheme.surfaceContainer,
+              //               borderRadius: BorderRadius.circular(16),
+              //             ),
+              //             child: Column(
+              //               crossAxisAlignment: CrossAxisAlignment.start,
+              //               children: [
+              //                 Icon(Icons.wallet_giftcard, color: Theme.of(context).colorScheme.onSurface, size: 28),
+              //                 const SizedBox(height: 12),
+              //                 Text(
+              //                   loc.translate("points"),
+              //                   style: GoogleFonts.poppins(
+              //                     fontSize: 16,
+              //                     fontWeight: FontWeight.w600,
+              //                     color: Theme.of(context).colorScheme.onSurface,
+              //                   ),
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       const SizedBox(width: 16),
+              //       Expanded(
+              //         child: GestureDetector(
+              //           onTap: () => Navigator.pushNamed(context, AppRoutes.voucher),
+              //           child: Container(
+              //             padding: const EdgeInsets.all(16),
+              //             decoration: BoxDecoration(
+              //               color: Theme.of(context).colorScheme.surfaceContainer,
+              //               borderRadius: BorderRadius.circular(16),
+              //             ),
+              //             child: Column(
+              //               crossAxisAlignment: CrossAxisAlignment.start,
+              //               children: [
+              //                 Icon(Icons.local_offer_outlined, color: Theme.of(context).colorScheme.onSurface, size: 28),
+              //                 const SizedBox(height: 12),
+              //                 Text(
+              //                   loc.translate("voucher"),
+              //                   style: GoogleFonts.poppins(
+              //                     fontSize: 16,
+              //                     fontWeight: FontWeight.w600,
+              //                     color: Theme.of(context).colorScheme.onSurface,
+              //                   ),
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 24),
+              // const Divider(),
 
               // PREFERENCES LIST
               Padding(
@@ -283,10 +284,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface),
                       dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
                       style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
-                      items: const [
-                        DropdownMenuItem(value: ThemeMode.system, child: Text("System")),
-                        DropdownMenuItem(value: ThemeMode.light, child: Text("Light")),
-                        DropdownMenuItem(value: ThemeMode.dark, child: Text("Dark")),
+                      items: [
+                        DropdownMenuItem(value: ThemeMode.system, child: Text("System", style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
+                        DropdownMenuItem(value: ThemeMode.light, child: Text("Light", style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
+                        DropdownMenuItem(value: ThemeMode.dark, child: Text("Dark", style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
                       ],
                       onChanged: (mode) {
                         if (mode != null) {
@@ -309,9 +310,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: Icon(Icons.keyboard_arrow_down, color: Theme.of(context).colorScheme.onSurface),
                       dropdownColor: Theme.of(context).colorScheme.surfaceContainer,
                       style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
-                      items: const [
-                        DropdownMenuItem(value: 'en', child: Text("English")),
-                        DropdownMenuItem(value: 'bn', child: Text("বাংলা")),
+                      items: [
+                        DropdownMenuItem(value: 'en', child: Text("English", style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
+                        DropdownMenuItem(value: 'bn', child: Text("বাংলা", style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
                       ],
                       onChanged: (code) {
                         if (code != null) {
@@ -326,11 +327,80 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildListItem(
                 icon: Icons.notifications_none,
                 title: loc.translate("notification"),
-                trailingWidget: Switch(
-                  value: true,
-                  onChanged: (val) {},
-                  activeColor: Colors.black,
-                ),
+                trailingWidget: _isNotifLoading 
+                    ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
+                    : Switch(
+                        value: user?.isNotificationEnabled ?? false,
+                        onChanged: (val) async {
+                          setState(() {
+                            _isNotifLoading = true;
+                          });
+                          
+                          final Map<String, dynamic> data = CustomMapBodyBuilder.build(
+                            actionWhen: "customer_profile_edit",
+                            languageCode: loc.locale.languageCode,
+                            data: {
+                              "uuid": UserDataStore.uuid,
+                              "is_notification_enabled": val ? "true" : "false",
+                              "device_token_for_notification": user?.deviceTokenForNotification ?? "",
+                            },
+                          );
+
+                          try {
+                            final response = await http.post(
+                              Uri.parse(AppUrls.customerProfileUpdate),
+                              body: data,
+                              headers: {
+                                'Authorization': 'Bearer ${UserDataStore.accessToken}'
+                              },
+                            );
+
+                            if (response.statusCode == 200) {
+                              final getResponse = await http.get(
+                                Uri.parse(AppUrls.getCurrentCustomerUser).replace(
+                                  queryParameters: {
+                                    "platform": CustomMapBodyBuilder.getPlatform(),
+                                    "language_code": loc.locale.languageCode,
+                                    "action_when": "admin_login",
+                                  },
+                                ),
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'Accept': 'application/json',
+                                  'Authorization': 'Bearer ${UserDataStore.accessToken}'
+                                }
+                              );
+
+                              if (getResponse.statusCode == 200) {
+                                final jsonData = jsonDecode(getResponse.body);
+                                CurrentUserModel currentUserModel = CurrentUserModel.fromJson(jsonData);
+                                await UserDataStore.saveUserData(currentUserModel);
+                                
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('Notification updated successfully')),
+                                  );
+                                }
+                              } else {
+                                throw Exception("Failed to fetch user");
+                              }
+                            } else {
+                               throw Exception("Failed to update notification: ${response.statusCode} - ${response.body}");
+                            }
+                          } catch (e) {
+                             if (mounted) {
+                               UiUtils.showApiErrorPopup(context, e.toString());
+                             }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isNotifLoading = false;
+                              });
+                            }
+                          }
+                        },
+                        activeColor: Theme.of(context).colorScheme.onSurface,
+                      ),
                 onTap: () {},
               ),
               _buildListItem(
@@ -472,7 +542,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
                 'Edit Profile',
-                style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -481,23 +551,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     TextField(
                       controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Full Name *'),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'Full Name *',
+                        labelStyle: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: phoneController,
                       readOnly: true,
-                      decoration: const InputDecoration(labelText: 'Phone Number'),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'Phone Number',
+                        labelStyle: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: emailController,
-                      decoration: const InputDecoration(labelText: 'Email'),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: nidController,
-                      decoration: const InputDecoration(labelText: 'NID Number'),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'NID Number',
+                        labelStyle: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      ),
                     ),
                   ],
                 ),
@@ -508,7 +594,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onPressed: () => Navigator.pop(dialogContext),
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.poppins(color: Colors.grey.shade600),
+                      style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ),
                 if (isLoading)
@@ -540,8 +626,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           "full_name": nameController.text,
                           "email": emailController.text,
                           "nid_number": nidController.text.trim(),
-                          "is_notification_enabled": "false",
-                          "device_token_for_notification": "",
+                          "is_notification_enabled": (UserDataStore.userData?.data?.user?.isNotificationEnabled ?? false).toString(),
+                          "device_token_for_notification": UserDataStore.userData?.data?.user?.deviceTokenForNotification ?? "",
                         },
                       );
 
@@ -549,7 +635,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         final response = await http.post(
                           Uri.parse(AppUrls.customerProfileUpdate),
                           body: data,
-                          headers: {'Authorization': 'Bearer ${UserDataStore.accessToken}'},
+                          headers: {
+                            'Authorization': 'Bearer ${UserDataStore.accessToken}'
+                          },
                         );
 
                         if (response.statusCode == 200) {

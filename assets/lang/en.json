@@ -222,5 +222,6 @@
   "mock_pickup_1": "Grand Central Terminal, NY",
   "mock_dropoff_1": "Brooklyn Museum, Parkway",
   "mock_pickup_2": "Hotel Indigo, Lower East Side",
-  "mock_dropoff_2": "JFK Airport, Terminal 4"
+  "mock_dropoff_2": "JFK Airport, Terminal 4",
+  "profile_picture_updated": "Profile picture updated successfully"
 }
