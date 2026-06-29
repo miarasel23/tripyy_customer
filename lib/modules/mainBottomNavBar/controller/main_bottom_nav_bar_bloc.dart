@@ -6,7 +6,7 @@ import 'main_bottom_nav_bar_state.dart';
 class MainBottomNavBarBloc
     extends Bloc<MainBottomNavEvent, MainBottomNavBarState> {
   MainBottomNavBarBloc()
-    : super(const MainBottomNavBarState(selectedIndex: 0)) {
+    : super(const MainBottomNavBarState(selectedIndex: 2)) {
     on<ChangeTabEvent>(_changingTab);
   }
 

@@ -23,6 +23,7 @@ import 'modules/splash/repository/splash_repository.dart';
 import 'modules/userLevel/controller/user_level_bloc.dart';
 import 'routes/app_routes.dart';
 import 'routes/route_generator.dart';
+import 'store/user_data_store.dart';
 import 'modules/dashboard/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
 import 'modules/dashboard/choose_car_bottom_sheet/repository/choose_car_bottom_sheet_repository.dart';
 
@@ -45,22 +46,31 @@ class MyRouteObserver extends NavigatorObserver {
   String? currentRoute;
   final ValueNotifier<String?> routeNotifier = ValueNotifier<String?>(null);
 
+  void _persistRoute(String? routeName) {
+    if (routeName != null && routeName != AppRoutes.splash && routeName != AppRoutes.error) {
+      UserDataStore.saveLastRoute(routeName);
+    }
+  }
+
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     currentRoute = route.settings.name;
     routeNotifier.value = currentRoute;
+    _persistRoute(currentRoute);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     currentRoute = previousRoute?.settings.name;
     routeNotifier.value = currentRoute;
+    _persistRoute(currentRoute);
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     currentRoute = newRoute?.settings.name;
     routeNotifier.value = currentRoute;
+    _persistRoute(currentRoute);
   }
 }
 

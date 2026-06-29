@@ -8,6 +8,7 @@ class UserDataStore {
   static const String _accessTokenKey = 'access-token';
   static const String _userDataKey = 'user-data';
   static const String _uuid = 'uuid';
+  static const String _lastRouteKey = 'last-route';
 
   static String? accessToken;
   static String? uuid;
@@ -60,6 +61,16 @@ class UserDataStore {
     String? user_uuid = sharedPreferences.getString(_uuid);
     uuid = user_uuid;
     return user_uuid;
+  }
+
+  static Future<void> saveLastRoute(String routeName) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString(_lastRouteKey, routeName);
+  }
+
+  static Future<String?> getLastRoute() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(_lastRouteKey);
   }
 
   static Future<void> clearAllData() async {

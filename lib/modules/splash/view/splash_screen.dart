@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
 import '../../../routes/app_routes.dart';
 import '../../../store/user_data_store.dart';
-import '../../../utils/colors_code.dart';
-import '../../../utils/enums.dart';
-import '../../../utils/images.dart';
-import '../../../widgets/inverted_curve_clipper.dart';
+import 'widgets/trippy_brand_animation.dart';
 import '../controller/splash_bloc.dart';
 import '../controller/splash_event.dart';
 import '../controller/splash_state.dart';
@@ -28,167 +24,35 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final token = await UserDataStore.getAccessToken();
-      print(token);
-      final loc = AppLocalizations.of(context);
+      // Let the beautiful Trippy animation play for 4 seconds
+      await Future.delayed(const Duration(seconds: 4));
+      
+      // Attempt to load user data in background if needed
       await UserDataStore.getUserData();
+      
+      // Get the last route the user visited
+      final lastRoute = await UserDataStore.getLastRoute();
 
-      if (token != null) {
-        String platform = "web";
-        if (Platform.isAndroid) {
-          platform = "android";
-        } else if (Platform.isIOS) {
-          platform = "ios";
+      // Navigate to last route if exists, otherwise to default home
+      if (mounted) {
+        if (lastRoute != null && lastRoute.isNotEmpty) {
+          Navigator.pushReplacementNamed(context, lastRoute);
+        } else {
+          Navigator.pushReplacementNamed(context, AppRoutes.bottomNav);
         }
-        context.read<SplashBloc>().add(
-          SplashAuthCheck(
-            platform: platform,
-            languageCode: loc.locale.languageCode,
-            actionWhen: "admin_login",
-          ),
-        );
-      } else {
-        Navigator.pushReplacementNamed(context, AppRoutes.numberInput);
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
-
-    return BlocListener<SplashBloc, SplashState>(
-      listener: (context, state) {
-        if (state.status == SplashStatus.success) {
-          Navigator.pushReplacementNamed(context, AppRoutes.bottomNav);
-        } else if (state.status == SplashStatus.failure) {
-          Navigator.pushReplacementNamed(context, AppRoutes.numberInput);
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: SafeArea(
-          child: Stack(
-            children: [
-              /// 🔥 Background Image
-              SizedBox(
-                height: 600,
-                width: double.infinity,
-                child: Image.asset(Images.splashScreenBgImg, fit: BoxFit.cover),
-              ),
-
-              /// 🔥 Bottom Curved Section
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: ClipPath(
-                  clipper: InvertedCurveClipper(),
-                  child: Container(
-                    width: double.infinity,
-                    height: 400,
-                    color: Theme.of(context).colorScheme.surface,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 45),
-
-                        /// 🌍 Localized Text
-                        firstLine(loc),
-                        const SizedBox(height: 8),
-                        secondLine(loc),
-
-                        const SizedBox(height: 20),
-
-                        /// 🔘 Button
-                        Padding(
-                          padding: const EdgeInsets.all(18.0),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.submitButton,
-                              foregroundColor: Theme.of(context).colorScheme.onSurface,
-                              minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.pushReplacementNamed(
-                                context,
-                                AppRoutes.numberInput,
-                              );
-                            },
-                            child: Text(
-                              loc.translate("get_started"),
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              /// 📍 Floating Icon
-              Positioned(
-                bottom: 270,
-                left: MediaQuery.of(context).size.width / 2 - 25,
-                child: Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.location_on,
-                    color: AppColors.primary,
-                    size: 30,
-                  ),
-                ),
-              ),
-            ],
-          ),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6F8), // Match the animation background perfectly
+      body: const SafeArea(
+        child: Center(
+          child: TrippyBrandAnimation(),
         ),
       ),
-    );
-  }
-
-  /// 🔤 TEXT UI
-
-  Widget firstLine(AppLocalizations loc) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          loc.translate("city"),
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(width: 4),
-        Text(loc.translate("to"), style: const TextStyle(fontSize: 22)),
-        const SizedBox(width: 4),
-        Text(
-          loc.translate("city"),
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-      ],
-    );
-  }
-
-  Widget secondLine(AppLocalizations loc) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(loc.translate("all"), style: const TextStyle(fontSize: 22)),
-        const SizedBox(width: 4),
-        Text(
-          loc.translate("over"),
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(width: 4),
-        Text(loc.translate("bangladesh"), style: const TextStyle(fontSize: 22)),
-      ],
     );
   }
 }
