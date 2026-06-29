@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../main.dart';
 import '../../routes/app_routes.dart';
+import '../../store/user_data_store.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -15,6 +16,19 @@ class ApiService {
 
   // Helper method to handle response centrally
   void _handleErrorResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      // Handle unauthorized / expired token by logging out
+      UserDataStore.clearAllData().then((_) {
+        if (globalNavigatorKey.currentState != null) {
+          globalNavigatorKey.currentState!.pushNamedAndRemoveUntil(
+            AppRoutes.numberInput,
+            (route) => false,
+          );
+        }
+      });
+      return;
+    }
+
     if (response.statusCode >= 400) {
       // Decode error message if available
       String errorMessage = 'An unexpected error occurred';
