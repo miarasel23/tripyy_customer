@@ -263,6 +263,8 @@ class _MytripScreenState extends State<MytripScreen> {
     final activeBgColor = isDark ? Colors.white : Colors.black;
     final activeTextColor = isDark ? Colors.black : Colors.white;
 
+    final String currencySymbol = loc.locale.languageCode == 'bn' ? '৳' : 'BDT ';
+
     final String serviceNameRaw = trip.serviceName ?? "Ride Share";
     final String serviceName = serviceNameRaw.replaceAll('_', ' ');
     final String carType = trip.carCategory?.carType ?? "Car";
@@ -392,7 +394,7 @@ class _MytripScreenState extends State<MytripScreen> {
                   ),
                   if (discountAmount != null && discountAmount > 0.0)
                     Text(
-                      "\$${(price + discountAmount).toStringAsFixed(2)}",
+                      "$currencySymbol${(price + discountAmount).toStringAsFixed(2)}",
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -401,7 +403,7 @@ class _MytripScreenState extends State<MytripScreen> {
                       ),
                     ),
                   Text(
-                    "\$${price.toStringAsFixed(2)}",
+                    "$currencySymbol${price.toStringAsFixed(2)}",
                     style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -417,7 +419,7 @@ class _MytripScreenState extends State<MytripScreen> {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        "Discount \$${discountAmount.toStringAsFixed(2)}",
+                        "Discount $currencySymbol${discountAmount.toStringAsFixed(2)}",
                         style: GoogleFonts.poppins(
                           fontSize: 10,
                           fontWeight: FontWeight.w600,

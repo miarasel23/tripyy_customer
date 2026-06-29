@@ -12,6 +12,7 @@ import '../../../../widgets/cancel_trip_dialog.dart';
 import '../widget/bidding_searching_state.dart';
 import '../widget/bidding_trip_details_card.dart';
 import '../widget/bidding_list_widget.dart';
+import '../../../../utils/app_urls.dart';
 import '../../../../routes/app_routes.dart';
 
 class BiddingScreen extends StatefulWidget {
@@ -296,7 +297,12 @@ class _BiddingScreenState extends State<BiddingScreen> {
             child: CircleAvatar(
               radius: 16,
               backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-              child: Icon(Icons.person, size: 20, color: isDark ? Colors.white70 : Colors.black54),
+              backgroundImage: AppUrls.profileImageUrl != null
+                  ? NetworkImage(AppUrls.profileImageUrl!)
+                  : null,
+              child: AppUrls.profileImageUrl == null
+                  ? Icon(Icons.person, size: 20, color: isDark ? Colors.white70 : Colors.black54)
+                  : null,
             ),
           )
         ],
