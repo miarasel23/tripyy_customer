@@ -17,6 +17,7 @@ class AppUrls {
       "$baseUrl/v1/customer/customer-profile-picture-update";
   static const String rentalInfo = "$baseUrl/v1/rental-trip/rental-info";
   static const String searchLocation = "$baseUrl/v1/global-api/search-location";
+  static const String getCustomerLocations = "$baseUrl/v1/customer/get-locations";
   static const String tripPriceDetailsCustomer = "$baseUrl/v1/rental-trip/trip-price-details-customer";
 
   // Rental Trip - Booking
@@ -25,6 +26,9 @@ class AppUrls {
   static const String acceptTripForCustomer = "$baseUrl/v1/rental-trip/accept_trip_for_customer";
   static const String cancelTripDriverOrCustomerAdmin = "$baseUrl/v1/rental-trip/cancel-trip-driver-or-customer-admin";
   static const String rentalTripGiveReview = "$baseUrl/v1/rental-trip/give-review";
+
+  static const String saveCustomerLocation = "$baseUrl/v1/customer/save-location";
+  static const String deleteCustomerLocation = "$baseUrl/v1/customer/delete-location";
 
   static String? get profileImageUrl {
     final image = UserDataStore.userData?.data?.user?.profilePicture;

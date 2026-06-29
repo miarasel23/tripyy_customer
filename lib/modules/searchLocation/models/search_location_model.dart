@@ -25,7 +25,7 @@ class SearchLocationData {
 
   factory SearchLocationData.fromJson(Map<String, dynamic> json) {
     return SearchLocationData(
-      uuid: json['uuid'],
+      uuid: json['uuid'] ?? json['geo_locat_uuid'],
       placeId: json['place_id'],
       address: json['address'],
       latitude: json['latitude']?.toDouble(),

@@ -49,7 +49,8 @@ class RouteGenerator {
           builder: (_) => const MainBottomNavBarScreen(),
         );
       case AppRoutes.savedLoc:
-        return MaterialPageRoute(settings: settings, builder: (_) => const SavedlocationScreen());
+        final autoOpenType = settings.arguments as String?;
+        return MaterialPageRoute(settings: settings, builder: (_) => SavedlocationScreen(autoOpenLocationType: autoOpenType));
       case AppRoutes.savedRoute:
         return MaterialPageRoute(settings: settings, builder: (_) => const SavedroutesScreen());
       case AppRoutes.viewDetails:

@@ -5,7 +5,12 @@ import '../../../../routes/app_routes.dart';
 import '../../../searchLocation/models/search_location_model.dart';
 import '../../../searchLocation/controller/search_location_bloc.dart';
 import '../../../searchLocation/repository/search_location_repository.dart';
-
+import 'dart:io';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../../../store/user_data_store.dart';
+import '../../../../utils/app_urls.dart';
+import 'saved_locations_row_widget.dart';
 class SearchAndSavedCardWidget extends StatefulWidget {
   final AppLocalizations loc;
   final Function(List<SearchLocationData>) onPickupsUpdated;
@@ -412,47 +417,17 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
               const SizedBox(height: 8),
               Divider(color: Theme.of(context).colorScheme.outlineVariant, height: 4, thickness: 1),
               const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildSavedLocItem(context, Icons.home, widget.loc.translate("home") ?? "Home", "2.4 KM", () {
-                    Navigator.pushNamed(context, AppRoutes.savedLoc);
-                  }),
-                  Container(width: 1, height: 30, color: Theme.of(context).colorScheme.outlineVariant),
-                  _buildSavedLocItem(context, Icons.work, widget.loc.translate("work") ?? "Work", "8.1 KM", () {
-                    Navigator.pushNamed(context, AppRoutes.savedLoc);
-                  }),
-                ],
+              SavedLocationsRowWidget(
+                loc: widget.loc,
+                isDropActive: _isDropActive,
+                onDestinationSelected: widget.onDestinationSelected,
+                setLocationFromMapDrag: setLocationFromMapDrag,
+                onPickupsUpdated: widget.onPickupsUpdated,
+                getValidPickups: getValidPickups,
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSavedLocItem(BuildContext context, IconData icon, String title, String subtitle, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-              Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 10)),
-            ],
-          ),
-        ],
       ),
     );
   }
