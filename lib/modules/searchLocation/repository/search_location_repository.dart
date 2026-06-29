@@ -51,17 +51,13 @@ class SearchLocationRepository {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
-      
       if (UserDataStore.accessToken != null && UserDataStore.accessToken!.isNotEmpty) {
         headers['Authorization'] = 'Bearer ${UserDataStore.accessToken}';
       }
-
       final response = await http.get(
         url,
         headers: headers,
       ).timeout(const Duration(seconds: 10));
-
-      print("Response: ${response.body}");
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -111,8 +107,6 @@ class SearchLocationRepository {
         headers: headers,
         body: body,
       ).timeout(const Duration(seconds: 10));
-
-      print("Save Response: ${response.body}");
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {
@@ -160,8 +154,6 @@ class SearchLocationRepository {
         headers: headers,
         body: body,
       ).timeout(const Duration(seconds: 10));
-
-      print("Delete Response: ${response.body}");
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
       } else {

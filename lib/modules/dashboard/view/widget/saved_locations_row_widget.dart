@@ -230,7 +230,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
               behavior: HitTestBehavior.opaque,
               child: Padding(
                 padding: const EdgeInsets.all(4),
-                child: Icon(Icons.edit, size: 14, color: Theme.of(context).colorScheme.primary),
+                child: Icon(Icons.edit, size: 14, color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
         ],

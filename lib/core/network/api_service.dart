@@ -43,15 +43,26 @@ class ApiService {
         errorMessage = 'Server error: ${response.statusCode}';
       }
 
-      // Navigate to error screen using global navigator key
-      if (globalNavigatorKey.currentState != null) {
-        globalNavigatorKey.currentState!.pushNamed(
-          AppRoutes.error,
-          arguments: errorMessage,
-        );
-      } else {
-        debugPrint('Error navigation failed: globalNavigatorKey state is null');
-      }
+      _showErrorSnackBar(errorMessage);
+    }
+  }
+
+  void _showErrorSnackBar(String message) {
+    final context = globalNavigatorKey.currentContext;
+    if (context != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    } else {
+      debugPrint('Error SnackBar failed: globalNavigatorKey.currentContext is null');
     }
   }
 
@@ -100,11 +111,6 @@ class ApiService {
   }
 
   void _navigateToError(String error) {
-    if (globalNavigatorKey.currentState != null) {
-      globalNavigatorKey.currentState!.pushNamed(
-        AppRoutes.error,
-        arguments: 'Connection Error: $error',
-      );
-    }
+    _showErrorSnackBar('Connection Error: Please check your internet connection and try again.');
   }
 }
