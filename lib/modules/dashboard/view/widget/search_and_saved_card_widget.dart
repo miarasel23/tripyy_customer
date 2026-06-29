@@ -198,6 +198,16 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
 
   bool get isDropFocused => _isDropActive;
 
+  bool _isFetchingLocation = false;
+
+  void setFetchingLocation(bool isFetching) {
+    if (mounted) {
+      setState(() {
+        _isFetchingLocation = isFetching;
+      });
+    }
+  }
+
   /// Called externally (e.g., from map drag) to update the active field
   void updateActiveFieldText(String address) {
     setState(() {
@@ -329,7 +339,13 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                         color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                         shape: BoxShape.circle,
                                       ),
-                                      child: Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 18),
+                                      child: _isFetchingLocation
+                                          ? SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            )
+                                          : Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 18),
                                     ),
                                   ),
                                 ] else ...[

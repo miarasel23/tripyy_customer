@@ -79,31 +79,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _getCurrentLocation({bool forcePopulatePickup = false}) async {
+    _searchCardKey.currentState?.setFetchingLocation(true);
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
+    if (!serviceEnabled) {
+      _searchCardKey.currentState?.setFetchingLocation(false);
+      return;
+    }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
+      if (permission == LocationPermission.denied) {
+        _searchCardKey.currentState?.setFetchingLocation(false);
+        return;
+      }
     }
-    if (permission == LocationPermission.deniedForever) return;
+    if (permission == LocationPermission.deniedForever) {
+      _searchCardKey.currentState?.setFetchingLocation(false);
+      return;
+    }
 
-    final position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-    );
-    final latLng = LatLng(position.latitude, position.longitude);
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      );
+      final latLng = LatLng(position.latitude, position.longitude);
 
-    setState(() {
-      _cameraCenter = latLng;
-    });
+      setState(() {
+        _cameraCenter = latLng;
+      });
 
-    _isProgrammaticCameraMove = true;
-    _mapController?.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(target: latLng, zoom: 15.0),
-    ));
+      _isProgrammaticCameraMove = true;
+      _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: latLng, zoom: 15.0),
+      ));
 
-    _handleCameraIdle(latLng, forcePopulatePickup: forcePopulatePickup);
+      _handleCameraIdle(latLng, forcePopulatePickup: forcePopulatePickup);
+    } catch (e) {
+      _searchCardKey.currentState?.setFetchingLocation(false);
+    }
   }
 
 
@@ -121,7 +135,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       // removed — it produces different names that cause address mismatches.
       final googleResult = await MapHelper.getPlaceIdFromCoordinates(position);
 
-      if (!mounted) return;
+      if (!mounted) {
+        _searchCardKey.currentState?.setFetchingLocation(false);
+        return;
+      }
 
       // If Google API returned nothing, show an error and clear the field.
       // We NEVER show a fake / native-geocoded address.
@@ -130,6 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _centerAddress = 'Address not found — please try again';
         });
         _searchCardKey.currentState?.updateActiveFieldText('');
+        _searchCardKey.currentState?.setFetchingLocation(false);
         return;
       }
 
@@ -223,6 +241,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (_pickups.isNotEmpty && _dropLatLng != null) {
         _drawRouteMulti();
       }
+
+      _searchCardKey.currentState?.setFetchingLocation(false);
     });
   }
 
