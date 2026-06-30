@@ -29,6 +29,8 @@ class _SplashScreenState extends State<SplashScreen> {
       
       // Attempt to load user data in background if needed
       await UserDataStore.getUserData();
+      await UserDataStore.getAccessToken();
+      await UserDataStore.getUuid();
       
       // Get the last route the user visited
       final lastRoute = await UserDataStore.getLastRoute();

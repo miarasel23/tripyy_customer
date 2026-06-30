@@ -8,20 +8,12 @@ import '../../../../store/user_data_store.dart';
 
 class SavedLocationsRowWidget extends StatefulWidget {
   final AppLocalizations loc;
-  final bool isDropActive;
-  final Function(SearchLocationData)? onDestinationSelected;
-  final Function(SearchLocationData) setLocationFromMapDrag;
-  final Function(List<SearchLocationData>) onPickupsUpdated;
-  final List<SearchLocationData> Function() getValidPickups;
+  final Function(SearchLocationData) onLocationSelected;
 
   const SavedLocationsRowWidget({
     super.key,
     required this.loc,
-    required this.isDropActive,
-    this.onDestinationSelected,
-    required this.setLocationFromMapDrag,
-    required this.onPickupsUpdated,
-    required this.getValidPickups,
+    required this.onLocationSelected,
   });
 
   @override
@@ -132,14 +124,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
                     latitude: lat,
                     longitude: lng,
                   );
-                  if (widget.isDropActive) {
-                    if (widget.onDestinationSelected != null) {
-                      widget.onDestinationSelected!(locData);
-                    }
-                  } else {
-                    widget.setLocationFromMapDrag(locData);
-                    widget.onPickupsUpdated(widget.getValidPickups());
-                  }
+                  widget.onLocationSelected(locData);
                   return;
                 }
               }
@@ -172,14 +157,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
                     latitude: lat,
                     longitude: lng,
                   );
-                  if (widget.isDropActive) {
-                    if (widget.onDestinationSelected != null) {
-                      widget.onDestinationSelected!(locData);
-                    }
-                  } else {
-                    widget.setLocationFromMapDrag(locData);
-                    widget.onPickupsUpdated(widget.getValidPickups());
-                  }
+                  widget.onLocationSelected(locData);
                   return;
                 }
               }

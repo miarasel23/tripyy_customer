@@ -248,6 +248,30 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
     });
   }
 
+  void _onHomeWorkTapped(SearchLocationData locData) {
+    setState(() {
+      if (_isDropActive) {
+        _destController.text = locData.address ?? "";
+        if (widget.onDestinationSelected != null) {
+          widget.onDestinationSelected!(locData);
+        }
+      } else if (_pickupFocusNodes.any((n) => n.hasFocus)) {
+        int idx = getActivePickupIndex();
+        if (idx >= 0 && idx < _pickupControllers.length) {
+          _pickupControllers[idx].text = locData.address ?? "";
+          _selectedPickups[idx] = locData;
+          widget.onPickupsUpdated(getValidPickups());
+        }
+      } else {
+        // Nothing is explicitly focused, default to destination
+        _destController.text = locData.address ?? "";
+        if (widget.onDestinationSelected != null) {
+          widget.onDestinationSelected!(locData);
+        }
+      }
+    });
+  }
+
   List<SearchLocationData> getValidPickups() {
     return _selectedPickups.whereType<SearchLocationData>().toList();
   }
@@ -419,11 +443,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
               const SizedBox(height: 8),
               SavedLocationsRowWidget(
                 loc: widget.loc,
-                isDropActive: _isDropActive,
-                onDestinationSelected: widget.onDestinationSelected,
-                setLocationFromMapDrag: setLocationFromMapDrag,
-                onPickupsUpdated: widget.onPickupsUpdated,
-                getValidPickups: getValidPickups,
+                onLocationSelected: _onHomeWorkTapped,
               ),
             ],
           ),
