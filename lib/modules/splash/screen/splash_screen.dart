@@ -37,7 +37,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
       // Navigate to last route if exists, otherwise to default home
       if (mounted) {
-        if (lastRoute != null && lastRoute.isNotEmpty) {
+        final token = UserDataStore.accessToken;
+        if (token == null || token.isEmpty) {
+          Navigator.pushReplacementNamed(context, AppRoutes.numberInput);
+        } else if (lastRoute != null && lastRoute.isNotEmpty) {
           Navigator.pushReplacementNamed(context, lastRoute);
         } else {
           Navigator.pushReplacementNamed(context, AppRoutes.bottomNav);

@@ -29,6 +29,7 @@ import 'modules/dashboard/choose_car_bottom_sheet/repository/choose_car_bottom_s
 import 'modules/dashboard/controller/trip_price_details_bloc.dart';
 import 'modules/dashboard/repository/trip_price_details_repository.dart';
 
+import 'modules/dashboard/controller/active_trip_bloc.dart';
 import 'store/app_globals.dart';
 import 'core/utils/theme/app_theme.dart';
 import 'modules/theme/controller/theme_bloc.dart';
@@ -178,6 +179,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (_) => TripPriceDetailsBloc(repository: TripPriceDetailsRepository()),
         ),
+        BlocProvider(create: (_) => ActiveTripBloc()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, themeState) {

@@ -52,6 +52,18 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   }
 
   Future<void> _fetchActiveTrip() async {
+    final token = UserDataStore.accessToken;
+    if (token == null || token.isEmpty) {
+      final currentRoute = globalRouteObserver.currentRoute;
+      if (currentRoute != AppRoutes.splash && currentRoute != AppRoutes.numberInput && currentRoute != AppRoutes.otp) {
+        UserDataStore.clearAllData();
+        if (mounted) {
+          Navigator.pushNamedAndRemoveUntil(context, AppRoutes.numberInput, (route) => false);
+        }
+      }
+      return;
+    }
+
     final customerUuid = UserDataStore.userData?.data?.user?.uuid;
     if (customerUuid == null || customerUuid.isEmpty) return;
 
