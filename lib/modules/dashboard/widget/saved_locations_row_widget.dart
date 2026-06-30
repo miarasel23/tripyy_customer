@@ -118,7 +118,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
                 final lng = double.tryParse(_homeLocation!['geo_location']['longitude'].toString());
                 if (lat != null && lng != null) {
                   final locData = SearchLocationData(
-                    uuid: _homeLocation!['uuid'],
+                    uuid: _homeLocation!['geo_location']['uuid'] ?? _homeLocation!['geo_locat_uuid'],
                     placeId: _homeLocation!['geo_location']['place_id'],
                     address: _homeLocation!['geo_location']['address'],
                     latitude: lat,
@@ -151,7 +151,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
                 final lng = double.tryParse(_workLocation!['geo_location']['longitude'].toString());
                 if (lat != null && lng != null) {
                   final locData = SearchLocationData(
-                    uuid: _workLocation!['uuid'],
+                    uuid: _workLocation!['geo_location']['uuid'] ?? _workLocation!['geo_locat_uuid'],
                     placeId: _workLocation!['geo_location']['place_id'],
                     address: _workLocation!['geo_location']['address'],
                     latitude: lat,
