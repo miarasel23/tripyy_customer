@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/utils/localization/app_localization.dart';
+import '../../../core/utils/ui_utils.dart';
 
 class DateTimeSelectionDialogs {
   static Future<DateTime?> pickDateAndTime(BuildContext context, {DateTime? initialDate, DateTime? minDateTime, String? dateHelpText, String? timeHelpText}) async {
@@ -8,22 +9,40 @@ class DateTimeSelectionDialogs {
     final DateTime effectiveMinDateTime = DateTime(effectiveMinRaw.year, effectiveMinRaw.month, effectiveMinRaw.day, effectiveMinRaw.hour, effectiveMinRaw.minute);
     final DateTime firstDate = DateTime(effectiveMinDateTime.year, effectiveMinDateTime.month, effectiveMinDateTime.day);
 
+    // Unfocus immediately before date picker to clear primary focus
+    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final DateTime? date = await showDatePicker(
       context: context,
       helpText: dateHelpText,
       initialDate: initialDate != null && initialDate.isAfter(firstDate) ? initialDate : effectiveMinDateTime,
       firstDate: firstDate,
       lastDate: firstDate.add(const Duration(days: 365)),
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
     );
+
+    // Unfocus immediately after date picker is dismissed or completed
+    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
 
     if (date != null) {
       TimeOfDay initialTime = TimeOfDay.fromDateTime(effectiveMinDateTime);
       while (true) {
+        // Unfocus immediately before time picker
+        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
+
         final TimeOfDay? time = await showTimePicker(
           context: context,
           helpText: timeHelpText,
           initialTime: initialTime,
+          initialEntryMode: TimePickerEntryMode.dialOnly,
         );
+
+        // Unfocus immediately after time picker is dismissed or completed
+        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
 
         if (time != null) {
           final selectedDateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
@@ -35,11 +54,10 @@ class DateTimeSelectionDialogs {
               final String min = effectiveMinDateTime.minute.toString().padLeft(2, '0');
               final String amPm = effectiveMinDateTime.hour >= 12 ? "PM" : "AM";
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('$timePrefix $hr:$min $amPm'),
-                  backgroundColor: Colors.red,
-                ),
+              UiUtils.showAppSnackBar(
+                context,
+                '$timePrefix $hr:$min $amPm',
+                type: 'error',
               );
             }
           } else {
@@ -55,12 +73,22 @@ class DateTimeSelectionDialogs {
 
   /// Prompts the user to select hours from 1 to 24 using a professional dropdown dialog.
   static Future<int?> pickHours(BuildContext context) async {
-    return await showDialog<int>(
+    // Unfocus before dialog
+    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    final int? result = await showDialog<int>(
       context: context,
       builder: (BuildContext context) {
         return const _HourSelectionDialog();
       },
     );
+
+    // Unfocus after dialog
+    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+
+    return result;
   }
 }
 

@@ -385,6 +385,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {
+    // Dismiss keyboard immediately to prevent restoration overlay
+    FocusScope.of(context).unfocus();
+    FocusManager.instance.primaryFocus?.unfocus();
+
     // Validate pickup
     if (_pickups.isEmpty) {
       UiUtils.showAppSnackBar(context, 'Please select a pickup location.', type: 'error');

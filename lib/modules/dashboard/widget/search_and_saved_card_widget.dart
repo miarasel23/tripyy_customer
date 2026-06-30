@@ -41,6 +41,29 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
   OverlayEntry? _overlayEntry;
   final LayerLink _layerLink = LayerLink();
   bool _isDropActive = false;
+  String? _lastSelectedDestAddress;
+
+  Future<void> _resolveDropoffAddress() async {
+    final query = _destController.text.trim();
+    if (query.isEmpty) return;
+    if (query == _lastSelectedDestAddress) return;
+
+    try {
+      final repo = SearchLocationRepository();
+      final response = await repo.searchLocations(query, widget.loc.locale.languageCode);
+      if (response.data != null && response.data!.isNotEmpty) {
+        final loc = response.data!.first;
+        _destController.text = loc.address ?? "";
+        _lastSelectedDestAddress = loc.address;
+        
+        if (widget.onDestinationSelected != null) {
+          widget.onDestinationSelected!(loc);
+        }
+      }
+    } catch (e) {
+      debugPrint("Failed to resolve dropoff address: $e");
+    }
+  }
 
   void _setupFocusListener(FocusNode node) {
     node.addListener(() {
@@ -56,6 +79,12 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
       } else {
         _removeOverlay();
       }
+
+      // Automatically search/resolve drop-off address if the node lost focus
+      if (node == _destFocusNode && !_destFocusNode.hasFocus) {
+        _resolveDropoffAddress();
+      }
+
       widget.onFocusChanged?.call(_isDropActive);
       setState(() {});
     });
@@ -166,6 +195,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                 widget.onPickupsUpdated(validPickups);
                               } else if (_destFocusNode.hasFocus) {
                                 _destController.text = loc.address ?? "";
+                                _lastSelectedDestAddress = loc.address;
                                 _destFocusNode.unfocus();
                                 if (widget.onDestinationSelected != null) {
                                   widget.onDestinationSelected!(loc);
@@ -238,6 +268,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
     setState(() {
       if (_isDropActive) {
         _destController.text = location.address ?? "";
+        _lastSelectedDestAddress = location.address;
       } else {
         int idx = getActivePickupIndex();
         if (idx >= 0 && idx < _pickupControllers.length) {
@@ -252,6 +283,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
     setState(() {
       if (_isDropActive) {
         _destController.text = locData.address ?? "";
+        _lastSelectedDestAddress = locData.address;
         if (widget.onDestinationSelected != null) {
           widget.onDestinationSelected!(locData);
         }
@@ -265,6 +297,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
       } else {
         // Nothing is explicitly focused, default to destination
         _destController.text = locData.address ?? "";
+        _lastSelectedDestAddress = locData.address;
         if (widget.onDestinationSelected != null) {
           widget.onDestinationSelected!(locData);
         }
@@ -400,6 +433,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                     onChanged: (val) {
                                       _bloc.add(SearchQueryChanged(val, widget.loc.locale.languageCode));
                                     },
+                                    onSubmitted: (_) => _resolveDropoffAddress(),
                                     decoration: InputDecoration(
                                       hintText: widget.loc.translate("where_are_you_going") ?? "Where to?",
                                       border: InputBorder.none,
