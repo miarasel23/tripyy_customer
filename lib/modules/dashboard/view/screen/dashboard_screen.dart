@@ -24,6 +24,9 @@ import '../widget/date_time_selection_dialogs.dart';
 import '../../helpers/map_helper.dart';
 import '../../models/trip_price_details_model.dart';
 import '../../repository/trip_price_details_repository.dart';
+import '../../controller/trip_price_details_bloc.dart';
+import '../../controller/trip_price_details_event.dart';
+import '../../controller/trip_price_details_state.dart';
 import '../../choose_car_bottom_sheet/view/choose_car_bottom_sheet.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -458,55 +461,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (startDateTime == null) return;
     }
 
-    // Show loading
-    showDialog(
-      context: context, 
-      barrierDismissible: false,
-      builder: (_) => const Center(child: CircularProgressIndicator()),
+    final req = TripPriceDetailsRequest(
+      platform: "web", 
+      languageCode: loc.locale.languageCode,
+      serviceType: serviceKey,
+      pickupLocationUuid: _pickups.map((e) => e.uuid!).toList(),
+      dropoffLocationUuid: [_dropoffUuid!],
+      startDatetime: "${startDateTime.year}-${startDateTime.month.toString().padLeft(2, '0')}-${startDateTime.day.toString().padLeft(2, '0')} ${startDateTime.hour.toString().padLeft(2, '0')}:${startDateTime.minute.toString().padLeft(2, '0')}:00",
+      endDatetime: returnDateTime != null ? "${returnDateTime.year}-${returnDateTime.month.toString().padLeft(2, '0')}-${returnDateTime.day.toString().padLeft(2, '0')} ${returnDateTime.hour.toString().padLeft(2, '0')}:${returnDateTime.minute.toString().padLeft(2, '0')}:00" : null,
     );
 
-    try {
-      final loc = AppLocalizations.of(context);
-      final req = TripPriceDetailsRequest(
-        platform: "web", // or detect using Platform
-        languageCode: loc.locale.languageCode,
-        serviceType: serviceKey,
-        pickupLocationUuid: _pickups.map((e) => e.uuid!).toList(),
-        dropoffLocationUuid: [_dropoffUuid!],
-        startDatetime: "${startDateTime.year}-${startDateTime.month.toString().padLeft(2, '0')}-${startDateTime.day.toString().padLeft(2, '0')} ${startDateTime.hour.toString().padLeft(2, '0')}:${startDateTime.minute.toString().padLeft(2, '0')}:00",
-        endDatetime: returnDateTime != null ? "${returnDateTime.year}-${returnDateTime.month.toString().padLeft(2, '0')}-${returnDateTime.day.toString().padLeft(2, '0')} ${returnDateTime.hour.toString().padLeft(2, '0')}:${returnDateTime.minute.toString().padLeft(2, '0')}:00" : null,
+    if (mounted) {
+      context.read<TripPriceDetailsBloc>().add(
+        FetchTripPriceDetails(
+          request: req,
+          defaultCars: defaultCars.cast<Car>(),
+          serviceKey: serviceKey,
+          pickupAddresses: _pickups.map((e) => e.address ?? 'Unknown').toList(),
+          dropoffAddresses: [_dropoffAddress ?? 'Unknown Dropoff'],
+          hoursBooked: hoursBooked,
+        ),
       );
+    }
+  }
 
-      final repo = TripPriceDetailsRepository();
-      final response = await repo.getTripPriceDetails(req);
-      
-      if (mounted) Navigator.pop(context); // Hide loading
-      
-      if (response.status == true) {
-        // Parse the vehicles from the response data if available
-        List<Car> finalCars = defaultCars.cast<Car>();
-        
-        try {
-          if (response.data != null && response.data is Map) {
-            final Map<String, dynamic> dataMap = response.data;
-            if (dataMap.containsKey(serviceKey)) {
-              final serviceGroup = dataMap[serviceKey];
-              if (serviceGroup != null && serviceGroup['cars'] is List) {
-                final parsedCars = (serviceGroup['cars'] as List).map((e) => Car.fromJson(e)).toList();
-                if (parsedCars.isNotEmpty) {
-                  finalCars = parsedCars;
-                }
-              }
-            }
-          }
-        } catch (parseErr) {
-          debugPrint("Failed to parse API vehicles: $parseErr");
-        }
-
-        // Show Vehicle Details in bottom sheet
-        if (mounted) {
-          UiUtils.showAppSnackBar(context, 'Trip details loaded successfully!', type: 'success');
-          
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    return BlocListener<TripPriceDetailsBloc, TripPriceDetailsState>(
+      listener: (context, state) {
+        if (state is TripPriceDetailsLoading) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (_) => const Center(child: CircularProgressIndicator()),
+          );
+        } else if (state is TripPriceDetailsSuccess) {
+          Navigator.pop(context); // Hide loading dialog
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -514,36 +505,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return FractionallySizedBox(
                 heightFactor: 0.845,
                 child: ChooseCarBottomSheet(
-                  cars: finalCars,
-                  serviceName: serviceKey,
-                  pickupAddresses: _pickups.map((e) => e.address ?? 'Unknown').toList(),
-                  dropoffAddresses: [_dropoffAddress ?? 'Unknown Dropoff'],
-                  tripReq: req,
-                  hoursBooked: hoursBooked,
+                  cars: state.finalCars,
+                  serviceName: state.serviceName,
+                  pickupAddresses: state.pickupAddresses,
+                  dropoffAddresses: state.dropoffAddresses,
+                  tripReq: state.tripReq,
+                  hoursBooked: state.hoursBooked,
                 ),
               );
             },
           );
+        } else if (state is TripPriceDetailsFailure) {
+          Navigator.pop(context); // Hide loading dialog
+          UiUtils.showAppSnackBar(context, state.error, type: 'error');
         }
-      } else {
-        if (mounted) {
-          UiUtils.showAppSnackBar(context, response.message ?? 'Failed to get trip price details', type: 'error');
-        }
-      }
-    } catch (e) {
-      if (mounted) Navigator.pop(context); // Hide loading
-      if (mounted) {
-        UiUtils.showAppSnackBar(context, e.toString().replaceAll('Exception: ', '').replaceAll('Error: ', ''), type: 'error');
-      }
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Column(
+      },
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Column(
         children: [
           // Top portion: Map and Top App Bar
           Expanded(
@@ -685,6 +664,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

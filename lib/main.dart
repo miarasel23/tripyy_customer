@@ -26,6 +26,8 @@ import 'routes/route_generator.dart';
 import 'store/user_data_store.dart';
 import 'modules/dashboard/choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
 import 'modules/dashboard/choose_car_bottom_sheet/repository/choose_car_bottom_sheet_repository.dart';
+import 'modules/dashboard/controller/trip_price_details_bloc.dart';
+import 'modules/dashboard/repository/trip_price_details_repository.dart';
 
 import 'store/app_globals.dart';
 import 'core/utils/theme/app_theme.dart';
@@ -172,6 +174,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (_) => ChooseCarBottomSheetBloc(repository: ChooseCarBottomSheetRepository()),
+        ),
+        BlocProvider(
+          create: (_) => TripPriceDetailsBloc(repository: TripPriceDetailsRepository()),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
