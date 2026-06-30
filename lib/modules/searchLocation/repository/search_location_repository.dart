@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../../utils/app_urls.dart';
-import '../models/search_location_model.dart';
+import '../model/search_location_model.dart';
 import '../../../../store/user_data_store.dart';
 
 class SearchLocationRepository {

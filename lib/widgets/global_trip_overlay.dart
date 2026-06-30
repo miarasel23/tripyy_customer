@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../modules/dashboard/models/create_rental_trip_model.dart';
-import '../modules/dashboard/models/trip_status.dart';
+import '../modules/dashboard/model/create_rental_trip_model.dart';
+import '../modules/dashboard/model/trip_status.dart';
 import '../modules/dashboard/repository/create_trip_repository.dart';
 import '../store/user_data_store.dart';
 import '../core/utils/localization/app_localization.dart';

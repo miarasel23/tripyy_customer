@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
-import '../../choose_car_bottom_sheet/models/choose_car_model.dart';
-import '../models/trip_price_details_model.dart';
+import '../choose_car_bottom_sheet/model/choose_car_model.dart';
+import '../model/trip_price_details_model.dart';
 
 abstract class TripPriceDetailsState extends Equatable {
   const TripPriceDetailsState();

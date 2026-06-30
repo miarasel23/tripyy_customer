@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../repository/trip_price_details_repository.dart';
 import 'trip_price_details_event.dart';
 import 'trip_price_details_state.dart';
-import '../../choose_car_bottom_sheet/models/choose_car_model.dart';
+import '../choose_car_bottom_sheet/model/choose_car_model.dart';
 
 class TripPriceDetailsBloc extends Bloc<TripPriceDetailsEvent, TripPriceDetailsState> {
   final TripPriceDetailsRepository repository;

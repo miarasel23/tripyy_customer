@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'my_trip_event.dart';
 import 'my_trip_state.dart';
 import '../repository/my_trip_repository.dart';
-import '../../dashboard/models/create_rental_trip_model.dart';
+import '../../dashboard/model/create_rental_trip_model.dart';
 
 class MyTripBloc extends Bloc<MyTripEvent, MyTripState> {
   final MyTripRepository _repository = MyTripRepository();

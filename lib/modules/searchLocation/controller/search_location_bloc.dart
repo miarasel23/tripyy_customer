@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/search_location_model.dart';
+import '../model/search_location_model.dart';
 import '../repository/search_location_repository.dart';
 
 abstract class SearchLocationEvent {}

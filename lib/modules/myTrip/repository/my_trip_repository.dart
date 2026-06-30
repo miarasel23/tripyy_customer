@@ -3,7 +3,7 @@ import '../../../../core/network/api_service.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../store/user_data_store.dart';
 import '../../../../utils/custom_map_body_builder.dart';
-import '../../dashboard/models/create_rental_trip_model.dart';
+import '../../dashboard/model/create_rental_trip_model.dart';
 
 class MyTripRepository {
   final ApiService _apiService = ApiService();

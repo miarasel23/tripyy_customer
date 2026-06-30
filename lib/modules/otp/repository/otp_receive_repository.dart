@@ -6,8 +6,8 @@ import 'package:http/http.dart';
 
 import '../../../store/user_data_store.dart';
 import '../../../utils/app_urls.dart';
-import '../../splash/models/current_user_model.dart';
-import '../models/otp_receive_model.dart';
+import '../../splash/model/current_user_model.dart';
+import '../model/otp_receive_model.dart';
 
 import '../../../store/app_globals.dart';
 

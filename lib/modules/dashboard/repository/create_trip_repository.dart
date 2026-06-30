@@ -5,8 +5,8 @@ import '../../../../core/network/api_service.dart';
 import '../../../../store/user_data_store.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../utils/custom_map_body_builder.dart';
-import '../models/create_rental_trip_model.dart';
-import '../models/trip_status.dart';
+import '../model/create_rental_trip_model.dart';
+import '../model/trip_status.dart';
 
 class CreateTripRepository {
   Future<Map<String, dynamic>> createRentalTrip(CreateRentalTripRequest request) async {

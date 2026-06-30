@@ -10,7 +10,7 @@ import '../../../store/user_data_store.dart';
 import '../../../utils/app_urls.dart';
 import '../../../utils/custom_map_body_builder.dart';
 import '../../splash/repository/splash_repository.dart';
-import '../../splash/models/current_user_model.dart';
+import '../../splash/model/current_user_model.dart';
 import '../../../store/app_globals.dart';
 
 class EditProfileRepository {

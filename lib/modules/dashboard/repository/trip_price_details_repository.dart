@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../../utils/app_urls.dart';
-import '../models/trip_price_details_model.dart';
+import '../model/trip_price_details_model.dart';
 
 import '../../../../store/user_data_store.dart';
 

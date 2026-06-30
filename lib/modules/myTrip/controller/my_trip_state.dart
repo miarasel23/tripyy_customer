@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import '../../dashboard/models/create_rental_trip_model.dart';
+import '../../dashboard/model/create_rental_trip_model.dart';
 
 class MyTripState extends Equatable {
   final int selectedIndex;

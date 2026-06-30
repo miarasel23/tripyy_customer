@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../modules/splash/models/current_user_model.dart';
+import '../modules/splash/model/current_user_model.dart';
 
 class UserDataStore {
   static const String _accessTokenKey = 'access-token';

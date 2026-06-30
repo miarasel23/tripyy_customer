@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../utils/enums.dart';
-import '../models/choose_car_model.dart';
+import '../model/choose_car_model.dart';
 
 class ChooseCarBottomSheetState extends Equatable {
   final String? currentCarIndex;
