@@ -1,1 +1,0 @@
-1. Elevated button highlights: softWrap: true is used so the long Bangla button text can move to the next line properly instead of overflowing or breaking the button layout.
