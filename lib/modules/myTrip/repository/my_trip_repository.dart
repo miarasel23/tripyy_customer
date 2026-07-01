@@ -50,11 +50,9 @@ class MyTripRepository {
                              e.toString().contains('Connection closed');
                              
         if (isNetworkError && retryCount < maxRetries) {
-          debugPrint("fetchTrips: connection failed ($e). Retrying $retryCount/$maxRetries...");
           await Future.delayed(const Duration(milliseconds: 500));
           continue;
         }
-        debugPrint("Error fetching trips after $retryCount attempts: $e");
         rethrow;
       }
     }
