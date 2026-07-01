@@ -114,6 +114,34 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
     );
   }
 
+  String _formatTimeTo12Hour(String? datetimeStr) {
+    if (datetimeStr == null || datetimeStr.isEmpty) return '--:--';
+    try {
+      final dt = DateTime.parse(datetimeStr);
+      final amPm = dt.hour >= 12 ? "PM" : "AM";
+      final hour12 = dt.hour == 0 ? 12 : (dt.hour > 12 ? dt.hour - 12 : dt.hour);
+      final hourStr = hour12.toString().padLeft(2, '0');
+      final minuteStr = dt.minute.toString().padLeft(2, '0');
+      return "$hourStr:$minuteStr $amPm";
+    } catch (_) {
+      if (datetimeStr.contains(' ')) {
+        return datetimeStr.split(' ').last.substring(0, 5);
+      }
+      return datetimeStr;
+    }
+  }
+
+  String _formatDateToLocal(String? datetimeStr) {
+    if (datetimeStr == null || datetimeStr.isEmpty) return 'Today';
+    try {
+      final dt = DateTime.parse(datetimeStr);
+      final months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return "${dt.day} ${months[dt.month - 1]}, ${dt.year}";
+    } catch (_) {
+      return datetimeStr.split(' ').first;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -121,14 +149,13 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
     final driver = widget.driver;
     final trip = widget.trip;
     
-    // Fallback format
-    final dateDisplay = trip.startDatetime?.split(' ').first ?? 'Today';
+    final dateDisplay = _formatDateToLocal(trip.startDatetime);
     String timeDisplay = '--:--';
-    if (trip.startDatetime != null && trip.startDatetime!.contains(' ')) {
-        timeDisplay = trip.startDatetime!.split(' ').last.substring(0, 5);
-        if (trip.endDatetime != null && trip.endDatetime!.contains(' ')) {
-            timeDisplay += " - ${trip.endDatetime!.split(' ').last.substring(0, 5)}";
-        }
+    if (trip.startDatetime != null) {
+      timeDisplay = _formatTimeTo12Hour(trip.startDatetime);
+      if (trip.endDatetime != null) {
+        timeDisplay += " - ${_formatTimeTo12Hour(trip.endDatetime)}";
+      }
     }
     
     final finalFare = driver?.totalAmount?.toStringAsFixed(2) ?? trip.offerAmount?.toStringAsFixed(2) ?? '0.00';

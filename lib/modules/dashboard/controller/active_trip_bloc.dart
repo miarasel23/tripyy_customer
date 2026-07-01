@@ -56,33 +56,49 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
             bool isTrackable = false;
             if (trackableStatuses.contains(activeTrip.tripStatus)) {
               if (isRideShare) {
+                // Rideshare: always show driver when status is trackable
                 isTrackable = true;
               } else {
-                final commencedStatuses = [
+                // Non-rideshare: statuses where the ride has physically commenced
+                final activelyRidingStatuses = [
                   TripStatus.arrivedPickupLocation,
                   TripStatus.rideStarted,
                   TripStatus.inProgress,
                   TripStatus.firstCompleted,
                 ];
-                if (commencedStatuses.contains(activeTrip.tripStatus)) {
+
+                if (activelyRidingStatuses.contains(activeTrip.tripStatus)) {
+                  // Trip already started: always show driver until completed
                   isTrackable = true;
-                } else if (activeTrip.startDatetime != null && activeTrip.startDatetime!.isNotEmpty) {
-                  try {
-                    final startTime = DateTime.parse(activeTrip.startDatetime!);
-                    final now = DateTime.now();
-                    final difference = startTime.difference(now);
-                    if (difference.inMinutes <= 120) {
+                } else {
+                  // Trip accepted/booked but not yet started: check 2-hour rule
+                  if (activeTrip.startDatetime != null && activeTrip.startDatetime!.isNotEmpty) {
+                    try {
+                      String normalized = activeTrip.startDatetime!.trim();
+                      if (!normalized.contains('Z') && !normalized.contains('+') && normalized.length >= 19) {
+                        normalized = "${normalized.replaceAll(' ', 'T')}+06:00";
+                      }
+                      final startTime = DateTime.parse(normalized);
+                      final now = DateTime.now();
+                      final diffMinutes = startTime.difference(now).inMinutes;
+                      // Show driver only if start time is within 2 hours (120 minutes) from now
+                      // If start is in the future beyond 2 hours => hidden; if past or within 2h => visible
+                      isTrackable = diffMinutes <= 120;
+                      print("[ACTIVE TRIP BLOC] Service: ${activeTrip.serviceName}, StartTime: $startTime, Now: $now, DiffMinutes: $diffMinutes, isTrackable: $isTrackable");
+                    } catch (e) {
+                      print("[ACTIVE TRIP BLOC] Error parsing startDatetime: $e");
                       isTrackable = true;
                     }
-                  } catch (_) {
+                  } else {
+                    // No start time defined: show driver by default
                     isTrackable = true;
                   }
-                } else {
-                  isTrackable = true;
                 }
+                print("[ACTIVE TRIP BLOC] Non-Rideshare isTrackable result: $isTrackable (status: ${activeTrip.tripStatus})");
               }
             }
 
+            print("[ACTIVE TRIP BLOC] isTrackable: $isTrackable, drivers list size: ${activeTrip.drivers.length}");
             if (isTrackable) {
               // 1. Save customer's current location asynchronously
               unawaited(_trackCustomerLocation(event.customerUuid, event.languageCode));
@@ -94,9 +110,13 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
                   activeDriver = activeTrip.drivers.firstWhere(
                     (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
                   );
-                } catch (_) {
+                  print("[ACTIVE TRIP BLOC] Found accepted/completed driver: ${activeDriver.driverUuid}");
+                } catch (e) {
                   activeDriver = activeTrip.drivers.first;
+                  print("[ACTIVE TRIP BLOC] fallback driver: ${activeDriver.driverUuid}, bidStatus: ${activeDriver.bidStatus}");
                 }
+              } else {
+                print("[ACTIVE TRIP BLOC] drivers list is empty!");
               }
               if (activeDriver != null && activeDriver.driverUuid != null) {
                 final driverPos = await _getDriverLocation(activeDriver.driverUuid, event.languageCode);
@@ -216,7 +236,10 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
   }
 
   Future<Map<String, double>?> _getDriverLocation(String? driverUuid, String langCode) async {
-    if (driverUuid == null || driverUuid.isEmpty) return null;
+    if (driverUuid == null || driverUuid.isEmpty) {
+      print("[ACTIVE TRIP BLOC] _getDriverLocation called with empty driverUuid");
+      return null;
+    }
     try {
       final url = Uri.parse(AppUrls.customerDriverTrackGet);
       final token = await UserDataStore.getAccessToken();
@@ -235,7 +258,9 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
         "driver_uuid": driverUuid,
       };
       
+      // print("[ACTIVE TRIP BLOC] Getting location for driver: $driverUuid, url: $url");
       final response = await http.post(url, headers: headers, body: body).timeout(const Duration(seconds: 10));
+      // print("[ACTIVE TRIP BLOC] _getDriverLocation statusCode: ${response.statusCode}, body: ${response.body}");
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         if (decoded['status'] == true && decoded['data'] != null) {
