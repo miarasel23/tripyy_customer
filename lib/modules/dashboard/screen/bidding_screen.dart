@@ -173,7 +173,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
         
         _pollingTimer?.cancel(); // null-safe cancel before navigation
         if (mounted) {
-          Navigator.of(context).pop();
+          Navigator.of(context).pop(true);
         }
       } catch (e) {
         globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();

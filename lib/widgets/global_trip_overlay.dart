@@ -8,6 +8,7 @@ import '../modules/dashboard/repository/create_trip_repository.dart';
 import '../store/user_data_store.dart';
 import '../core/utils/localization/app_localization.dart';
 import '../utils/app_colors.dart';
+import '../utils/app_urls.dart';
 import '../routes/app_routes.dart';
 import '../main.dart';
 
@@ -181,16 +182,20 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     return Material(
       color: Colors.transparent,
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
           final customerUuid = UserDataStore.userData?.data?.user?.uuid;
           if (customerUuid != null) {
-            globalNavigatorKey.currentState?.pushNamed(
+            final result = await globalNavigatorKey.currentState?.pushNamed(
               AppRoutes.biddingScreen,
               arguments: {
                 'customerUuid': customerUuid,
                 'tripUuid': trip.uuid ?? "",
               },
             );
+            if (result == true && mounted) {
+              setState(() { _requestedTrip = null; });
+              _fetchActiveTrip();
+            }
           }
         },
         child: Container(
@@ -259,16 +264,20 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
                         final customerUuid = UserDataStore.userData?.data?.user?.uuid;
                         if (customerUuid != null) {
-                          globalNavigatorKey.currentState?.pushNamed(
+                          final result = await globalNavigatorKey.currentState?.pushNamed(
                             AppRoutes.biddingScreen,
                             arguments: {
                               'customerUuid': customerUuid,
                               'tripUuid': trip.uuid ?? "",
                             },
                           );
+                          if (result == true && mounted) {
+                            setState(() { _requestedTrip = null; });
+                            _fetchActiveTrip();
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -285,44 +294,82 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF13151B) : Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+               
+                if (trip.drivers.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    constraints: const BoxConstraints(maxHeight: 180),
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF13151B) : Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+                    ),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                      itemCount: trip.drivers.length,
+                      separatorBuilder: (context, index) => Divider(color: isDark ? Colors.white10 : Colors.grey.shade300, height: 24),
+                      itemBuilder: (context, index) {
+                        final driver = trip.drivers[index];
+                        final currency = loc.locale.languageCode == 'bn' ? '৳' : 'BDT';
+                        return Row(
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: isDark ? Colors.white24 : Colors.black12,
+                              radius: 18,
+                              backgroundImage: (driver.profilePicture != null && AppUrls.getImageUrl(driver.profilePicture) != null)
+                                  ? NetworkImage(AppUrls.getImageUrl(driver.profilePicture)!)
+                                  : null,
+                              child: (driver.profilePicture == null || AppUrls.getImageUrl(driver.profilePicture) == null)
+                                  ? Icon(Icons.person, color: isDark ? Colors.white : Colors.black, size: 20)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    driver.name?.toUpperCase() ?? "Driver",
+                                    style: GoogleFonts.poppins(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 13,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Colors.amber, size: 12),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        "${driver.averageRating?.toStringAsFixed(1) ?? '0.0'}",
+                                        style: GoogleFonts.poppins(
+                                          color: isDark ? Colors.white54 : Colors.black54,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              "$currency ${driver.totalAmount?.toStringAsFixed(0) ?? '0'}",
+                              style: GoogleFonts.poppins(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildSummaryItem(
-                        context,
-                        loc.translate('offer_price') == 'offer_price' ? "Your Offer" : loc.translate('offer_price'),
-                        "${offerAmount?.toStringAsFixed(0) ?? '0'} ৳",
-                        isDark,
-                      ),
-                      _buildSummaryDivider(isDark),
-                      _buildSummaryItem(
-                        context,
-                        loc.translate('pending_bids') == 'pending_bids' ? "Total Bids" : loc.translate('pending_bids'),
-                        "$totalBids",
-                        isDark,
-                        valueColor: totalBids > 0 ? AppColors.primary : null,
-                      ),
-                      if (totalBids > 0 && lowestBid != null) ...[
-                        _buildSummaryDivider(isDark),
-                        _buildSummaryItem(
-                          context,
-                          loc.translate('lowest_bid') == 'lowest_bid' ? "Lowest Bid" : loc.translate('lowest_bid'),
-                          "${lowestBid.toStringAsFixed(0)} ৳",
-                          isDark,
-                          valueColor: Colors.green,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+                ],
               ],
             ),
           ),
