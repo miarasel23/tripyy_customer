@@ -109,6 +109,7 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
                 } catch (e) {
                   activeDriver = activeTrip.drivers.first;
                 }
+              }
 
               if (activeDriver != null && activeDriver.driverUuid != null) {
                 final driverPos = await _getDriverLocation(activeDriver.driverUuid, event.languageCode);
