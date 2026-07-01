@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../core/utils/localization/app_localization.dart';
 import '../../../routes/app_routes.dart';
 import '../../../store/user_data_store.dart';
 import '../widget/trippy_brand_animation.dart';
-import '../controller/splash_bloc.dart';
-import '../controller/splash_event.dart';
-import '../controller/splash_state.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

@@ -63,7 +63,7 @@ class _RadarPainter extends CustomPainter {
 
     // Draw the central solid circle
     final centerPaint = Paint()
-      ..color = color.withOpacity(0.8)
+      ..color = color.withValues(alpha: 0.8)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(center, maxRadius * 0.2, centerPaint);
     
@@ -82,7 +82,7 @@ class _RadarPainter extends CustomPainter {
       final opacity = (1.0 - ringProgress).clamp(0.0, 1.0);
 
       final ringPaint = Paint()
-        ..color = color.withOpacity(opacity * 0.5)
+        ..color = color.withValues(alpha: opacity * 0.5)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5;
 

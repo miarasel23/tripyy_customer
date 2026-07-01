@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/utils/localization/app_localization.dart';
 import '../../../../utils/app_urls.dart';
@@ -10,7 +9,6 @@ import '../../model/trip_price_details_model.dart';
 import '../controller/choose_car_bottom_sheet_bloc.dart';
 import '../controller/choose_car_bottom_sheet_events.dart';
 import '../controller/choose_car_bottom_sheet_state.dart';
-import '../../../../utils/colors_code.dart';
 import '../model/choose_car_model.dart';
 import '../../../../store/user_data_store.dart';
 import '../../model/create_rental_trip_model.dart';
@@ -110,7 +108,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
           builder: (ctx) {
             final loc = AppLocalizations.of(context);
             return AlertDialog(
-              title: Text(loc.translate("message") ?? "Message"),
+              title: Text(loc.translate("message")),
               content: Text(e.toString().replaceAll('Exception: ', '').replaceAll('Error: ', '')),
               actions: [
                 TextButton(
@@ -369,7 +367,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                   children: [
                                     if (car.minimumBookingPrice != null)
                                       Text(
-                                        '${loc.translate("up_to") ?? "Up to"} ' + 
+                                        '${loc.translate("up_to")} ' + 
                                         (loc.locale.languageCode == 'bn' 
                                             ? '৳${car.minimumBookingPrice}' 
                                             : 'BDT ${car.minimumBookingPrice}'),

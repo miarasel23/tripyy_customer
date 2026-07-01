@@ -7,7 +7,7 @@ import '../model/search_location_model.dart';
 import '../repository/search_location_repository.dart';
 
 class SearchLocationScreen extends StatelessWidget {
-  const SearchLocationScreen({Key? key}) : super(key: key);
+  const SearchLocationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class SearchLocationScreen extends StatelessWidget {
 }
 
 class SearchLocationView extends StatefulWidget {
-  const SearchLocationView({Key? key}) : super(key: key);
+  const SearchLocationView({super.key});
 
   @override
   State<SearchLocationView> createState() => _SearchLocationViewState();
@@ -46,7 +46,7 @@ class _SearchLocationViewState extends State<SearchLocationView> {
     final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(loc.translate("pick_up_location") ?? "Pick Up Location"),
+        title: Text(loc.translate("pick_up_location")),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -61,7 +61,7 @@ class _SearchLocationViewState extends State<SearchLocationView> {
               onChanged: _onSearchChanged,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: loc.translate("where_are_you_going") ?? "Where to?",
+                hintText: loc.translate("where_are_you_going"),
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -103,7 +103,7 @@ class _SearchLocationViewState extends State<SearchLocationView> {
                   );
                 }
                 return Center(
-                  child: Text(loc.translate("search_location") ?? "Search for a location"),
+                  child: Text(loc.translate("search_location")),
                 );
               },
             ),

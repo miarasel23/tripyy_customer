@@ -3,7 +3,6 @@ import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/utils/localization/app_localization.dart';
-import '../../../utils/colors_code.dart';
 
 class AdditionalserviceScreen extends StatelessWidget {
   const AdditionalserviceScreen({super.key});

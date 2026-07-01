@@ -84,9 +84,7 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
                       // Show driver only if start time is within 2 hours (120 minutes) from now
                       // If start is in the future beyond 2 hours => hidden; if past or within 2h => visible
                       isTrackable = diffMinutes <= 120;
-                      print("[ACTIVE TRIP BLOC] Service: ${activeTrip.serviceName}, StartTime: $startTime, Now: $now, DiffMinutes: $diffMinutes, isTrackable: $isTrackable");
                     } catch (e) {
-                      print("[ACTIVE TRIP BLOC] Error parsing startDatetime: $e");
                       isTrackable = true;
                     }
                   } else {
@@ -94,11 +92,9 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
                     isTrackable = true;
                   }
                 }
-                print("[ACTIVE TRIP BLOC] Non-Rideshare isTrackable result: $isTrackable (status: ${activeTrip.tripStatus})");
               }
             }
 
-            print("[ACTIVE TRIP BLOC] isTrackable: $isTrackable, drivers list size: ${activeTrip.drivers.length}");
             if (isTrackable) {
               // 1. Save customer's current location asynchronously
               unawaited(_trackCustomerLocation(event.customerUuid, event.languageCode));
@@ -110,14 +106,10 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
                   activeDriver = activeTrip.drivers.firstWhere(
                     (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
                   );
-                  print("[ACTIVE TRIP BLOC] Found accepted/completed driver: ${activeDriver.driverUuid}");
                 } catch (e) {
                   activeDriver = activeTrip.drivers.first;
-                  print("[ACTIVE TRIP BLOC] fallback driver: ${activeDriver.driverUuid}, bidStatus: ${activeDriver.bidStatus}");
                 }
-              } else {
-                print("[ACTIVE TRIP BLOC] drivers list is empty!");
-              }
+
               if (activeDriver != null && activeDriver.driverUuid != null) {
                 final driverPos = await _getDriverLocation(activeDriver.driverUuid, event.languageCode);
                 if (driverPos != null) {
@@ -258,9 +250,7 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
         "driver_uuid": driverUuid,
       };
       
-      // print("[ACTIVE TRIP BLOC] Getting location for driver: $driverUuid, url: $url");
       final response = await http.post(url, headers: headers, body: body).timeout(const Duration(seconds: 10));
-      // print("[ACTIVE TRIP BLOC] _getDriverLocation statusCode: ${response.statusCode}, body: ${response.body}");
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
         if (decoded['status'] == true && decoded['data'] != null) {

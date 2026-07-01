@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/localization/app_localization.dart';
 import '../../../routes/app_routes.dart';
-import '../../../utils/colors_code.dart';
 import '../../../utils/enums.dart';
 import '../../localization/Controller/localization_controller.dart';
 import '../controller/send_otp_bloc.dart';
@@ -96,14 +95,14 @@ class NumberInputScreen extends StatelessWidget {
                                 child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, strokeWidth: 2.5),
                               ),
                             OtpStatus.failure => Text(
-                              loc.translate("retry") ?? "Retry",
+                              loc.translate("retry"),
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             _ => Text(
-                              loc.translate("continue") ?? "Continue",
+                              loc.translate("continue"),
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -124,7 +123,7 @@ class NumberInputScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      loc.translate("enter_your_phone_number") ?? "Enter your phone number",
+                      loc.translate("enter_your_phone_number"),
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.bold, // Uber's bold header
@@ -198,8 +197,8 @@ class NumberInputScreen extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _langButton(context, 'en', loc.translate("english") ?? "EN", currentLang == 'en'),
-          _langButton(context, 'bn', loc.translate("bengal") ?? "BN", currentLang == 'bn'),
+          _langButton(context, 'en', loc.translate("english"), currentLang == 'en'),
+          _langButton(context, 'bn', loc.translate("bengal"), currentLang == 'bn'),
         ],
       ),
     );
@@ -315,7 +314,7 @@ class NumberInputScreen extends StatelessWidget {
                 letterSpacing: 1.5,
               ),
               decoration: InputDecoration(
-                hintText: loc.translate("enter_your_number") ?? "000 000 0000",
+                hintText: loc.translate("enter_your_number"),
                 hintStyle: GoogleFonts.poppins(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

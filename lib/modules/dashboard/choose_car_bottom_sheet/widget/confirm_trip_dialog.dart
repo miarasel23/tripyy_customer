@@ -59,7 +59,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
               children: [
             Center(
               child: Text(
-                loc.translate("confirm_trip") ?? "Trip Summary",
+                loc.translate("confirm_trip"),
                 style: GoogleFonts.poppins(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -71,7 +71,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
             
             // Pickup & Drop-off Header
             Text(
-              loc.translate("pickup_and_dropoff") ?? "PICKUP & DROP-OFF",
+              loc.translate("pickup_and_dropoff"),
               style: GoogleFonts.poppins(
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
@@ -124,7 +124,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(loc.translate("service") ?? "Service", style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
+                Text(loc.translate("service"), style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
                 Text(widget.serviceName.replaceAll('_', ' '), style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
               ],
             ),
@@ -132,7 +132,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(loc.translate("vehicle") ?? "Vehicle", style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
+                Text(loc.translate("vehicle"), style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
                 Text("${widget.selectedCar.carType} (${widget.selectedCar.setCapacity})", style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
               ],
             ),
@@ -140,7 +140,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(loc.translate("payment") ?? "Payment", style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
+                Text(loc.translate("payment"), style: GoogleFonts.poppins(fontSize: 14, color: subTextColor)),
                 Text("CASH", style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: textColor)),
               ],
             ),
@@ -158,7 +158,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    loc.translate("estimated_fare") ?? "Estimated Fare", 
+                    loc.translate("estimated_fare"), 
                     style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: textColor)
                   ),
                   Text(
@@ -180,9 +180,9 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
               textAlign: TextAlign.left,
               style: GoogleFonts.poppins(color: textColor, fontSize: 14),
               decoration: InputDecoration(
-                labelText: loc.translate("offer_price") ?? "Offer Price",
+                labelText: loc.translate("offer_price"),
                 labelStyle: GoogleFonts.poppins(color: subTextColor, fontSize: 14),
-                hintText: loc.translate("enter_offer_price") ?? "Enter your offer price",
+                hintText: loc.translate("enter_offer_price"),
                 hintStyle: GoogleFonts.poppins(color: subTextColor?.withOpacity(0.5), fontSize: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -206,7 +206,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return loc.translate("offer_price_required") ?? "Offer price is required";
+                  return loc.translate("offer_price_required");
                 }
                 
                 final num? offerPrice = num.tryParse(value);
@@ -215,10 +215,10 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
                 if (offerPrice != null && estFare != null) {
                   final num minAllowedOffer = estFare * 0.85;
                   if (offerPrice < minAllowedOffer) {
-                    return loc.translate("offer_price_too_low") ?? "Offer price too low";
+                    return loc.translate("offer_price_too_low");
                   }
                   if (offerPrice > estFare) {
-                    return loc.translate("offer_price_too_high") ?? "Offer price too high";
+                    return loc.translate("offer_price_too_high");
                   }
                 }
                 
@@ -235,9 +235,9 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
               style: GoogleFonts.poppins(color: textColor, fontSize: 14),
               decoration: InputDecoration(
                 alignLabelWithHint: true,
-                labelText: loc.translate("note") ?? "Note (Optional)",
+                labelText: loc.translate("note"),
                 labelStyle: GoogleFonts.poppins(color: subTextColor, fontSize: 14),
-                hintText: loc.translate("add_note") ?? "Add a note for driver",
+                hintText: loc.translate("add_note"),
                 hintStyle: GoogleFonts.poppins(color: subTextColor?.withOpacity(0.5), fontSize: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -270,7 +270,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
                       foregroundColor: isDark ? Colors.white : Colors.black,
                     ),
                     onPressed: () => Navigator.pop(context, null),
-                    child: Text(loc.translate("cancel") ?? "Cancel", style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text(loc.translate("cancel"), style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -291,7 +291,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
                         });
                       }
                     },
-                    child: Text(loc.translate("submit") ?? "Submit", style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
+                    child: Text(loc.translate("submit"), style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
                   ),
                 ),
               ],

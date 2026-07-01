@@ -175,9 +175,6 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
-    final totalBids = trip.bidSummary?.totalBids ?? trip.totalBids ?? 0;
-    final lowestBid = trip.bidSummary?.lowestBidAmount;
-    final offerAmount = trip.offerAmount;
 
     return Material(
       color: Colors.transparent,
@@ -345,7 +342,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                                       const Icon(Icons.star, color: Colors.amber, size: 12),
                                       const SizedBox(width: 4),
                                       Text(
-                                        "${driver.averageRating?.toStringAsFixed(1) ?? '0.0'}",
+                                        driver.averageRating?.toStringAsFixed(1) ?? '0.0',
                                         style: GoogleFonts.poppins(
                                           color: isDark ? Colors.white54 : Colors.black54,
                                           fontSize: 11,
@@ -378,46 +375,16 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     );
   }
 
-  Widget _buildSummaryItem(BuildContext context, String label, String value, bool isDark, {Color? valueColor}) {
-    return Column(
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 11,
-            color: isDark ? Colors.white54 : Colors.black54,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
-            color: valueColor ?? (isDark ? Colors.white : Colors.black),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryDivider(bool isDark) {
-    return Container(
-      width: 1,
-      height: 24,
-      color: isDark ? Colors.white10 : Colors.grey.shade300,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
     // Determine current route name, preferring the ModalRoute (available immediately) and falling back to the observer
     final routeName = ModalRoute.of(context)?.settings.name ?? globalRouteObserver.currentRoute;
     // Hide overlay on active trip screen (exact match or any sub‑route) to make this page fully invisible
-    final hideActiveOverlay = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith('${AppRoutes.activeTrip}'));
+    final hideActiveOverlay = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith(AppRoutes.activeTrip));
     
     // Hide bidding overlay on bidding screen (exact match or any sub-route)
-    final hideBiddingOverlay = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith('${AppRoutes.biddingScreen}'));
+    final hideBiddingOverlay = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen));
 
     final showActiveOverlay = _activeTrip != null && !hideActiveOverlay;
     final showBiddingOverlay = !showActiveOverlay && _requestedTrip != null && !hideBiddingOverlay;
@@ -462,8 +429,6 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
 
     if (allLocations.isEmpty) return const SizedBox.shrink();
 
-    final activeBgColor = Colors.white;
-    final activeTextColor = Colors.black;
 
     return Material(
       color: Colors.transparent,

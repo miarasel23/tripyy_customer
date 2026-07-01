@@ -122,8 +122,8 @@ class _MyAppState extends State<MyApp> {
     final context = globalScaffoldMessengerKey.currentContext;
     if (context != null) {
       final loc = AppLocalizations.of(context);
-      noInternetStr = loc.translate("no_internet") ?? noInternetStr;
-      backOnlineStr = loc.translate("back_online") ?? backOnlineStr;
+      noInternetStr = loc.translate("no_internet");
+      backOnlineStr = loc.translate("back_online");
     }
 
     final isDark = context != null && Theme.of(context).brightness == Brightness.dark;

@@ -26,10 +26,10 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context);
     final List<String> reasons = [
-      loc.translate("waiting_long_time") ?? "Waiting for a long time",
-      loc.translate("driver_asked_cancel") ?? "Driver asked to cancel",
-      loc.translate("changed_mind") ?? "Changed my mind",
-      loc.translate("others") ?? "Others"
+      loc.translate("waiting_long_time"),
+      loc.translate("driver_asked_cancel"),
+      loc.translate("changed_mind"),
+      loc.translate("others")
     ];
     // Compute once to avoid repeated lookups and mismatch between frames
     final String othersStr = reasons.last;
@@ -54,7 +54,7 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context).translate("why_cancel") ?? "Why are you cancelling?",
+              AppLocalizations.of(context).translate("why_cancel"),
               style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
                 maxLines: 3,
                 style: TextStyle(color: widget.isDark ? Colors.white : Colors.black),
                 decoration: InputDecoration(
-                  hintText: loc.translate("write_reason") ?? "Please write your reason...",
+                  hintText: loc.translate("write_reason"),
                   hintStyle: TextStyle(color: widget.isDark ? Colors.white54 : Colors.black38),
                   filled: true,
                   fillColor: widget.isDark ? AppColors.darkCardDeep : Colors.grey.shade100,
@@ -117,7 +117,7 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
                     ),
                     onPressed: () => Navigator.of(context).pop(),
                     child: Text(
-                      loc.translate("dismiss") ?? "Dismiss",
+                      loc.translate("dismiss"),
                       style: GoogleFonts.poppins(
                         color: widget.isDark ? Colors.white70 : Colors.black54,
                         fontWeight: FontWeight.w600,
@@ -143,7 +143,7 @@ class _CancelTripDialogState extends State<CancelTripDialog> {
                       Navigator.of(context).pop(finalReason);
                     },
                     child: Text(
-                      loc.translate("submit") ?? "Submit",
+                      loc.translate("submit"),
                       style: GoogleFonts.poppins(
                         color: widget.isDark ? Colors.black : Colors.white,
                         fontWeight: FontWeight.w600,

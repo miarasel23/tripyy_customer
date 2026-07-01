@@ -13,7 +13,7 @@ class UiUtils {
       builder: (ctx) {
         final loc = AppLocalizations.of(context);
         return AlertDialog(
-          title: Text(loc.translate("message") ?? "Message"),
+          title: Text(loc.translate("message")),
           content: Text(errorMessage.replaceAll('Exception: ', '').replaceAll('Error: ', '')),
           actions: [
             TextButton(
