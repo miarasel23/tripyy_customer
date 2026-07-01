@@ -52,10 +52,18 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   }
 
   Future<void> _fetchActiveTrip() async {
-    final token = UserDataStore.accessToken;
+    String? token = UserDataStore.accessToken;
+    if (token == null || token.isEmpty) {
+      // Check SharedPreferences directly to prevent race condition on app startup
+      token = await UserDataStore.getAccessToken();
+    }
+
     if (token == null || token.isEmpty) {
       final currentRoute = globalRouteObserver.currentRoute;
-      if (currentRoute != AppRoutes.splash && currentRoute != AppRoutes.numberInput && currentRoute != AppRoutes.otp) {
+      if (currentRoute != null && 
+          currentRoute != AppRoutes.splash && 
+          currentRoute != AppRoutes.numberInput && 
+          currentRoute != AppRoutes.otp) {
         UserDataStore.clearAllData();
         if (mounted) {
           Navigator.pushNamedAndRemoveUntil(context, AppRoutes.numberInput, (route) => false);
