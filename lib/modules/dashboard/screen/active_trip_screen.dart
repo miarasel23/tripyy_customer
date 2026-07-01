@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import '../controller/active_trip_bloc.dart';
 import '../controller/active_trip_event.dart';
 import '../controller/active_trip_state.dart';
@@ -35,6 +38,8 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
   bool _isRouteExpanded = false;
   bool _isReviewSheetShown = false;
+  Marker? _driverMarker;
+  double _driverRotation = 0.0;
 
   @override
   void initState() {
@@ -118,6 +123,18 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
   void _fitMapToBounds(List<LatLng> points) {
     if (points.isEmpty) return;
+    
+    if (points.length == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _mapController != null) {
+          _mapController!.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: points.first, zoom: 15.0),
+          ));
+        }
+      });
+      return;
+    }
+
     double? minLat, maxLat, minLng, maxLng;
     for (final p in points) {
       if (minLat == null || p.latitude < minLat) minLat = p.latitude;
@@ -131,7 +148,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _mapController != null) {
-        _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 60.0));
+        _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80.0));
       }
     });
   }
@@ -182,6 +199,273 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     }
   }
 
+  double _calculateBearing(LatLng start, LatLng end) {
+    final double lat1 = start.latitude * (math.pi / 180.0);
+    final double lng1 = start.longitude * (math.pi / 180.0);
+    final double lat2 = end.latitude * (math.pi / 180.0);
+    final double lng2 = end.longitude * (math.pi / 180.0);
+
+    final double dLng = lng2 - lng1;
+
+    final double y = math.sin(dLng) * math.cos(lat2);
+    final double x = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dLng);
+
+    final double bearing = math.atan2(y, x) * (180.0 / math.pi);
+    return (bearing + 360.0) % 360.0;
+  }
+
+  Future<void> _updateDriverMarker(RentalTrip trip, double? lat, double? lng) async {
+    if (lat == null || lng == null) {
+      if (_driverMarker != null) {
+        setState(() {
+          _markers.remove(_driverMarker);
+          _driverMarker = null;
+        });
+      }
+      return;
+    }
+
+    final bool isFirstLoad = _driverMarker == null;
+    final position = LatLng(lat, lng);
+    final carType = trip.carCategory?.carType;
+
+    if (_driverMarker != null) {
+      final prevPos = _driverMarker!.position;
+      if (prevPos.latitude != position.latitude || prevPos.longitude != position.longitude) {
+        _driverRotation = _calculateBearing(prevPos, position);
+      }
+    }
+
+    final lower = carType?.toLowerCase() ?? '';
+    final bool isBike = lower.contains('bike') || lower.contains('motor');
+    final Color vehicleColor = isBike ? const Color(0xFFF44336) : const Color(0xFF4CAF50);
+
+    final BitmapDescriptor icon = await _getMarkerIconFromIconData(
+      carType,
+      vehicleColor,
+      80.0,
+    );
+
+    final newMarker = Marker(
+      markerId: const MarkerId('driver_location'),
+      position: position,
+      icon: icon,
+      rotation: _driverRotation,
+      anchor: const Offset(0.5, 0.5),
+      infoWindow: InfoWindow(title: trip.drivers.isNotEmpty ? trip.drivers.first.name : "Driver"),
+    );
+
+    if (mounted) {
+      setState(() {
+        if (_driverMarker != null) {
+          _markers.removeWhere((m) => m.markerId == const MarkerId('driver_location'));
+        }
+        _driverMarker = newMarker;
+        _markers.add(newMarker);
+      });
+
+      if (isFirstLoad && _mapController != null) {
+        _mapController!.animateCamera(CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: position,
+            zoom: 16.5,
+            tilt: 35.0,
+          ),
+        ));
+      }
+    }
+  }
+
+  Future<BitmapDescriptor> _getMarkerIconFromIconData(String? carType, Color color, double size) async {
+    final pictureRecorder = ui.PictureRecorder();
+    final canvas = Canvas(pictureRecorder);
+    final sizeObj = Size(size, size);
+
+    final lower = carType?.toLowerCase() ?? '';
+    final bool isBike = lower.contains('bike') || lower.contains('motor');
+
+    if (isBike) {
+      _paintTopDownBike(canvas, sizeObj, color);
+    } else {
+      _paintTopDownCar(canvas, sizeObj, color);
+    }
+
+    final picture = pictureRecorder.endRecording();
+    final image = await picture.toImage(size.toInt(), size.toInt());
+    final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    return BitmapDescriptor.fromBytes(bytes!.buffer.asUint8List());
+  }
+
+  void _paintTopDownCar(Canvas canvas, Size size, Color color) {
+    final double w = size.width;
+    final double h = size.height;
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    final double cx = w / 2;
+    final double cy = h / 2;
+
+    // 1. Draw dynamic soft drop shadow around the whole vehicle
+    paint.color = Colors.black.withAlpha(40);
+    final shadowPath = Path()
+      ..moveTo(cx - w * 0.22, cy - h * 0.38)
+      ..quadraticBezierTo(cx, cy - h * 0.44, cx + w * 0.22, cy - h * 0.38)
+      ..lineTo(cx + w * 0.24, cy + h * 0.38)
+      ..quadraticBezierTo(cx, cy + h * 0.44, cx - w * 0.24, cy + h * 0.38)
+      ..close();
+    canvas.drawPath(shadowPath, paint);
+
+    // 2. Draw 4 wheels (tires)
+    paint.color = const Color(0xFF1A1A1A);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - w * 0.28, cy - h * 0.28, w * 0.08, h * 0.16), Radius.circular(w * 0.02)), paint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + w * 0.20, cy - h * 0.28, w * 0.08, h * 0.16), Radius.circular(w * 0.02)), paint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - w * 0.28, cy + h * 0.14, w * 0.08, h * 0.18), Radius.circular(w * 0.02)), paint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + w * 0.20, cy + h * 0.14, w * 0.08, h * 0.18), Radius.circular(w * 0.02)), paint);
+
+    // 3. Draw main body chassis (Light Green)
+    paint.color = const Color(0xFF4CAF50);
+    final bodyPath = Path()
+      ..moveTo(cx - w * 0.20, cy - h * 0.35)
+      ..quadraticBezierTo(cx - w * 0.18, cy - h * 0.40, cx, cy - h * 0.42)
+      ..quadraticBezierTo(cx + w * 0.18, cy - h * 0.40, cx + w * 0.20, cy - h * 0.35)
+      ..lineTo(cx + w * 0.22, cy - h * 0.10)
+      ..quadraticBezierTo(cx + w * 0.24, cy, cx + w * 0.22, cy + h * 0.20)
+      ..lineTo(cx + w * 0.20, cy + h * 0.38)
+      ..quadraticBezierTo(cx, cy + h * 0.41, cx - w * 0.20, cy + h * 0.38)
+      ..lineTo(cx - w * 0.22, cy + h * 0.20)
+      ..quadraticBezierTo(cx - w * 0.24, cy, cx - w * 0.22, cy - h * 0.10)
+      ..close();
+    canvas.drawPath(bodyPath, paint);
+
+    // 4. Draw top/front hood cover (Red)
+    paint.color = const Color(0xFFF44336);
+    final hoodPath = Path()
+      ..moveTo(cx - w * 0.20, cy - h * 0.35)
+      ..quadraticBezierTo(cx - w * 0.18, cy - h * 0.40, cx, cy - h * 0.42)
+      ..quadraticBezierTo(cx + w * 0.18, cy - h * 0.40, cx + w * 0.20, cy - h * 0.35)
+      ..lineTo(cx + w * 0.21, cy - h * 0.15)
+      ..quadraticBezierTo(cx, cy - h * 0.10, cx - w * 0.21, cy - h * 0.15)
+      ..close();
+    canvas.drawPath(hoodPath, paint);
+
+    // 5. Side mirrors (Red)
+    paint.color = const Color(0xFFF44336);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - w * 0.27, cy - h * 0.20, w * 0.06, h * 0.06), Radius.circular(w * 0.01)), paint);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx + w * 0.21, cy - h * 0.20, w * 0.06, h * 0.06), Radius.circular(w * 0.01)), paint);
+
+    // 6. Draw front windshield, side windows, rear windshield (Cabin area)
+    paint.color = const Color(0xFF1E2124);
+    
+    final windshieldPath = Path()
+      ..moveTo(cx - w * 0.15, cy - h * 0.16)
+      ..lineTo(cx + w * 0.15, cy - h * 0.16)
+      ..quadraticBezierTo(cx + w * 0.12, cy - h * 0.26, cx, cy - h * 0.27)
+      ..quadraticBezierTo(cx - w * 0.12, cy - h * 0.26, cx - w * 0.15, cy - h * 0.16)
+      ..close();
+    canvas.drawPath(windshieldPath, paint);
+
+    paint.color = const Color(0xFFE0E0E0);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - w * 0.15, cy - h * 0.16, w * 0.30, h * 0.32),
+        Radius.circular(w * 0.02),
+      ),
+      paint,
+    );
+
+    paint.color = const Color(0xFF1E2124);
+    final rearWindowPath = Path()
+      ..moveTo(cx - w * 0.14, cy + h * 0.16)
+      ..lineTo(cx + w * 0.14, cy + h * 0.16)
+      ..quadraticBezierTo(cx + w * 0.11, cy + h * 0.24, cx, cy + h * 0.25)
+      ..quadraticBezierTo(cx - w * 0.11, cy + h * 0.24, cx - w * 0.14, cy + h * 0.16)
+      ..close();
+    canvas.drawPath(rearWindowPath, paint);
+
+    // 7. Draw headlights
+    paint.color = const Color(0xFFFFEB3B);
+    canvas.drawArc(Rect.fromLTWH(cx - w * 0.18, cy - h * 0.43, w * 0.07, h * 0.04), 3.14, 3.14, true, paint);
+    canvas.drawArc(Rect.fromLTWH(cx + w * 0.11, cy - h * 0.43, w * 0.07, h * 0.04), 3.14, 3.14, true, paint);
+
+    // 8. Draw red rear taillights
+    paint.color = const Color(0xFFF44336);
+    canvas.drawRect(Rect.fromLTWH(cx - w * 0.17, cy + h * 0.37, w * 0.06, h * 0.02), paint);
+    canvas.drawRect(Rect.fromLTWH(cx + w * 0.11, cy + h * 0.37, w * 0.06, h * 0.02), paint);
+  }
+
+  void _paintTopDownBike(Canvas canvas, Size size, Color color) {
+    final double w = size.width;
+    final double h = size.height;
+    final paint = Paint()..style = PaintingStyle.fill;
+    
+    final double cx = w / 2;
+    final double cy = h / 2;
+
+    // 1. Shadow backing
+    paint.color = Colors.black.withAlpha(35);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - w * 0.16, cy - h * 0.40, w * 0.32, h * 0.82),
+        Radius.circular(w * 0.08),
+      ),
+      paint,
+    );
+
+    // 2. Main framework
+    paint.color = const Color(0xFF222222);
+    canvas.drawRect(Rect.fromLTWH(cx - w * 0.04, cy - h * 0.30, w * 0.08, h * 0.60), paint);
+
+    // 3. Thick front tire
+    paint.color = Colors.black;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - w * 0.03, cy - h * 0.42, w * 0.06, h * 0.20),
+        Radius.circular(w * 0.015),
+      ),
+      paint,
+    );
+
+    // 4. Rear tire
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - w * 0.04, cy + h * 0.22, w * 0.08, h * 0.24),
+        Radius.circular(w * 0.02),
+      ),
+      paint,
+    );
+
+    // 5. Handlebars (Red top side)
+    paint.color = const Color(0xFFF44336);
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(cx - w * 0.22, cy - h * 0.26, w * 0.44, h * 0.035), Radius.circular(w * 0.01)), paint);
+    paint.color = Colors.black;
+    canvas.drawRect(Rect.fromLTWH(cx - w * 0.24, cy - h * 0.26, w * 0.04, h * 0.035), paint);
+    canvas.drawRect(Rect.fromLTWH(cx + w * 0.20, cy - h * 0.26, w * 0.04, h * 0.035), paint);
+
+    // 6. Gas tank & body shell (Light Green)
+    paint.color = const Color(0xFF4CAF50);
+    final bodyPath = Path()
+      ..moveTo(cx - w * 0.06, cy - h * 0.20)
+      ..lineTo(cx + w * 0.06, cy - h * 0.20)
+      ..quadraticBezierTo(cx + w * 0.12, cy - h * 0.05, cx + w * 0.08, cy + h * 0.10)
+      ..lineTo(cx - w * 0.08, cy + h * 0.10)
+      ..quadraticBezierTo(cx - w * 0.12, cy - h * 0.05, cx - w * 0.06, cy - h * 0.20)
+      ..close();
+    canvas.drawPath(bodyPath, paint);
+
+    // Seat detail
+    paint.color = const Color(0xFF1A1A1A);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(cx - w * 0.05, cy + h * 0.02, w * 0.10, h * 0.18),
+        Radius.circular(w * 0.02),
+      ),
+      paint,
+    );
+
+    // Headlight front beam
+    paint.color = const Color(0xFFFFEB3B);
+    canvas.drawCircle(Offset(cx, cy - h * 0.44), w * 0.025, paint);
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -199,6 +483,8 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             if (oldTrip?.uuid != trip.uuid) {
               _fetchRoutePolylinesForTrip(trip);
             }
+
+            _updateDriverMarker(trip, state.driverLatitude, state.driverLongitude);
 
             if (trip.tripStatus == TripStatus.completed && trip.givenReview != true) {
               if (!_isReviewSheetShown) {
@@ -218,7 +504,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         child: BlocBuilder<ActiveTripBloc, ActiveTripState>(
           builder: (context, state) {
             if (state is ActiveTripLoading && _activeTrip == null) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return Center(child: CircularProgressIndicator(color: isDark ? Colors.white : Colors.black));
             }
 
             if (state is ActiveTripFailure && _activeTrip == null) {
@@ -230,7 +516,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             }
 
             if (_activeTrip == null) {
-              return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+              return Center(child: CircularProgressIndicator(color: isDark ? Colors.white : Colors.black));
             }
 
             final trip = _activeTrip!;
@@ -325,6 +611,43 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   }
 
   Widget _buildBottomSheet(bool isDark, RentalTrip trip, RentalDriverBid? driver, AppLocalizations loc) {
+    double? driverLat;
+    double? driverLng;
+    final state = context.read<ActiveTripBloc>().state;
+    if (state is ActiveTripSuccess) {
+      driverLat = state.driverLatitude;
+      driverLng = state.driverLongitude;
+    }
+
+    int? etaMinutes;
+    String? etaLabel;
+
+    if (driverLat != null && driverLng != null) {
+      if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress) {
+        if (trip.dropoffLocations.isNotEmpty) {
+          final destLat = double.tryParse(trip.dropoffLocations.first.latitude ?? '');
+          final destLng = double.tryParse(trip.dropoffLocations.first.longitude ?? '');
+          if (destLat != null && destLng != null) {
+            final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, destLat, destLng);
+            etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
+            etaLabel = "Arriving at destination in $etaMinutes ${etaMinutes == 1 ? 'minute' : 'minutes'}";
+          }
+        }
+      } else if (trip.tripStatus == TripStatus.arrivedPickupLocation) {
+        etaLabel = "Driver has arrived at pickup location";
+      } else {
+        if (trip.pickupLocations.isNotEmpty) {
+          final pickLat = double.tryParse(trip.pickupLocations.first.latitude ?? '');
+          final pickLng = double.tryParse(trip.pickupLocations.first.longitude ?? '');
+          if (pickLat != null && pickLng != null) {
+            final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, pickLat, pickLng);
+            etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
+            etaLabel = "Driver arrives in $etaMinutes ${etaMinutes == 1 ? 'minute' : 'minutes'}";
+          }
+        }
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1C1E26) : Colors.white,
@@ -348,7 +671,48 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildRouteProgress(isDark, trip, loc),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+
+          if (etaLabel != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white : Colors.black,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark ? Colors.black12 : Colors.white10,
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(isDark ? 10 : 15),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  )
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.access_time_filled,
+                    color: isDark ? Colors.black : Colors.white,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    etaLabel,
+                    style: GoogleFonts.poppins(
+                      color: isDark ? Colors.black : Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
 
           // Driver Info Card
           Padding(
@@ -556,7 +920,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     Container(
                       width: double.infinity,
                       height: 56,
-                      color: isDark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
+                      color: isDark ? Colors.white.withAlpha(20) : Colors.black.withAlpha(10),
                     ),
                     Positioned.fill(
                       child: LayoutBuilder(
@@ -573,7 +937,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                             alignment: Alignment.centerLeft,
                             child: Container(
                               width: constraints.maxWidth * progress,
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: isDark ? Colors.white.withAlpha(60) : Colors.black.withAlpha(50),
                             ),
                           );
                         },

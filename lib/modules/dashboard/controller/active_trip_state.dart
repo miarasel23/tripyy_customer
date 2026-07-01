@@ -8,7 +8,9 @@ class ActiveTripLoading extends ActiveTripState {}
 
 class ActiveTripSuccess extends ActiveTripState {
   final RentalTrip activeTrip;
-  ActiveTripSuccess(this.activeTrip);
+  final double? driverLatitude;
+  final double? driverLongitude;
+  ActiveTripSuccess(this.activeTrip, {this.driverLatitude, this.driverLongitude});
 }
 
 class ActiveTripFailure extends ActiveTripState {

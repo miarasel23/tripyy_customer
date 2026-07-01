@@ -29,6 +29,8 @@ class AppUrls {
 
   static const String saveCustomerLocation = "$baseUrl/v1/customer/save-location";
   static const String deleteCustomerLocation = "$baseUrl/v1/customer/delete-location";
+  static const String saveCustomerDriverTrack = "$baseUrl/v1/customer-driver-track/create";
+  static const String customerDriverTrackGet = "$baseUrl/v1/customer-driver-track/get";
 
   static String? get profileImageUrl {
     final image = UserDataStore.userData?.data?.user?.profilePicture;

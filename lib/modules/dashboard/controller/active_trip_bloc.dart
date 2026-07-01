@@ -1,5 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
+import '../../../../store/user_data_store.dart';
+import '../../../../utils/app_urls.dart';
+import '../../searchLocation/repository/search_location_repository.dart';
 import '../repository/create_trip_repository.dart';
 import '../model/create_rental_trip_model.dart';
 import '../model/trip_status.dart';
@@ -33,7 +39,79 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
 
           if (found.isNotEmpty) {
             final activeTrip = found.first;
-            emit(ActiveTripSuccess(activeTrip));
+
+            double? driverLat;
+            double? driverLng;
+
+            final isRideShare = activeTrip.serviceName?.toUpperCase() == 'RIDE_SHARE';
+            final trackableStatuses = [
+              TripStatus.accepted,
+              TripStatus.booked,
+              TripStatus.arrivedPickupLocation,
+              TripStatus.rideStarted,
+              TripStatus.inProgress,
+              TripStatus.firstCompleted,
+            ];
+
+            bool isTrackable = false;
+            if (trackableStatuses.contains(activeTrip.tripStatus)) {
+              if (isRideShare) {
+                isTrackable = true;
+              } else {
+                final commencedStatuses = [
+                  TripStatus.arrivedPickupLocation,
+                  TripStatus.rideStarted,
+                  TripStatus.inProgress,
+                  TripStatus.firstCompleted,
+                ];
+                if (commencedStatuses.contains(activeTrip.tripStatus)) {
+                  isTrackable = true;
+                } else if (activeTrip.startDatetime != null && activeTrip.startDatetime!.isNotEmpty) {
+                  try {
+                    final startTime = DateTime.parse(activeTrip.startDatetime!);
+                    final now = DateTime.now();
+                    final difference = startTime.difference(now);
+                    if (difference.inMinutes <= 120) {
+                      isTrackable = true;
+                    }
+                  } catch (_) {
+                    isTrackable = true;
+                  }
+                } else {
+                  isTrackable = true;
+                }
+              }
+            }
+
+            if (isTrackable) {
+              // 1. Save customer's current location asynchronously
+              unawaited(_trackCustomerLocation(event.customerUuid, event.languageCode));
+
+              // 2. Fetch driver's current tracking location
+              RentalDriverBid? activeDriver;
+              if (activeTrip.drivers.isNotEmpty) {
+                try {
+                  activeDriver = activeTrip.drivers.firstWhere(
+                    (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+                  );
+                } catch (_) {
+                  activeDriver = activeTrip.drivers.first;
+                }
+              }
+              if (activeDriver != null && activeDriver.driverUuid != null) {
+                final driverPos = await _getDriverLocation(activeDriver.driverUuid, event.languageCode);
+                if (driverPos != null) {
+                  driverLat = driverPos['latitude'];
+                  driverLng = driverPos['longitude'];
+                }
+              }
+            }
+
+            emit(ActiveTripSuccess(
+              activeTrip,
+              driverLatitude: driverLat,
+              driverLongitude: driverLng,
+            ));
 
             // Stop polling once terminal state is reached
             final terminalStatuses = [TripStatus.completed, TripStatus.cancelled];
@@ -87,9 +165,98 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
 
     on<UpdateActiveTripLocalReview>((event, emit) {
       if (state is ActiveTripSuccess) {
-        emit(ActiveTripSuccess(event.updatedTrip));
+        emit(ActiveTripSuccess(
+          event.updatedTrip,
+          driverLatitude: (state as ActiveTripSuccess).driverLatitude,
+          driverLongitude: (state as ActiveTripSuccess).driverLongitude,
+        ));
       }
     });
+  }
+
+  Future<void> _trackCustomerLocation(String customerUuid, String langCode) async {
+    try {
+      final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        return;
+      }
+      final position = await Geolocator.getCurrentPosition();
+      
+      final repo = SearchLocationRepository();
+      final query = "${position.latitude},${position.longitude}";
+      final searchResponse = await repo.searchLocations(query, langCode);
+      
+      if (searchResponse.data != null && searchResponse.data!.isNotEmpty) {
+        final geolocationUuid = searchResponse.data!.first.uuid;
+        if (geolocationUuid == null) return;
+        
+        final url = Uri.parse(AppUrls.saveCustomerDriverTrack);
+        final token = await UserDataStore.getAccessToken();
+        final headers = {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json',
+        };
+        if (token != null && token.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $token';
+        }
+        
+        final body = {
+          "platform": "android",
+          "language_code": langCode,
+          "action_when": "track_location_insert",
+          "customer_uuid": customerUuid,
+          "geolocation_uuid": geolocationUuid,
+        };
+        
+        await http.post(url, headers: headers, body: body).timeout(const Duration(seconds: 10));
+      }
+    } catch (e) {
+      print("[ACTIVE TRIP BLOC] Error tracking customer location: $e");
+    }
+  }
+
+  Future<Map<String, double>?> _getDriverLocation(String? driverUuid, String langCode) async {
+    if (driverUuid == null || driverUuid.isEmpty) return null;
+    try {
+      final url = Uri.parse(AppUrls.customerDriverTrackGet);
+      final token = await UserDataStore.getAccessToken();
+      final headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+      };
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      
+      final body = {
+        "platform": "android",
+        "language_code": langCode,
+        "action_when": "track_location_get",
+        "driver_uuid": driverUuid,
+      };
+      
+      final response = await http.post(url, headers: headers, body: body).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['status'] == true && decoded['data'] != null) {
+          final List dataList = decoded['data'];
+          if (dataList.isNotEmpty) {
+            final latestTrack = dataList.first;
+            if (latestTrack['geolocation'] != null) {
+              final geo = latestTrack['geolocation'];
+              final lat = double.tryParse(geo['latitude']?.toString() ?? '');
+              final lng = double.tryParse(geo['longitude']?.toString() ?? '');
+              if (lat != null && lng != null) {
+                return {"latitude": lat, "longitude": lng};
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      print("[ACTIVE TRIP BLOC] Error getting driver location: $e");
+    }
+    return null;
   }
 
   @override
