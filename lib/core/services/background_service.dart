@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../../modules/myTrip/repository/my_trip_repository.dart';
@@ -46,7 +48,6 @@ Future<void> initializeBackgroundService() async {
       initialNotificationTitle: 'Trippy Customer Service',
       initialNotificationContent: 'Running in the background...',
       foregroundServiceNotificationId: 888,
-      foregroundServiceTypes: [AndroidForegroundType.dataSync],
     ),
     iosConfiguration: IosConfiguration(
       autoStart: true,
@@ -88,8 +89,10 @@ void onStart(ServiceInstance service) async {
 
       // Only check if user is logged in
       if (uuid != null && uuid.isNotEmpty && token != null && token.isNotEmpty) {
-        // Using "en" as default language for background poll since we don't have context
-        final response = await repository.fetchTrips("REQUESTED", "en");
+        final prefs = await SharedPreferences.getInstance();
+        final langCode = prefs.getString('active_language_code') ?? 'en';
+        
+        final response = await repository.fetchTrips("REQUESTED", langCode);
 
         int currentBids = 0;
         for (var trip in response.trips) {
@@ -97,10 +100,26 @@ void onStart(ServiceInstance service) async {
         }
 
         if (currentBids > lastNotifiedBidsCount) {
+          String title = 'Driver Found!';
+          String body = 'A driver has placed a bid on your requested trip. Tap to view bids.';
+          
+          try {
+            final jsonStr = await rootBundle.loadString('assets/lang/$langCode.json');
+            final Map<String, dynamic> translations = jsonDecode(jsonStr);
+            title = translations['notification_new_bid_title'] ?? title;
+            body = translations['notification_new_bid_body'] ?? body;
+          } catch (err) {
+            debugPrint("BackgroundService: Failed to load localization asset: $err");
+            if (langCode == 'bn') {
+              title = 'ড্রাইভার পাওয়া গেছে!';
+              body = 'একজন ড্রাইভার আপনার অনুরোধ করা ট্রিপে বিড করেছেন। বিড দেখতে ট্যাপ করুন।';
+            }
+          }
+
           flutterLocalNotificationsPlugin.show(
             id: 889,
-            title: 'Driver Found!',
-            body: 'A driver has placed a bid on your requested trip. Tap to view bids.',
+            title: title,
+            body: body,
             notificationDetails: const NotificationDetails(
               android: AndroidNotificationDetails(
                 'trip_bid_channel',

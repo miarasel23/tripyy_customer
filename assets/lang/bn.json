@@ -226,5 +226,16 @@
   "mock_dropoff_1": "ব্রুকলিন মিউজিয়াম, পার্কওয়ে",
   "mock_pickup_2": "হোটেল ইন্ডিগো, লোয়ার ইস্ট সাইড",
   "mock_dropoff_2": "জেএফকে বিমানবন্দর, টার্মিনাল ৪",
-  "profile_picture_updated": "প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে"
+  "profile_picture_updated": "প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে",
+  "notification_new_bid_title": "নতুন বিড!",
+  "notification_new_bid_body": "একজন ড্রাইভার আপনার অনুরোধ করা ট্রিপে বিড করেছেন। বিড দেখতে ট্যাপ করুন।",
+  "overlay_finding_driver": "ড্রাইভার খোঁজা হচ্ছে...",
+  "overlay_total_bids": "মোট বিড: {count}টি",
+  "overlay_lowest_bid": "সর্বনিম্ন বিড: {amount} টাকা",
+  "overlay_highest_bid": "সর্বোচ্চ বিড: {amount} টাকা",
+  "overlay_your_offer": "আপনার অফার: {amount} টাকা",
+  "overlay_no_bids": "বিডের জন্য অপেক্ষা করা হচ্ছে...",
+  "offer_price": "আপনার অফার",
+  "pending_bids": "মোট বিড",
+  "lowest_bid": "সর্বনিম্ন বিড"
 }

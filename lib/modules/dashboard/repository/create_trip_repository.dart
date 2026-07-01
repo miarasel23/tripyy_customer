@@ -66,41 +66,58 @@ class CreateTripRepository {
     String? platform,
     String tripStatus = TripStatus.requested,
   }) async {
-    try {
-      final queryParams = CustomMapBodyBuilder.build(
-        actionWhen: 'rental_bid_trip_list_for_customer',
-        languageCode: langCode,
-        data: {
-          'customer_uuid': customerUuid,
-          'trip_status': tripStatus,
-        },
-      ).map((key, value) => MapEntry(key, value.toString()));
-      final uri = Uri.parse(AppUrls.rentalBidTripListForCustomer).replace(queryParameters: queryParams);
-      final token = await UserDataStore.getAccessToken();
-      final headers = {
-        'Accept': 'application/json',
-      };
-      if (token != null && token.isNotEmpty) {
-        headers['Authorization'] = 'Bearer $token';
-      }
-      
-      final response = await ApiService().get(
-        uri,
-        headers: headers,
-      );
-      
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        if (decoded['status'] == false) {
-          throw Exception(decoded['message'] ?? "Unknown server error");
+    int retryCount = 0;
+    const int maxRetries = 5;
+    
+    while (true) {
+      try {
+        final queryParams = CustomMapBodyBuilder.build(
+          actionWhen: 'rental_bid_trip_list_for_customer',
+          languageCode: langCode,
+          data: {
+            'customer_uuid': customerUuid,
+            'trip_status': tripStatus,
+          },
+        ).map((key, value) => MapEntry(key, value.toString()));
+        final uri = Uri.parse(AppUrls.rentalBidTripListForCustomer).replace(queryParameters: queryParams);
+        final token = await UserDataStore.getAccessToken();
+        final headers = {
+          'Accept': 'application/json',
+          'Connection': 'close',
+        };
+        if (token != null && token.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $token';
         }
-        return RentalBidListResponse.fromJson(decoded);
-      } else {
-        throw Exception("Server error: ${response.statusCode}");
+        
+        final response = await ApiService().get(
+          uri,
+          headers: headers,
+          showSnackBarOnError: false,
+        );
+        
+        if (response.statusCode == 200) {
+          final decoded = jsonDecode(response.body);
+          if (decoded['status'] == false) {
+            throw Exception(decoded['message'] ?? "Unknown server error");
+          }
+          return RentalBidListResponse.fromJson(decoded);
+        } else {
+          throw Exception("Server error: ${response.statusCode}");
+        }
+      } catch (e) {
+        retryCount++;
+        final isNetworkError = e is http.ClientException || 
+                             e.toString().contains('ClientException') || 
+                             e.toString().contains('SocketException') || 
+                             e.toString().contains('HttpException') ||
+                             e.toString().contains('Connection closed');
+        
+        if (isNetworkError && retryCount < maxRetries) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          continue;
+        }
+        rethrow;
       }
-    } catch (e) {
-      debugPrint("Error fetching bids: $e");
-      rethrow;
     }
   }
 

@@ -238,9 +238,15 @@ class _BiddingScreenState extends State<BiddingScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final isConnectionError = e.toString().contains('Connection closed') || 
+                                   e.toString().contains('ClientException') ||
+                                   e.toString().contains('SocketException') ||
+                                   e.toString().contains('HttpException');
         setState(() {
           _isLoading = false;
-          _errorMessage = e.toString();
+          if (!isConnectionError) {
+            _errorMessage = e.toString();
+          }
         });
       }
     }

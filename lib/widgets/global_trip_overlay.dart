@@ -23,6 +23,7 @@ class GlobalTripOverlay extends StatefulWidget {
 class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   final CreateTripRepository _repo = CreateTripRepository();
   RentalTrip? _activeTrip;
+  RentalTrip? _requestedTrip;
   Timer? _pollingTimer;
   bool _isExpanded = false;
 
@@ -79,30 +80,66 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       final loc = AppLocalizations.of(context);
       final langCode = loc.locale.languageCode;
       
-      final response = await _repo.fetchBids(
+      final activeFuture = _repo.fetchBids(
         customerUuid: customerUuid,
         langCode: langCode,
         tripStatus: TripStatus.all,
       );
+      
+      final requestedFuture = _repo.fetchBids(
+        customerUuid: customerUuid,
+        langCode: langCode,
+        tripStatus: TripStatus.requested,
+      );
+
+      final results = await Future.wait([activeFuture, requestedFuture]);
+      final activeResponse = results[0];
+      final requestedResponse = results[1];
 
       if (mounted) {
         setState(() {
-          if (response.trips.isNotEmpty) {
+          if (activeResponse.trips.isNotEmpty) {
             // BUG FIX: Search for an active trip by status rather than blindly taking first
             final activeStatuses = [
               TripStatus.rideStarted,
               TripStatus.firstCompleted,
             ];
-            final found = response.trips.where((t) => activeStatuses.contains(t.tripStatus)).toList();
+            final found = activeResponse.trips.where((t) => activeStatuses.contains(t.tripStatus)).toList();
             _activeTrip = found.isNotEmpty ? found.first : null;
           } else {
             _activeTrip = null;
+          }
+
+          if (requestedResponse.trips.isNotEmpty) {
+            _requestedTrip = requestedResponse.trips.first;
+          } else {
+            _requestedTrip = null;
           }
         });
       }
     } catch (e) {
       // Silently ignore polling errors
     }
+  }
+
+  String _translate(String key, {Map<String, String>? args}) {
+    final loc = AppLocalizations.of(context);
+    String val = loc.translate(key);
+    if (val == key) {
+      if (key == 'overlay_finding_driver') return 'Finding your driver...';
+      if (key == 'overlay_total_bids') return 'Total Bids: ${args?['count']}';
+      if (key == 'overlay_lowest_bid') return 'Lowest Bid: ${args?['amount']} BDT';
+      if (key == 'overlay_highest_bid') return 'Highest Bid: ${args?['amount']} BDT';
+      if (key == 'overlay_your_offer') return 'Your Offer: ${args?['amount']} BDT';
+      if (key == 'overlay_no_bids') return 'Waiting for bids...';
+      return key;
+    }
+    if (args != null) {
+      args.forEach((k, v) {
+        val = val.replaceAll('{$k}', v);
+      });
+    }
+    return val;
   }
 
   String _formatDate(String? dateStr) {
@@ -132,24 +169,230 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     return Icons.directions_car;
   }
 
+  Widget _buildBiddingOverlayContent(BuildContext context) {
+    final trip = _requestedTrip!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final loc = AppLocalizations.of(context);
+
+    final totalBids = trip.bidSummary?.totalBids ?? trip.totalBids ?? 0;
+    final lowestBid = trip.bidSummary?.lowestBidAmount;
+    final offerAmount = trip.offerAmount;
+
+    return Material(
+      color: Colors.transparent,
+      child: GestureDetector(
+        onTap: () {
+          final customerUuid = UserDataStore.userData?.data?.user?.uuid;
+          if (customerUuid != null) {
+            globalNavigatorKey.currentState?.pushNamed(
+              AppRoutes.biddingScreen,
+              arguments: {
+                'customerUuid': customerUuid,
+                'tripUuid': trip.uuid ?? "",
+              },
+            );
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C1E26) : Colors.white,
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(24),
+              bottomRight: Radius.circular(24),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 2),
+              )
+            ],
+          ),
+          child: SafeArea(
+            top: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white24 : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 24,
+                      child: _AnimatedVehicleIcon(
+                        iconData: _getVehicleIcon(trip.carCategory?.carType),
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _translate('overlay_finding_driver'),
+                            style: GoogleFonts.poppins(
+                              color: isDark ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                          Text(
+                            trip.serviceName?.replaceAll('_', ' ') ?? "CAR RENTAL",
+                            style: GoogleFonts.poppins(
+                              color: isDark ? Colors.white54 : Colors.black54,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        final customerUuid = UserDataStore.userData?.data?.user?.uuid;
+                        if (customerUuid != null) {
+                          globalNavigatorKey.currentState?.pushNamed(
+                            AppRoutes.biddingScreen,
+                            arguments: {
+                              'customerUuid': customerUuid,
+                              'tripUuid': trip.uuid ?? "",
+                            },
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isDark ? Colors.white : Colors.black,
+                        foregroundColor: isDark ? Colors.black : Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        minimumSize: const Size(0, 32),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: Text(
+                        loc.translate('view_bids') == 'view_bids' ? "View Bids" : loc.translate('view_bids'),
+                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.black : Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF13151B) : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _buildSummaryItem(
+                        context,
+                        loc.translate('offer_price') == 'offer_price' ? "Your Offer" : loc.translate('offer_price'),
+                        "${offerAmount?.toStringAsFixed(0) ?? '0'} ৳",
+                        isDark,
+                      ),
+                      _buildSummaryDivider(isDark),
+                      _buildSummaryItem(
+                        context,
+                        loc.translate('pending_bids') == 'pending_bids' ? "Total Bids" : loc.translate('pending_bids'),
+                        "$totalBids",
+                        isDark,
+                        valueColor: totalBids > 0 ? AppColors.primary : null,
+                      ),
+                      if (totalBids > 0 && lowestBid != null) ...[
+                        _buildSummaryDivider(isDark),
+                        _buildSummaryItem(
+                          context,
+                          loc.translate('lowest_bid') == 'lowest_bid' ? "Lowest Bid" : loc.translate('lowest_bid'),
+                          "${lowestBid.toStringAsFixed(0)} ৳",
+                          isDark,
+                          valueColor: Colors.green,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryItem(BuildContext context, String label, String value, bool isDark, {Color? valueColor}) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            color: isDark ? Colors.white54 : Colors.black54,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: valueColor ?? (isDark ? Colors.white : Colors.black),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryDivider(bool isDark) {
+    return Container(
+      width: 1,
+      height: 24,
+      color: isDark ? Colors.white10 : Colors.grey.shade300,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Determine current route name, preferring the ModalRoute (available immediately) and falling back to the observer
     final routeName = ModalRoute.of(context)?.settings.name ?? globalRouteObserver.currentRoute;
     // Hide overlay on active trip screen (exact match or any sub‑route) to make this page fully invisible
-    final hideOverlay = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith('${AppRoutes.activeTrip}'));
+    final hideActiveOverlay = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith('${AppRoutes.activeTrip}'));
+    
+    // Hide bidding overlay on bidding screen (exact match or any sub-route)
+    final hideBiddingOverlay = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith('${AppRoutes.biddingScreen}'));
+
+    final showActiveOverlay = _activeTrip != null && !hideActiveOverlay;
+    final showBiddingOverlay = !showActiveOverlay && _requestedTrip != null && !hideBiddingOverlay;
 
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Stack(
         children: [
           widget.child,
-          if (_activeTrip != null && !hideOverlay)
+          if (showActiveOverlay)
             Positioned(
               left: 0,
               right: 0,
               top: 0,
               child: _buildOverlayContent(context),
+            ),
+          if (showBiddingOverlay)
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 0,
+              child: _buildBiddingOverlayContent(context),
             ),
         ],
       ),
@@ -451,6 +694,63 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _AnimatedVehicleIcon extends StatefulWidget {
+  final IconData iconData;
+  final Color color;
+
+  const _AnimatedVehicleIcon({required this.iconData, required this.color});
+
+  @override
+  State<_AnimatedVehicleIcon> createState() => _AnimatedVehicleIconState();
+}
+
+class _AnimatedVehicleIconState extends State<_AnimatedVehicleIcon> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+    
+    _slideAnimation = Tween<double>(begin: -15.0, end: 15.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    
+    _opacityAnimation = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 1.0), weight: 20),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.0), weight: 60),
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 0.0), weight: 20),
+    ]).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _opacityAnimation.value,
+          child: Transform.translate(
+            offset: Offset(_slideAnimation.value, 0),
+            child: Icon(widget.iconData, color: widget.color, size: 24),
+          ),
+        );
+      },
     );
   }
 }

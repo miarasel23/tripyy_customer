@@ -255,6 +255,7 @@ class RentalTrip {
   final String? startDatetime;
   final String? endDatetime;
   final bool? givenReview;
+  final BidSummaryModel? bidSummary;
 
   RentalTrip({
     this.id,
@@ -272,6 +273,7 @@ class RentalTrip {
     this.startDatetime,
     this.endDatetime,
     this.givenReview,
+    this.bidSummary,
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -291,6 +293,7 @@ class RentalTrip {
       startDatetime: json['start_datetime']?.toString(),
       endDatetime: json['end_datetime']?.toString(),
       givenReview: json['given_review'] as bool?,
+      bidSummary: json['bid_summary'] != null ? BidSummaryModel.fromJson(json['bid_summary']) : null,
     );
   }
 
@@ -310,6 +313,7 @@ class RentalTrip {
     String? startDatetime,
     String? endDatetime,
     bool? givenReview,
+    BidSummaryModel? bidSummary,
   }) {
     return RentalTrip(
       id: id ?? this.id,
@@ -327,7 +331,36 @@ class RentalTrip {
       startDatetime: startDatetime ?? this.startDatetime,
       endDatetime: endDatetime ?? this.endDatetime,
       givenReview: givenReview ?? this.givenReview,
+      bidSummary: bidSummary ?? this.bidSummary,
     );
+  }
+}
+
+class BidSummaryModel {
+  final double? lowestBidAmount;
+  final double? highestBidAmount;
+  final int? totalBids;
+
+  BidSummaryModel({
+    this.lowestBidAmount,
+    this.highestBidAmount,
+    this.totalBids,
+  });
+
+  factory BidSummaryModel.fromJson(Map<String, dynamic> json) {
+    return BidSummaryModel(
+      lowestBidAmount: (json['lowest_bid_amount'] as num?)?.toDouble(),
+      highestBidAmount: (json['highest_bid_amount'] as num?)?.toDouble(),
+      totalBids: json['total_bids'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'lowest_bid_amount': lowestBidAmount,
+      'highest_bid_amount': highestBidAmount,
+      'total_bids': totalBids,
+    };
   }
 }
 

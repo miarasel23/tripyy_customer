@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/services/background_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -39,7 +40,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   AppGlobals.init();
   await initializeBackgroundService();
-  runApp(MyApp());
+  
+  final prefs = await SharedPreferences.getInstance();
+  final initialLang = prefs.getString('active_language_code') ?? 'en';
+  
+  runApp(MyApp(initialLanguageCode: initialLang));
 }
 
 final GlobalKey<ScaffoldMessengerState> globalScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -80,7 +85,8 @@ class MyRouteObserver extends NavigatorObserver {
 final MyRouteObserver globalRouteObserver = MyRouteObserver();
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  final String? initialLanguageCode;
+  const MyApp({super.key, this.initialLanguageCode});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -151,7 +157,7 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => ThemeBloc()),
-        BlocProvider(create: (_) => LocalizationBloc()),
+        BlocProvider(create: (_) => LocalizationBloc(Locale(widget.initialLanguageCode ?? 'en'))),
         BlocProvider(create: (_) => MainBottomNavBarBloc()),
         BlocProvider(create: (_) => PointsBloc()),
         BlocProvider(create: (_) => MyTripBloc()),

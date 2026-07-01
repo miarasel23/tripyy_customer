@@ -47,7 +47,13 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
           emit(NoActiveTrip("No active trip found."));
         }
       } catch (e) {
-        emit(ActiveTripFailure(e.toString().replaceAll('Exception: ', '')));
+        final isConnectionError = e.toString().contains('Connection closed') || 
+                                   e.toString().contains('ClientException') ||
+                                   e.toString().contains('SocketException') ||
+                                   e.toString().contains('HttpException');
+        if (!isConnectionError) {
+          emit(ActiveTripFailure(e.toString().replaceAll('Exception: ', '')));
+        }
       }
     });
 

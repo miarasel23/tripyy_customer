@@ -223,5 +223,17 @@
   "mock_dropoff_1": "Brooklyn Museum, Parkway",
   "mock_pickup_2": "Hotel Indigo, Lower East Side",
   "mock_dropoff_2": "JFK Airport, Terminal 4",
-  "profile_picture_updated": "Profile picture updated successfully"
+  "profile_picture_updated": "Profile picture updated successfully",
+  "notification_new_bid_title": "New Bid!",
+  "notification_new_bid_body": "A driver has placed a bid on your requested trip. Tap to view bids.",
+  "overlay_finding_driver": "Finding your driver...",
+  "overlay_total_bids": "Total Bids: {count}",
+  "overlay_lowest_bid": "Lowest Bid: {amount} BDT",
+  "overlay_highest_bid": "Highest Bid: {amount} BDT",
+  "overlay_your_offer": "Your Offer: {amount} BDT",
+  "overlay_no_bids": "Waiting for bids...",
+  "view_bids": "View Bids",
+  "offer_price": "Your Offer",
+  "pending_bids": "Total Bids",
+  "lowest_bid": "Lowest Bid"
 }

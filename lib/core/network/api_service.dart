@@ -66,13 +66,15 @@ class ApiService {
     }
   }
 
-  Future<http.Response> get(Uri url, {Map<String, String>? headers}) async {
+  Future<http.Response> get(Uri url, {Map<String, String>? headers, bool showSnackBarOnError = true}) async {
     try {
       final response = await http.get(url, headers: headers);
       _handleErrorResponse(response);
       return response;
     } catch (e) {
-      _navigateToError(e.toString());
+      if (showSnackBarOnError) {
+        _navigateToError(e.toString());
+      }
       rethrow;
     }
   }
