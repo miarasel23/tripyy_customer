@@ -53,6 +53,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _dropoffUuid;
   String? _dropoffAddress;
 
+  /// Selected service
+  String? _selectedServiceKey;
+  List<dynamic>? _selectedServiceCars;
+
   /// Reverse geocoded address for center pin
   String? _centerAddress;
   Timer? _mapIdleDebounce;
@@ -246,6 +250,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
 
       _searchCardKey.currentState?.setFetchingLocation(false);
+      _checkAndTriggerNextStep();
     });
   }
 
@@ -300,6 +305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ));
       }
     }
+    _checkAndTriggerNextStep();
   }
 
   /// Called when the user selects a destination from the search list
@@ -323,6 +329,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _mapController?.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(target: latLng, zoom: 18.0),
     ));
+    _checkAndTriggerNextStep();
   }
 
   void _rebuildMarkers() {
@@ -384,27 +391,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
   }
 
-  Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars) async {
+  void _checkAndTriggerNextStep() {
+    if (_selectedServiceKey != null && _selectedServiceCars != null) {
+      if (_pickups.isNotEmpty && 
+          !_pickups.any((p) => p.uuid == null || p.uuid!.isEmpty) && 
+          _dropoffUuid != null && _dropoffUuid!.isNotEmpty) {
+         _handleServiceSelection(_selectedServiceKey!, _selectedServiceCars!, fromAutoTrigger: true);
+      }
+    }
+  }
+
+  Future<void> _handleServiceSelection(String serviceKey, List<dynamic> defaultCars, {bool fromAutoTrigger = false}) async {
     // Dismiss keyboard immediately to prevent restoration overlay
     FocusScope.of(context).unfocus();
     FocusManager.instance.primaryFocus?.unfocus();
 
+    if (!fromAutoTrigger) {
+      bool isUnselecting = false;
+      setState(() {
+        if (_selectedServiceKey == serviceKey) {
+          // Unselect if it's already selected
+          _selectedServiceKey = null;
+          _selectedServiceCars = null;
+          isUnselecting = true;
+        } else {
+          _selectedServiceKey = serviceKey;
+          _selectedServiceCars = defaultCars;
+        }
+      });
+      if (isUnselecting) return; // Stop if we just unselected
+    }
+
     // Validate pickup
     if (_pickups.isEmpty) {
-      UiUtils.showAppSnackBar(context, 'Please select a pickup location.', type: 'error');
       return;
     }
 
     // Validate pickup has a valid UUID (location confirmed by the backend)
     final invalidPickup = _pickups.any((p) => p.uuid == null || p.uuid!.isEmpty);
     if (invalidPickup) {
-      UiUtils.showAppSnackBar(context, 'Pickup location could not be confirmed. Please drag the map to re-select.', type: 'error');
+      if (!fromAutoTrigger) {
+        UiUtils.showAppSnackBar(context, 'Pickup location could not be confirmed. Please drag the map to re-select.', type: 'error');
+      }
       return;
     }
 
     // Validate dropoff
     if (_dropoffUuid == null || _dropoffUuid!.isEmpty) {
-      UiUtils.showAppSnackBar(context, 'Please select a drop-off location.', type: 'error');
       return;
     }
 
@@ -651,7 +684,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 BlocBuilder<ChooseCarBottomSheetBloc, ChooseCarBottomSheetState>(
                   builder: (context, state) => ServicesSectionWidget(
                     state: state,
-                    onServiceTap: _handleServiceSelection,
+                    selectedServiceKey: _selectedServiceKey,
+                    onServiceTap: (key, cars) => _handleServiceSelection(key, cars, fromAutoTrigger: false),
                   ),
                 ),
                 const SizedBox(height: 20),

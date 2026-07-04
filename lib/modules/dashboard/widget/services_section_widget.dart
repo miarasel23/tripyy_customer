@@ -8,8 +8,9 @@ import '../choose_car_bottom_sheet/screen/choose_car_bottom_sheet.dart';
 class ServicesSectionWidget extends StatelessWidget {
   final ChooseCarBottomSheetState state;
   final Function(String serviceKey, List<dynamic> defaultCars) onServiceTap;
+  final String? selectedServiceKey;
 
-  const ServicesSectionWidget({Key? key, required this.state, required this.onServiceTap}) : super(key: key);
+  const ServicesSectionWidget({Key? key, required this.state, required this.onServiceTap, this.selectedServiceKey}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,8 @@ class ServicesSectionWidget extends StatelessWidget {
         children: keys.map((key) {
           final serviceGroup = state.groups?[key];
           final avatar = serviceGroup?.avatar;
+          final bool isSelected = key == selectedServiceKey;
+
           return GestureDetector(
             onTap: () {
               if (key != null) {
@@ -36,8 +39,9 @@ class ServicesSectionWidget extends StatelessWidget {
               height: 145,
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
               decoration: BoxDecoration(
-                color: isLight ? Colors.white : Color(0xFF2A2F3D),
+                color: isSelected ? (isLight ? Colors.blue[50] : Colors.blue[900]?.withOpacity(0.3)) : (isLight ? Colors.white : Color(0xFF2A2F3D)),
                 borderRadius: BorderRadius.circular(16),
+                border: isSelected ? Border.all(color: Colors.blue, width: 1.5) : null,
                 boxShadow: isLight ? [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.05),
