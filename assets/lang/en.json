@@ -235,5 +235,8 @@
   "view_bids": "View Bids",
   "offer_price": "Your Offer",
   "pending_bids": "Total Bids",
-  "lowest_bid": "Lowest Bid"
+  "lowest_bid": "Lowest Bid",
+  "please_enable_location_services": "Please enable location",
+  "location_permission_denied": "Location permission is required to detect your location",
+  "location_permission_permanently_denied": "Location permission is permanently denied. Please allow location in App Settings."
 }

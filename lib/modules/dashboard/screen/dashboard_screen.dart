@@ -70,7 +70,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final loc = AppLocalizations.of(context);
       context.read<ChooseCarBottomSheetBloc>().add(
@@ -87,21 +86,49 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _getCurrentLocation({bool forcePopulatePickup = false}) async {
     _searchCardKey.currentState?.setFetchingLocation(true);
+
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      _searchCardKey.currentState?.setFetchingLocation(false);
-      return;
+      if (mounted) {
+        UiUtils.showAppSnackBar(
+          context,
+          AppLocalizations.of(context).translate("please_enable_location_services"),
+          type: 'warning',
+        );
+      }
+      await Geolocator.openLocationSettings();
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _searchCardKey.currentState?.setFetchingLocation(false);
+        return;
+      }
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        if (mounted) {
+          UiUtils.showAppSnackBar(
+            context,
+            AppLocalizations.of(context).translate("location_permission_denied"),
+            type: 'error',
+          );
+        }
         _searchCardKey.currentState?.setFetchingLocation(false);
         return;
       }
     }
+
     if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        UiUtils.showAppSnackBar(
+          context,
+          AppLocalizations.of(context).translate("location_permission_permanently_denied"),
+          type: 'error',
+        );
+      }
+      await Geolocator.openAppSettings();
       _searchCardKey.currentState?.setFetchingLocation(false);
       return;
     }
@@ -112,9 +139,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
       final latLng = LatLng(position.latitude, position.longitude);
 
-      setState(() {
-        _cameraCenter = latLng;
-      });
+      if (mounted) {
+        setState(() {
+          _cameraCenter = latLng;
+        });
+      }
 
       _isProgrammaticCameraMove = true;
       _mapController?.animateCamera(CameraUpdate.newCameraPosition(
@@ -677,7 +706,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
           // Bottom portion: Services and Search
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -688,7 +717,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     onServiceTap: (key, cars) => _handleServiceSelection(key, cars, fromAutoTrigger: false),
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 8),
                 SearchAndSavedCardWidget(
                   key: _searchCardKey,
                   loc: loc,
