@@ -40,21 +40,21 @@ class _SplashScreenState extends State<SplashScreen> {
         debugPrint("Splash: Error loading UUID: $e");
       }
       
-      // Let the beautiful Trippy animation play for 4 seconds
-      await Future.delayed(const Duration(seconds: 4));
-      
+      final token = UserDataStore.accessToken;
+      final uuid = UserDataStore.uuid;
+      final isLoggedIn = token != null && token.isNotEmpty && uuid != null && uuid.isNotEmpty;
+
       if (mounted) {
-        final token = UserDataStore.accessToken;
-        
-        // If token is missing, redirect to login
-        if (token == null || token.isEmpty) {
-          debugPrint("Splash: Token is null or empty, redirecting to numberInput");
-          await UserDataStore.clearAllData();
-          Navigator.pushReplacementNamed(context, AppRoutes.numberInput);
-        } else {
-          debugPrint("Splash: Token found, redirecting to bottomNav");
-          // If already logged in, automatically open home page (bottomNav)
+        if (isLoggedIn) {
+          debugPrint("Splash: Logged in user detected, entering home page immediately.");
           Navigator.pushReplacementNamed(context, AppRoutes.bottomNav);
+        } else {
+          debugPrint("Splash: New/Logged out user, showing splash animation.");
+          await Future.delayed(const Duration(seconds: 4));
+          if (!mounted) return;
+          await UserDataStore.clearAllData();
+          if (!mounted) return;
+          Navigator.pushReplacementNamed(context, AppRoutes.numberInput);
         }
       }
     });

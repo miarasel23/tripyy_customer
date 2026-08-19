@@ -43,6 +43,7 @@ Future<void> initializeBackgroundService() async {
     androidConfiguration: AndroidConfiguration(
       onStart: onStart,
       autoStart: true,
+      autoStartOnBoot: true,
       isForegroundMode: true,
       notificationChannelId: 'trip_bid_channel',
       initialNotificationTitle: 'Trippy Customer Service',
@@ -67,6 +68,20 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
+
+  if (service is AndroidServiceInstance) {
+    service.on('setAsForeground').listen((event) {
+      service.setAsForegroundService();
+    });
+    service.on('setAsBackground').listen((event) {
+      service.setAsBackgroundService();
+    });
+    service.on('stopService').listen((event) {
+      service.stopSelf();
+    });
+
+    service.setAsForegroundService();
+  }
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();

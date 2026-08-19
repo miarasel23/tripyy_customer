@@ -43,8 +43,18 @@ void main() async {
   
   final prefs = await SharedPreferences.getInstance();
   final initialLang = prefs.getString('active_language_code') ?? 'en';
+
+  final token = await UserDataStore.getAccessToken();
+  final uuid = await UserDataStore.getUuid();
+  await UserDataStore.getUserData();
+
+  final bool isLoggedIn = token != null && token.isNotEmpty && uuid != null && uuid.isNotEmpty;
+  final String initialRoute = isLoggedIn ? AppRoutes.bottomNav : AppRoutes.splash;
   
-  runApp(MyApp(initialLanguageCode: initialLang));
+  runApp(MyApp(
+    initialLanguageCode: initialLang,
+    initialRoute: initialRoute,
+  ));
 }
 
 final GlobalKey<ScaffoldMessengerState> globalScaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -86,7 +96,8 @@ final MyRouteObserver globalRouteObserver = MyRouteObserver();
 
 class MyApp extends StatefulWidget {
   final String? initialLanguageCode;
-  const MyApp({super.key, this.initialLanguageCode});
+  final String initialRoute;
+  const MyApp({super.key, this.initialLanguageCode, this.initialRoute = AppRoutes.splash});
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -210,7 +221,7 @@ class _MyAppState extends State<MyApp> {
             ],
 
             // 🔥 ROUTING
-            initialRoute: AppRoutes.splash,
+            initialRoute: widget.initialRoute,
             onGenerateRoute: RouteGenerator.generateRoute,
             navigatorObservers: [globalRouteObserver],
             builder: (context, child) {
