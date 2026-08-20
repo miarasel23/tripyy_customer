@@ -244,5 +244,8 @@
   "give_offer": "অফার দিন",
   "give_offer_for": "অফার দিন ৳{amount}",
   "offer_your_fare": "আপনার অফার দিন",
-  "close": "বন্ধ করুন"
+  "close": "বন্ধ করুন",
+  "exit_app_title": "অ্যাপ থেকে বের হন",
+  "exit_app_message": "আপনি কি নিশ্চিত যে আপনি অ্যাপ থেকে বের হতে চান?",
+  "exit_app_confirm": "বের হন"
 }

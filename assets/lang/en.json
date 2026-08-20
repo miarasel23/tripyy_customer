@@ -242,5 +242,8 @@
   "give_offer": "Give Offer",
   "give_offer_for": "Give Offer for BDT {amount}",
   "offer_your_fare": "Offer your fare",
-  "close": "Close"
+  "close": "Close",
+  "exit_app_title": "Exit App",
+  "exit_app_message": "Are you sure you want to exit the app?",
+  "exit_app_confirm": "Exit"
 }
