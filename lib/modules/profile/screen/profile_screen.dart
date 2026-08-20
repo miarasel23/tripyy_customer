@@ -144,24 +144,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         builder: (context, state) {
                           Widget avatarWidget;
                           if (state.status == EditProfilePictureStatus.loading) {
-                            avatarWidget = CircleAvatar(
-                              radius: 40,
-                              backgroundColor: Theme.of(context).colorScheme.surface,
-                              child: const CircularProgressIndicator(),
+                            avatarWidget = Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: const Center(child: CircularProgressIndicator()),
                             );
                           } else {
                             final currentImageUrl = AppUrls.profileImageUrl;
                             if (currentImageUrl != null && currentImageUrl.isNotEmpty) {
-                              avatarWidget = CircleAvatar(
-                                radius: 40,
-                                backgroundImage: NetworkImage(currentImageUrl),
-                                backgroundColor: Colors.grey.shade200,
+                              avatarWidget = Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Image.network(
+                                    currentImageUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => Icon(
+                                      Icons.person,
+                                      size: 40,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
                               );
                             } else {
-                              avatarWidget = CircleAvatar(
-                                radius: 40,
-                                backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                child: Icon(Icons.person, size: 40, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              avatarWidget = Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Icon(
+                                  Icons.person,
+                                  size: 40,
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
                               );
                             }
                           }

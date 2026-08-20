@@ -162,7 +162,7 @@ class RentalDriverBid {
 
   factory RentalDriverBid.fromJson(Map<String, dynamic> json) {
     return RentalDriverBid(
-      rentBidUuid: json['rent_bid_uuid'],
+      rentBidUuid: json['rent_bid_uuid']?.toString() ?? json['bid_uuid']?.toString() ?? json['uuid']?.toString(),
       bidAmount: (json['bid_amount'] as num?)?.toDouble(),
       totalAmount: (json['total_amount'] as num?)?.toDouble(),
       insuranceChargeAmount: (json['insurance_charge_amount'] as num?)?.toDouble(),
@@ -214,13 +214,15 @@ class LocationModel {
 class CarCategoryModel {
   final String? carType;
   final String? carAvatar;
+  final String? setCapacity;
 
-  CarCategoryModel({this.carType, this.carAvatar});
+  CarCategoryModel({this.carType, this.carAvatar, this.setCapacity});
 
   factory CarCategoryModel.fromJson(Map<String, dynamic> json) {
     return CarCategoryModel(
       carType: json['car_type'],
       carAvatar: json['car_avatar'],
+      setCapacity: json['set_capacity']?.toString() ?? json['seat_capacity']?.toString(),
     );
   }
 }
@@ -235,6 +237,29 @@ class PriceInfoModel {
     return PriceInfoModel(
       minimumBookingPrice: (json['minimum_booking_price'] as num?)?.toDouble(),
       pricePerKm: (json['price_per_km'] as num?)?.toDouble(),
+    );
+  }
+}
+
+class SeenDriverModel {
+  final String? driverUuid;
+  final String? name;
+  final String? profilePicture;
+  final String? createdAt;
+
+  SeenDriverModel({
+    this.driverUuid,
+    this.name,
+    this.profilePicture,
+    this.createdAt,
+  });
+
+  factory SeenDriverModel.fromJson(Map<String, dynamic> json) {
+    return SeenDriverModel(
+      driverUuid: json['driver_uuid']?.toString(),
+      name: json['name']?.toString(),
+      profilePicture: json['profile_picture']?.toString(),
+      createdAt: json['created_at']?.toString(),
     );
   }
 }
@@ -254,8 +279,13 @@ class RentalTrip {
   final String? paymentMethod;
   final String? startDatetime;
   final String? endDatetime;
+  final String? createdAt;
+  final String? countryCode;
   final bool? givenReview;
   final BidSummaryModel? bidSummary;
+  final int? seenDriverCount;
+  final List<SeenDriverModel> seenDrivers;
+  final List<String> seenDriverPhotos;
 
   RentalTrip({
     this.id,
@@ -272,8 +302,13 @@ class RentalTrip {
     this.paymentMethod,
     this.startDatetime,
     this.endDatetime,
+    this.createdAt,
+    this.countryCode,
     this.givenReview,
     this.bidSummary,
+    this.seenDriverCount,
+    this.seenDrivers = const [],
+    this.seenDriverPhotos = const [],
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -292,8 +327,13 @@ class RentalTrip {
       paymentMethod: json['payment_method']?.toString(),
       startDatetime: json['start_datetime']?.toString(),
       endDatetime: json['end_datetime']?.toString(),
+      createdAt: json['created_at']?.toString() ?? json['createdAt']?.toString() ?? json['created_time']?.toString() ?? json['start_datetime']?.toString(),
+      countryCode: json['country_code']?.toString() ?? json['countryCode']?.toString(),
       givenReview: json['given_review'] as bool?,
       bidSummary: json['bid_summary'] != null ? BidSummaryModel.fromJson(json['bid_summary']) : null,
+      seenDriverCount: json['seen_driver_count'] as int?,
+      seenDrivers: (json['seen_drivers'] as List<dynamic>?)?.map((e) => SeenDriverModel.fromJson(e)).toList() ?? [],
+      seenDriverPhotos: (json['seen_driver_photos'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
     );
   }
 
@@ -314,6 +354,9 @@ class RentalTrip {
     String? endDatetime,
     bool? givenReview,
     BidSummaryModel? bidSummary,
+    int? seenDriverCount,
+    List<SeenDriverModel>? seenDrivers,
+    List<String>? seenDriverPhotos,
   }) {
     return RentalTrip(
       id: id ?? this.id,
@@ -332,6 +375,9 @@ class RentalTrip {
       endDatetime: endDatetime ?? this.endDatetime,
       givenReview: givenReview ?? this.givenReview,
       bidSummary: bidSummary ?? this.bidSummary,
+      seenDriverCount: seenDriverCount ?? this.seenDriverCount,
+      seenDrivers: seenDrivers ?? this.seenDrivers,
+      seenDriverPhotos: seenDriverPhotos ?? this.seenDriverPhotos,
     );
   }
 }

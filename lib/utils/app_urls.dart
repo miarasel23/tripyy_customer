@@ -25,6 +25,7 @@ class AppUrls {
   static const String rentalBidTripListForCustomer = "$baseUrl/v1/rental-trip/rental-bid-trip-list_for_customer";
   static const String acceptTripForCustomer = "$baseUrl/v1/rental-trip/accept_trip_for_customer";
   static const String cancelTripDriverOrCustomerAdmin = "$baseUrl/v1/rental-trip/cancel-trip-driver-or-customer-admin";
+  static const String cancelRentBidDriverOrCustomerAdmin = "$baseUrl/v1/rental-trip/cancel-rent-bid-driver-or-customer-admin";
   static const String rentalTripGiveReview = "$baseUrl/v1/rental-trip/give-review";
 
   static const String saveCustomerLocation = "$baseUrl/v1/customer/save-location";

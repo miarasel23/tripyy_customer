@@ -1,13 +1,175 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/localization/app_localization.dart';
 import '../model/create_rental_trip_model.dart';
+import '../repository/create_trip_repository.dart';
 import '../../../../utils/app_urls.dart';
 import '../../../../widgets/radar_animation.dart';
 import '../../../../widgets/full_screen_image_gallery.dart';
-import '../../../../main.dart';
+import '../../../../store/app_globals.dart';
 
-class BiddingListWidget extends StatelessWidget {
+class TripTimerBadge extends StatefulWidget {
+  final String? serviceName;
+  final String? createdAt;
+  final String? countryCode;
+  final bool isDark;
+
+  const TripTimerBadge({
+    super.key,
+    required this.serviceName,
+    this.createdAt,
+    this.countryCode,
+    required this.isDark,
+  });
+
+  @override
+  State<TripTimerBadge> createState() => _TripTimerBadgeState();
+}
+
+class _TripTimerBadgeState extends State<TripTimerBadge> {
+  late int _remainingSeconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSeconds();
+    _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant TripTimerBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.serviceName != widget.serviceName || oldWidget.createdAt != widget.createdAt) {
+      _timer?.cancel();
+      _initSeconds();
+      _startTimer();
+    }
+  }
+
+  DateTime? _parseDateTime(String? raw, {String? countryCode}) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    try {
+      String clean = raw.trim();
+      if (clean.contains(' ') && !clean.contains('T')) {
+        clean = clean.replaceAll(' ', 'T');
+      }
+
+      final code = (countryCode != null && countryCode.isNotEmpty)
+          ? countryCode.toUpperCase()
+          : AppGlobals.countryCode.toUpperCase();
+      final isBD = code == "BD";
+
+      if (!clean.endsWith('Z') && !clean.contains('+') && !RegExp(r'T\d{2}:\d{2}:\d{2}-\d{2}').hasMatch(clean)) {
+        if (isBD) {
+          clean += "+06:00"; // Asia/Dhaka timezone offset
+        }
+      }
+
+      DateTime parsed = DateTime.parse(clean);
+      return parsed.toLocal();
+    } catch (_) {
+      try {
+        int? ts = int.tryParse(raw.trim());
+        if (ts != null) {
+          if (ts < 10000000000) {
+            return DateTime.fromMillisecondsSinceEpoch(ts * 1000).toLocal();
+          } else {
+            return DateTime.fromMillisecondsSinceEpoch(ts).toLocal();
+          }
+        }
+      } catch (_) {}
+      return null;
+    }
+  }
+
+  void _initSeconds() {
+    final service = widget.serviceName?.toLowerCase() ?? "";
+    final isRideShare = service == "ride_share" || 
+                        service.contains("ride_share") || 
+                        service == "rideshare";
+    final int maxSeconds = isRideShare ? (2 * 60) : (60 * 60);
+
+    final createdAt = _parseDateTime(
+      widget.createdAt,
+      countryCode: widget.countryCode,
+    );
+
+    if (createdAt != null) {
+      final elapsed = DateTime.now().difference(createdAt).inSeconds;
+      final remaining = maxSeconds - (elapsed > 0 ? elapsed : 0);
+      _remainingSeconds = remaining > 0 ? remaining : 0;
+    } else {
+      _remainingSeconds = maxSeconds;
+    }
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (_remainingSeconds > 0 && mounted) {
+        setState(() {
+          _remainingSeconds--;
+        });
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String get _formattedTimer {
+    if (_remainingSeconds <= 0) {
+      return "Expired";
+    }
+    int minutes = _remainingSeconds ~/ 60;
+    int seconds = _remainingSeconds % 60;
+    String mStr = minutes.toString().padLeft(2, '0');
+    String sStr = seconds.toString().padLeft(2, '0');
+    return "$mStr:$sStr";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: widget.isDark ? const Color(0xFF1E3A29) : const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: widget.isDark ? const Color(0xFF2E7D32) : const Color(0xFF81C784),
+          width: 1.2,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.timer_outlined,
+            size: 15,
+            color: widget.isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            _formattedTimer,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: widget.isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class BiddingListWidget extends StatefulWidget {
   final bool isDark;
   final RentalTrip currentTrip;
   final Function(RentalDriverBid bid) onAcceptBid;
@@ -19,7 +181,230 @@ class BiddingListWidget extends StatelessWidget {
     required this.onAcceptBid,
   });
 
+  @override
+  State<BiddingListWidget> createState() => _BiddingListWidgetState();
+}
+
+class _BiddingListWidgetState extends State<BiddingListWidget> {
+  final Set<String> _hiddenBidUuids = {};
+  final CreateTripRepository _repo = CreateTripRepository();
+
+  void _hideBid(RentalDriverBid bid) {
+    final uuid = bid.rentBidUuid ?? bid.driverUuid ?? bid.name ?? "";
+    if (uuid.isNotEmpty && mounted) {
+      setState(() {
+        _hiddenBidUuids.add(uuid);
+      });
+    }
+
+    final bidUuid = bid.rentBidUuid ?? bid.driverUuid;
+    if (bidUuid != null && bidUuid.isNotEmpty) {
+      final loc = AppLocalizations.of(context);
+      _repo.cancelRentBid(
+        bidUuid: bidUuid,
+        langCode: loc.locale.languageCode,
+      ).then((response) {
+        debugPrint("Rent bid cancelled successfully: ${response['message']}");
+      }).catchError((error) {
+        debugPrint("Error cancelling rent bid: $error");
+      });
+    }
+  }
+
+  String _formatDateTime(String? raw) {
+    if (raw == null || raw.isEmpty) return "18 Aug 2026 and 4:30 AM";
+    try {
+      DateTime dt = DateTime.parse(raw);
+      final List<String> months = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      ];
+      String month = months[dt.month - 1];
+      int hour = dt.hour % 12;
+      if (hour == 0) hour = 12;
+      String minute = dt.minute.toString().padLeft(2, '0');
+      String period = dt.hour >= 12 ? "PM" : "AM";
+      return "${dt.day} $month ${dt.year} and $hour:$minute $period";
+    } catch (_) {
+      return raw;
+    }
+  }
+
+  bool get _isTripExpired {
+    final service = widget.currentTrip.serviceName?.toLowerCase() ?? "";
+    final isRideShare = service == "ride_share" || 
+                        service.contains("ride_share") || 
+                        service == "rideshare";
+    final int maxSeconds = isRideShare ? (2 * 60) : (60 * 60);
+
+    final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
+    if (createdAtStr == null || createdAtStr.trim().isEmpty) return false;
+    try {
+      String clean = createdAtStr.trim();
+      if (clean.contains(' ') && !clean.contains('T')) {
+        clean = clean.replaceAll(' ', 'T');
+      }
+      final isBD = (widget.currentTrip.countryCode?.toUpperCase() == "BD") || (AppGlobals.countryCode.toUpperCase() == "BD");
+      if (!clean.endsWith('Z') && !clean.contains('+') && !RegExp(r'T\d{2}:\d{2}:\d{2}-\d{2}').hasMatch(clean)) {
+        if (isBD) clean += "+06:00";
+      }
+      DateTime createdAt = DateTime.parse(clean).toLocal();
+      int elapsed = DateTime.now().difference(createdAt).inSeconds;
+      return elapsed >= maxSeconds;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  String _toBanglaDigits(String numberStr) {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const bangla = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    for (int i = 0; i < english.length; i++) {
+      numberStr = numberStr.replaceAll(english[i], bangla[i]);
+    }
+    return numberStr;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    final isBn = loc.locale.languageCode == 'bn';
+    final expired = _isTripExpired;
+
+    final visibleDrivers = widget.currentTrip.drivers.where((bid) {
+      final id = bid.rentBidUuid ?? bid.driverUuid ?? bid.name ?? "";
+      return !_hiddenBidUuids.contains(id);
+    }).toList();
+
+    final countStr = isBn ? _toBanglaDigits(visibleDrivers.length.toString()) : visibleDrivers.length.toString();
+    final driversFoundText = loc.translate("drivers_found_count").replaceAll('{count}', countStr);
+
+    return Column(
+      children: [
+        if (!expired) ...[
+          const SizedBox(height: 4),
+          const SizedBox(
+             height: 50,
+             child: RadarAnimation(size: 50, color: Color(0xFF6C63FF)),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            loc.translate("searching_for_more_drivers"),
+            style: GoogleFonts.poppins(
+               fontSize: 12,
+               color: widget.isDark ? Colors.white70 : Colors.black54,
+            ),
+          ),
+          const SizedBox(height: 10),
+        ],
+        Text(
+          expired 
+              ? loc.translate("bidding_expired") 
+              : driversFoundText,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: expired ? Colors.redAccent : Colors.green,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Expanded(
+          child: visibleDrivers.isEmpty
+              ? Center(
+                  child: Text(
+                    loc.translate("no_active_bids_right_now"),
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: widget.isDark ? Colors.white54 : Colors.black54,
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: visibleDrivers.length,
+                  itemBuilder: (context, index) {
+                    final bid = visibleDrivers[index];
+                    return DriverBidCard(
+                      key: ValueKey(bid.rentBidUuid ?? bid.driverUuid ?? index.toString()),
+                      bid: bid,
+                      currentTrip: widget.currentTrip,
+                      isDark: widget.isDark,
+                      isBn: isBn,
+                      onAcceptBid: widget.onAcceptBid,
+                      onHide: () => _hideBid(bid),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class DriverBidCard extends StatefulWidget {
+  final RentalDriverBid bid;
+  final RentalTrip currentTrip;
+  final bool isDark;
+  final bool isBn;
+  final Function(RentalDriverBid bid) onAcceptBid;
+  final VoidCallback onHide;
+
+  const DriverBidCard({
+    super.key,
+    required this.bid,
+    required this.currentTrip,
+    required this.isDark,
+    required this.isBn,
+    required this.onAcceptBid,
+    required this.onHide,
+  });
+
+  @override
+  State<DriverBidCard> createState() => _DriverBidCardState();
+}
+
+class _DriverBidCardState extends State<DriverBidCard> {
+  late int _secondsLeft;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _secondsLeft = 60; // 60-second timer for each bid card
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) return;
+      if (_secondsLeft > 1) {
+        setState(() {
+          _secondsLeft--;
+        });
+      } else {
+        _timer?.cancel();
+        widget.onHide(); // Automatically hide when 60s timer expires
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _toBanglaDigits(String numberStr) {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const bangla = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    for (int i = 0; i < english.length; i++) {
+      numberStr = numberStr.replaceAll(english[i], bangla[i]);
+    }
+    return numberStr;
+  }
+
   void _showReviewsBottomSheet(BuildContext context, RentalDriverBid bid, bool isDark) {
+    final loc = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -47,7 +432,7 @@ class BiddingListWidget extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                "Driver Reviews",
+                loc.translate("driver_reviews"),
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -59,7 +444,7 @@ class BiddingListWidget extends StatelessWidget {
               Expanded(
                 child: ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: bid.ratingList!.length,
+                  itemCount: bid.ratingList?.length ?? 0,
                   itemBuilder: (context, index) {
                     final review = bid.ratingList![index];
                     return Container(
@@ -91,7 +476,7 @@ class BiddingListWidget extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      review.customerName ?? "Customer",
+                                      review.customerName ?? loc.translate("customer_label"),
                                       style: GoogleFonts.poppins(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -145,182 +530,372 @@ class BiddingListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 4),
-        const SizedBox(
-           height: 50,
-           child: RadarAnimation(size: 50, color: Color(0xFF6C63FF)),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          "Searching for more drivers...",
-          style: GoogleFonts.poppins(
-             fontSize: 12,
-             color: isDark ? Colors.white70 : Colors.black54,
+    final bid = widget.bid;
+    final isDark = widget.isDark;
+    final loc = AppLocalizations.of(context);
+    final isBn = widget.isBn;
+    final bidAmount = bid.totalAmount ?? bid.bidAmount ?? 0.00;
+    final formattedPrice = isBn 
+        ? '৳${_toBanglaDigits(bidAmount.round().toString())}' 
+        : 'BDT${bidAmount.round()}';
+
+    // Car photo gallery info & URL
+    final int photoCount = bid.carPhotos?.length ?? 0;
+    final int displayCount = photoCount > 0 ? photoCount : 1;
+    String? carPhotoUrl;
+    if (photoCount > 0) {
+      carPhotoUrl = bid.carPhotos!.first.startsWith('http')
+          ? bid.carPhotos!.first
+          : "${AppUrls.imageBaseUrl}${bid.carPhotos!.first}";
+    }
+
+    final double progressFactor = ((60 - _secondsLeft) / 60.0).clamp(0.0, 1.0);
+
+    final etaText = loc.translate("estimated_time_min").replaceAll('{count}', isBn ? _toBanglaDigits('16') : '16');
+    final ridesCountStr = isBn ? _toBanglaDigits((bid.totalCompletedTrips ?? 1310).toString()) : (bid.totalCompletedTrips ?? 1310).toString();
+    final ridesText = loc.translate("rides_count").replaceAll('{count}', ridesCountStr);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF22242B) : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          "Drivers Found! (${currentTrip.totalBids ?? currentTrip.drivers.length})",
-          style: GoogleFonts.poppins(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.green,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: currentTrip.drivers.length,
-            itemBuilder: (context, index) {
-              final bid = currentTrip.drivers[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1C1E26) : Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. Top Price & ETA Row (e.g. BDT500 16 min / ৳৫০০ ১৬ মিনিট)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                formattedPrice,
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black,
                 ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                etaText,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white54 : Colors.black54,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+
+          // 2. Middle Row: Driver Avatar, Details, and Car Photo Gallery Box
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Driver Profile Picture
+              CircleAvatar(
+                radius: 22,
+                backgroundImage: (bid.profilePicture != null && bid.profilePicture!.isNotEmpty)
+                    ? NetworkImage(bid.profilePicture!.startsWith('http') 
+                        ? bid.profilePicture! 
+                        : "${AppUrls.imageBaseUrl}${bid.profilePicture}")
+                    : const NetworkImage("https://randomuser.me/api/portraits/men/32.jpg") as ImageProvider,
+                backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+              ),
+              const SizedBox(width: 10),
+
+              // Driver Details
+              Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundImage: bid.profilePicture != null 
-                            ? NetworkImage("${AppUrls.imageBaseUrl}${bid.profilePicture}") 
-                            : null,
-                          backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                          child: bid.profilePicture == null 
-                            ? Icon(Icons.person, color: isDark ? Colors.white : Colors.black54) 
-                            : null,
+                        Flexible(
+                          child: Text(
+                            bid.name ?? "Md Abdus Salam",
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(width: 4),
+                        GestureDetector(
+                          onTap: () {
+                            if (bid.ratingList != null && bid.ratingList!.isNotEmpty) {
+                              _showReviewsBottomSheet(context, bid, isDark);
+                            }
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
+                              Icon(Icons.star, color: isDark ? Colors.white : Colors.amber, size: 14),
+                              const SizedBox(width: 2),
                               Text(
-                                (bid.name ?? "Driver").toUpperCase(),
+                                isBn 
+                                    ? _toBanglaDigits(bid.averageRating?.toStringAsFixed(2) ?? "4.33")
+                                    : (bid.averageRating?.toStringAsFixed(2) ?? "4.33"),
                                 style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : Colors.black,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(width: 4),
                               Text(
-                                '${(AppLocalizations.of(context).translate("total") ?? "Total").toUpperCase()}: ' + 
-                                (AppLocalizations.of(context).locale.languageCode == 'bn' 
-                                    ? '৳${bid.totalAmount ?? bid.bidAmount ?? '0.00'}' 
-                                    : 'BDT ${bid.totalAmount ?? bid.bidAmount ?? '0.00'}'),
+                                ridesText,
                                 style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black,
+                                  fontSize: 12,
+                                  color: isDark ? Colors.white54 : Colors.black54,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                if (bid.ratingList != null && bid.ratingList!.isNotEmpty) {
-                                  _showReviewsBottomSheet(context, bid, isDark);
-                                } else {
-                                  globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
-                                  globalScaffoldMessengerKey.currentState?.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        AppLocalizations.of(context).translate("no_reviews") ?? "No reviews available yet.",
-                                        style: TextStyle(color: isDark ? Colors.black : Colors.white),
-                                      ),
-                                      backgroundColor: isDark ? Colors.white : Colors.black,
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.star, color: Colors.amber, size: 14),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${bid.averageRating?.toStringAsFixed(1) ?? "0.0"} (${bid.totalCompletedTrips ?? 0} trips)',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: (bid.ratingList != null && bid.ratingList!.isNotEmpty) 
-                                          ? Colors.blueAccent 
-                                          : (isDark ? Colors.white54 : Colors.black54),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      bid.carRegNumber ?? "Toyota Corolla",
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Professional Car Photo Gallery Card (Multi-card stack effect + count badge)
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  if (photoCount > 0 && widget.bid.carPhotos != null && widget.bid.carPhotos!.isNotEmpty) {
+                    showDialog(
+                      context: context,
+                      builder: (_) => FullScreenImageGallery(
+                        images: widget.bid.carPhotos!,
+                        initialIndex: 0,
+                      ),
+                    );
+                  }
+                },
+                child: SizedBox(
+                  width: 70,
+                  height: 50,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Stack Layer 2 (Behind card for multi-photo gallery effect)
+                      if (photoCount > 1)
+                        Positioned(
+                          right: -3,
+                          top: 2,
+                          bottom: 2,
+                          child: Container(
+                            width: 64,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF2E313A) : Colors.grey.shade400,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            const SizedBox(height: 5),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDark ? Colors.white : Colors.black,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              onPressed: () => onAcceptBid(bid),
-                              child: Text("Accept", style: GoogleFonts.poppins(color: isDark ? Colors.black : Colors.white)),
+                          ),
+                        ),
+                      // Main Photo Container Card
+                      Container(
+                        width: 66,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isDark ? Colors.white24 : Colors.grey.shade300,
+                            width: 1.2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                      ],
-                    ),
-                    if (bid.carPhotos != null && bid.carPhotos!.isNotEmpty) ...[
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        height: 60,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: bid.carPhotos!.length,
-                          itemBuilder: (context, photoIndex) {
-                            return GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => FullScreenImageGallery(
-                                    images: bid.carPhotos!,
-                                    initialIndex: photoIndex,
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.only(right: 8),
-                                width: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  image: DecorationImage(
-                                    image: NetworkImage("${AppUrls.imageBaseUrl}${bid.carPhotos![photoIndex]}"),
-                                    fit: BoxFit.cover,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Stack(
+                            children: [
+                              Positioned.fill(
+                                child: carPhotoUrl != null
+                                    ? Image.network(
+                                        carPhotoUrl,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Image.network(
+                                          "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=200",
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
+                                    : Image.network(
+                                        "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=200",
+                                        fit: BoxFit.cover,
+                                      ),
+                              ),
+                              // Bottom Gradient Overlay for readability
+                              Positioned(
+                                left: 0, right: 0, bottom: 0, height: 24,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.black.withValues(alpha: 0.8),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            );
-                          },
+                              // Photo Count Glassmorphism Badge
+                              Positioned(
+                                bottom: 3,
+                                right: 3,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.75),
+                                    borderRadius: BorderRadius.circular(5),
+                                    border: Border.all(color: Colors.white24, width: 0.5),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.collections_rounded, size: 9, color: Colors.white),
+                                      const SizedBox(width: 2.5),
+                                      Text(
+                                        isBn ? _toBanglaDigits(displayCount.toString()) : "$displayCount",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ]
-                  ],
+                    ],
+                  ),
                 ),
-              );
-            },
+              ),
+            ],
           ),
-        ),
-      ],
+
+          const SizedBox(height: 14),
+
+          // 3. Action Buttons: Black & White Theme with Progress Bar Accept Button
+          Row(
+            children: [
+              // Decline Button (Black and White Theme)
+              Expanded(
+                child: SizedBox(
+                  height: 46,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDark ? const Color(0xFF1E2026) : Colors.grey.shade200,
+                      foregroundColor: isDark ? Colors.white : Colors.black87,
+                      side: BorderSide(
+                        color: isDark ? Colors.white12 : Colors.black12,
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    onPressed: widget.onHide,
+                    child: Text(
+                      loc.translate("decline"),
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Accept Button with 60s Progress Bar Background (Full Black BG + Charcoal Gray Progress Fill)
+              Expanded(
+                child: SizedBox(
+                  height: 46,
+                  child: GestureDetector(
+                    onTap: () => widget.onAcceptBid(bid),
+                    child: Stack(
+                      children: [
+                        // Full Black Base Container
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isDark ? Colors.white24 : Colors.grey.shade800,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        // Charcoal Dark Gray Progress Fill
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: FractionallySizedBox(
+                                widthFactor: progressFactor,
+                                child: Container(
+                                  color: const Color(0xFF5A5E6B),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Text Overlay in Crisp White
+                        Center(
+                          child: Text(
+                            loc.translate("accept"),
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
