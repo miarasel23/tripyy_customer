@@ -240,5 +240,9 @@
   "lowest_bid": "সর্বনিম্ন বিড",
   "please_enable_location_services": "দয়া করে লোকেশন চালু করুন",
   "location_permission_denied": "আপনার লোকেশন শনাক্ত করতে লোকেশন পারমিশন প্রয়োজন",
-  "location_permission_permanently_denied": "লোকেশন পারমিশন স্থায়ীভাবে বন্ধ আছে। অ্যাপ সেটিংস থেকে পারমিশন দিন।"
+  "location_permission_permanently_denied": "লোকেশন পারমিশন স্থায়ীভাবে বন্ধ আছে। অ্যাপ সেটিংস থেকে পারমিশন দিন।",
+  "give_offer": "অফার দিন",
+  "give_offer_for": "অফার দিন ৳{amount}",
+  "offer_your_fare": "আপনার অফার দিন",
+  "close": "বন্ধ করুন"
 }

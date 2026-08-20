@@ -238,5 +238,9 @@
   "lowest_bid": "Lowest Bid",
   "please_enable_location_services": "Please enable location",
   "location_permission_denied": "Location permission is required to detect your location",
-  "location_permission_permanently_denied": "Location permission is permanently denied. Please allow location in App Settings."
+  "location_permission_permanently_denied": "Location permission is permanently denied. Please allow location in App Settings.",
+  "give_offer": "Give Offer",
+  "give_offer_for": "Give Offer for BDT {amount}",
+  "offer_your_fare": "Offer your fare",
+  "close": "Close"
 }
