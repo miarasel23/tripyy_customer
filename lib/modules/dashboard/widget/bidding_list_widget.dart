@@ -89,7 +89,7 @@ class _TripTimerBadgeState extends State<TripTimerBadge> {
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    final int maxSeconds = isRideShare ? (2 * 60) : (60 * 60);
+    final int maxSeconds = isRideShare ? (1 * 60) : (60 * 60);
 
     final createdAt = _parseDateTime(
       widget.createdAt,
@@ -235,7 +235,7 @@ class _BiddingListWidgetState extends State<BiddingListWidget> {
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    final int maxSeconds = isRideShare ? (2 * 60) : (60 * 60);
+    final int maxSeconds = isRideShare ? (1 * 60) : (60 * 60);
 
     final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
     if (createdAtStr == null || createdAtStr.trim().isEmpty) return false;
@@ -364,14 +364,34 @@ class DriverBidCard extends StatefulWidget {
 }
 
 class _DriverBidCardState extends State<DriverBidCard> {
+  late int _maxSeconds;
   late int _secondsLeft;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _secondsLeft = 60; // 60-second timer for each bid card
+    _initSeconds();
     _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant DriverBidCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentTrip.serviceName != widget.currentTrip.serviceName) {
+      _timer?.cancel();
+      _initSeconds();
+      _startTimer();
+    }
+  }
+
+  void _initSeconds() {
+    final service = widget.currentTrip.serviceName?.toLowerCase() ?? "";
+    final isRideShare = service == "ride_share" || 
+                        service.contains("ride_share") || 
+                        service == "rideshare";
+    _maxSeconds = isRideShare ? 60 : 3600; // 1 min for RIDE_SHARE, 1 hour (3600s) for non-RIDE_SHARE
+    _secondsLeft = _maxSeconds;
   }
 
   void _startTimer() {
@@ -549,10 +569,10 @@ class _DriverBidCardState extends State<DriverBidCard> {
           : "${AppUrls.imageBaseUrl}${bid.carPhotos!.first}";
     }
 
-    final double progressFactor = ((60 - _secondsLeft) / 60.0).clamp(0.0, 1.0);
+    final double progressFactor = ((_maxSeconds - _secondsLeft) / _maxSeconds.toDouble()).clamp(0.0, 1.0);
 
     final etaText = loc.translate("estimated_time_min").replaceAll('{count}', isBn ? _toBanglaDigits('16') : '16');
-    final ridesCountStr = isBn ? _toBanglaDigits((bid.totalCompletedTrips ?? 1310).toString()) : (bid.totalCompletedTrips ?? 1310).toString();
+    final ridesCountStr = isBn ? _toBanglaDigits((bid.totalCompletedTrips ?? 0).toString()) : (bid.totalCompletedTrips ?? 0).toString();
     final ridesText = loc.translate("rides_count").replaceAll('{count}', ridesCountStr);
 
     return Container(
@@ -611,8 +631,11 @@ class _DriverBidCardState extends State<DriverBidCard> {
                     ? NetworkImage(bid.profilePicture!.startsWith('http') 
                         ? bid.profilePicture! 
                         : "${AppUrls.imageBaseUrl}${bid.profilePicture}")
-                    : const NetworkImage("https://randomuser.me/api/portraits/men/32.jpg") as ImageProvider,
+                    : null,
                 backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                child: (bid.profilePicture == null || bid.profilePicture!.isEmpty)
+                    ? Icon(Icons.person, size: 22, color: isDark ? Colors.white54 : Colors.black54)
+                    : null,
               ),
               const SizedBox(width: 10),
 
@@ -625,7 +648,7 @@ class _DriverBidCardState extends State<DriverBidCard> {
                       children: [
                         Flexible(
                           child: Text(
-                            bid.name ?? "Md Abdus Salam",
+                            bid.name ?? "",
                             style: GoogleFonts.poppins(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -648,8 +671,8 @@ class _DriverBidCardState extends State<DriverBidCard> {
                               const SizedBox(width: 2),
                               Text(
                                 isBn 
-                                    ? _toBanglaDigits(bid.averageRating?.toStringAsFixed(2) ?? "4.33")
-                                    : (bid.averageRating?.toStringAsFixed(2) ?? "4.33"),
+                                    ? _toBanglaDigits(bid.averageRating?.toStringAsFixed(2) ?? "0.0")
+                                    : (bid.averageRating?.toStringAsFixed(2) ?? "0.0"),
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
@@ -669,14 +692,16 @@ class _DriverBidCardState extends State<DriverBidCard> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      bid.carRegNumber ?? "Toyota Corolla",
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: isDark ? Colors.white70 : Colors.black87,
+                    if (bid.carRegNumber != null && bid.carRegNumber!.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        bid.carRegNumber!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: isDark ? Colors.white70 : Colors.black87,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
@@ -742,14 +767,14 @@ class _DriverBidCardState extends State<DriverBidCard> {
                                     ? Image.network(
                                         carPhotoUrl,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Image.network(
-                                          "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=200",
-                                          fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                                          child: Icon(Icons.directions_car, size: 24, color: isDark ? Colors.white54 : Colors.black45),
                                         ),
                                       )
-                                    : Image.network(
-                                        "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=200",
-                                        fit: BoxFit.cover,
+                                    : Container(
+                                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                                        child: Icon(Icons.directions_car, size: 24, color: isDark ? Colors.white54 : Colors.black45),
                                       ),
                               ),
                               // Bottom Gradient Overlay for readability

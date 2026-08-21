@@ -97,7 +97,7 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    final int maxSeconds = isRideShare ? (2 * 60) : (60 * 60);
+    final int maxSeconds = isRideShare ? (1 * 60) : (60 * 60);
 
     final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
     final createdAt = _parseDateTime(
@@ -284,13 +284,41 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                                widget.currentTrip.totalBids ?? 
                                (widget.currentTrip.drivers.isEmpty ? 0 : widget.currentTrip.drivers.length);
 
-    final pickupAddress = widget.currentTrip.pickupLocations.isNotEmpty 
-        ? widget.currentTrip.pickupLocations.first.address ?? "Senpara Parbata Ln 392 (Mirpur)"
-        : "Senpara Parbata Ln 392 (Mirpur)";
+    final List<_LocationDisplayItem> locationItems = [];
+    if (widget.currentTrip.pickupLocations.isNotEmpty) {
+      for (int i = 0; i < widget.currentTrip.pickupLocations.length; i++) {
+        final addr = widget.currentTrip.pickupLocations[i].address ?? "Senpara Parbata Ln 392 (Mirpur)";
+        locationItems.add(_LocationDisplayItem(
+          icon: Icons.accessibility_new_rounded,
+          iconColor: const Color(0xFF2196F3),
+          address: addr,
+        ));
+      }
+    } else {
+      locationItems.add(_LocationDisplayItem(
+        icon: Icons.accessibility_new_rounded,
+        iconColor: const Color(0xFF2196F3),
+        address: "Senpara Parbata Ln 392 (Mirpur)",
+      ));
+    }
 
-    final dropoffAddress = widget.currentTrip.dropoffLocations.isNotEmpty
-        ? widget.currentTrip.dropoffLocations.first.address ?? "Gulshan 1 (Dhaka)"
-        : "Gulshan 1 (Dhaka)";
+    if (widget.currentTrip.dropoffLocations.isNotEmpty) {
+      for (int i = 0; i < widget.currentTrip.dropoffLocations.length; i++) {
+        final addr = widget.currentTrip.dropoffLocations[i].address ?? "Gulshan 1 (Dhaka)";
+        final isLast = (i == widget.currentTrip.dropoffLocations.length - 1);
+        locationItems.add(_LocationDisplayItem(
+          icon: isLast ? Icons.flag_rounded : Icons.location_on,
+          iconColor: isLast ? const Color(0xFF4CAF50) : const Color(0xFFFF9800),
+          address: addr,
+        ));
+      }
+    } else {
+      locationItems.add(_LocationDisplayItem(
+        icon: Icons.flag_rounded,
+        iconColor: const Color(0xFF4CAF50),
+        address: "Gulshan 1 (Dhaka)",
+      ));
+    }
 
     final isExpired = _remainingSeconds <= 0;
 
@@ -311,6 +339,8 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
     if (!isBn && totalDriversViewed == 1) {
       driversViewedText = driversViewedText.replaceAll("drivers viewed", "driver viewed");
     }
+
+    final maxCardHeight = MediaQuery.of(context).size.height * 0.58;
 
     return GestureDetector(
       onVerticalDragEnd: (details) {
@@ -333,8 +363,8 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
         }
       },
       child: Container(
-        margin: const EdgeInsets.all(12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF14161D) : const Color(0xFFF7F8FA),
           borderRadius: BorderRadius.circular(24),
@@ -346,10 +376,16 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
             )
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: maxCardHeight,
+          ),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
             // 1. Top Header Row: Drivers Viewed Request & Overlapping Avatars & Timer
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -488,8 +524,8 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                       Expanded(
                         child: Text(
                           isBn 
-                              ? "$currencySymbol${_toBanglaDigits(_offerPrice.toString())}" 
-                              : "$currencySymbol$_offerPrice",
+                              ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}" 
+                              : "$currencySymbol $_offerPrice",
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             fontSize: 26,
@@ -543,8 +579,8 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                       ),
                       onPressed: () {
                         final formattedPriceText = isBn 
-                            ? "$currencySymbol${_toBanglaDigits(_offerPrice.toString())}" 
-                            : "$currencySymbol$_offerPrice";
+                            ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}" 
+                            : "$currencySymbol $_offerPrice";
                         final updatedText = loc.translate("fare_updated_to").replaceAll('{amount}', formattedPriceText);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -592,8 +628,8 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                               const SizedBox(width: 12),
                               Text(
                                 isBn 
-                                    ? "$currencySymbol${_toBanglaDigits(_offerPrice.toString())} ${loc.translate('cash')}"
-                                    : "$currencySymbol$_offerPrice ${loc.translate('cash')}",
+                                    ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())} ${loc.translate('cash')}"
+                                    : "$currencySymbol $_offerPrice ${loc.translate('cash')}",
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -616,29 +652,26 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                           ),
                           child: Column(
                             children: [
-                              _buildLocationItem(
-                                icon: Icons.accessibility_new_rounded,
-                                iconColor: const Color(0xFF2196F3),
-                                address: pickupAddress,
-                                isDark: isDark,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 9, top: 4, bottom: 4),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    width: 2,
-                                    height: 16,
-                                    color: isDark ? Colors.white24 : Colors.grey.shade300,
-                                  ),
+                              for (int i = 0; i < locationItems.length; i++) ...[
+                                _buildLocationItem(
+                                  icon: locationItems[i].icon,
+                                  iconColor: locationItems[i].iconColor,
+                                  address: locationItems[i].address,
+                                  isDark: isDark,
                                 ),
-                              ),
-                              _buildLocationItem(
-                                icon: Icons.flag_rounded,
-                                iconColor: const Color(0xFF4CAF50),
-                                address: dropoffAddress,
-                                isDark: isDark,
-                              ),
+                                if (i < locationItems.length - 1)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 9, top: 4, bottom: 4),
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Container(
+                                        width: 2,
+                                        height: 16,
+                                        color: isDark ? Colors.white24 : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                  ),
+                              ],
                             ],
                           ),
                         ),
@@ -675,6 +708,21 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
           ],
         ),
       ),
-    );
+    ),
+  ),
+);
   }
 }
+
+class _LocationDisplayItem {
+  final IconData icon;
+  final Color iconColor;
+  final String address;
+
+  _LocationDisplayItem({
+    required this.icon,
+    required this.iconColor,
+    required this.address,
+  });
+}
+
