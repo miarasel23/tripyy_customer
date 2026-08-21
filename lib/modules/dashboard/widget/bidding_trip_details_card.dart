@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/utils/localization/app_localization.dart';
+import '../../../../store/user_data_store.dart';
 import '../../../../utils/app_urls.dart';
 import '../model/create_rental_trip_model.dart';
+import '../repository/create_trip_repository.dart';
 import '../../../../store/app_globals.dart';
 
 class BiddingTripDetailsCard extends StatefulWidget {
@@ -27,6 +29,8 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
   Timer? _timer;
   late int _offerPrice;
   bool _isExpanded = false;
+  bool _hasShownExpiredDialog = false;
+  bool _isUpdatingOffer = false;
 
   @override
   void initState() {
@@ -36,11 +40,14 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
     _startTimer();
   }
 
+  late int _initialBasePrice;
+
   void _initPrice() {
     final rawPrice = widget.currentTrip.offerAmount ?? 
                      widget.currentTrip.priceInfo?.minimumBookingPrice ?? 
                      379.0;
     _offerPrice = rawPrice.round();
+    _initialBasePrice = _offerPrice;
   }
 
   @override
@@ -97,7 +104,7 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    final int maxSeconds = isRideShare ? (1 * 60) : (60 * 60);
+    final int maxSeconds = isRideShare ? (2 * 60) : (60 * 60);
 
     final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
     final createdAt = _parseDateTime(
@@ -115,15 +122,366 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
   }
 
   void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_remainingSeconds > 0 && mounted) {
         setState(() {
           _remainingSeconds--;
         });
+        if (_remainingSeconds == 0) {
+          _timer?.cancel();
+          _onTimerExpired();
+        }
       } else {
         _timer?.cancel();
+        if (_remainingSeconds == 0 && mounted) {
+          _onTimerExpired();
+        }
       }
     });
+  }
+
+  void _onTimerExpired() {
+    if (_hasShownExpiredDialog || !mounted) return;
+    _hasShownExpiredDialog = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _showExpiredOfferDialog();
+      }
+    });
+  }
+
+  Future<bool> _sendUpdateOfferAmount({
+    required int newPrice,
+    required bool isKeepTrying,
+  }) async {
+    if (_isUpdatingOffer) return false;
+    setState(() {
+      _isUpdatingOffer = true;
+    });
+
+    final loc = AppLocalizations.of(context);
+    final isBn = loc.locale.languageCode == 'bn';
+    final currencySymbol = isBn ? '৳' : 'BDT';
+    final isDark = widget.isDark;
+
+    String customerUuid = UserDataStore.userData?.data?.user?.uuid ?? UserDataStore.uuid ?? "";
+    if (customerUuid.isEmpty) {
+      customerUuid = await UserDataStore.getUuid() ?? "";
+    }
+    final tripUuid = widget.currentTrip.uuid ?? "";
+
+    try {
+      final repo = CreateTripRepository();
+      await repo.updateTripOfferAmount(
+        customerUuid: customerUuid,
+        tripUuid: tripUuid,
+        offerAmount: newPrice.toString(),
+        langCode: loc.locale.languageCode,
+      );
+
+      if (mounted) {
+        setState(() {
+          _offerPrice = newPrice;
+          _initialBasePrice = newPrice;
+          _initTimer();
+          _hasShownExpiredDialog = false;
+        });
+        _startTimer();
+
+        final formattedPriceText = isBn
+            ? "$currencySymbol ${_toBanglaDigits(newPrice.toString())}"
+            : "$currencySymbol $newPrice";
+
+        final msg = isKeepTrying
+            ? (isBn ? "বর্তমান দামে আবার চেষ্টা করা হচ্ছে ($formattedPriceText)" : "Continuing search with $formattedPriceText")
+            : loc.translate("fare_updated_to").replaceAll('{amount}', formattedPriceText);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(msg),
+            duration: const Duration(seconds: 3),
+            backgroundColor: isDark ? Colors.white : Colors.black,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return true;
+    } catch (e) {
+      if (mounted) {
+        final errText = e.toString().replaceAll('Exception: ', '');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errText),
+            duration: const Duration(seconds: 3),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+      return false;
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isUpdatingOffer = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _showExpiredOfferDialog() async {
+    final loc = AppLocalizations.of(context);
+    final isBn = loc.locale.languageCode == 'bn';
+    final currencySymbol = isBn ? '৳' : 'BDT';
+    final isDark = widget.isDark;
+
+    int tempOfferPrice = _offerPrice + 50;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        bool isDialogLoading = false;
+
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            final formattedPriceText = isBn
+                ? "$currencySymbol ${_toBanglaDigits(tempOfferPrice.toString())}"
+                : "$currencySymbol $tempOfferPrice";
+            final currentPriceText = isBn
+                ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}"
+                : "$currencySymbol $_offerPrice";
+
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF191B23) : Colors.white,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.grey.shade200,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.25),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    )
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      isBn
+                          ? "গাড়িচালকদের দ্রুত প্রতিক্রিয়া পেতে আপনার অফারের দাম বাড়ান অথবা বর্তমান দামে অনুসন্ধান চালিয়ে যান।"
+                          : "No driver accepted yet. Increase your offer to get responses faster, or continue trying with your current fare.",
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF232733) : const Color(0xFFF4F6F9),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isDark ? Colors.white10 : Colors.grey.shade300,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: isDialogLoading
+                                ? null
+                                : () {
+                                    if (tempOfferPrice > _offerPrice) {
+                                      setDialogState(() {
+                                        tempOfferPrice -= 10;
+                                      });
+                                    }
+                                  },
+                            child: Container(
+                              width: 56,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF14161D) : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isDark ? Colors.white10 : Colors.grey.shade300,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  isBn ? "-১০" : "-10",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          Text(
+                            formattedPriceText,
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+
+                          GestureDetector(
+                            onTap: isDialogLoading
+                                ? null
+                                : () {
+                                    setDialogState(() {
+                                      tempOfferPrice += 10;
+                                    });
+                                  },
+                            child: Container(
+                              width: 56,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isDark ? const Color(0xFF14161D) : Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isDark ? Colors.white10 : Colors.grey.shade300,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  isBn ? "+১০" : "+10",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? Colors.white : Colors.black,
+                          foregroundColor: isDark ? Colors.black : Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: isDialogLoading
+                            ? null
+                            : () async {
+                                setDialogState(() {
+                                  isDialogLoading = true;
+                                });
+                                final success = await _sendUpdateOfferAmount(
+                                  newPrice: tempOfferPrice,
+                                  isKeepTrying: false,
+                                );
+                                if (context.mounted) {
+                                  setDialogState(() {
+                                    isDialogLoading = false;
+                                  });
+                                }
+                                if (success && dialogContext.mounted) {
+                                  Navigator.of(dialogContext).pop();
+                                }
+                              },
+                        child: isDialogLoading
+                            ? SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: isDark ? Colors.black : Colors.white,
+                                ),
+                              )
+                            : Text(
+                                isBn
+                                    ? "দাম বাড়ান ($formattedPriceText)"
+                                    : "Raise Offer ($formattedPriceText)",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    SizedBox(
+                      height: 48,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: isDark ? const Color(0xFF232733) : Colors.grey.shade100,
+                          side: BorderSide(
+                            color: isDark ? Colors.white24 : Colors.grey.shade300,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: isDialogLoading
+                            ? null
+                            : () async {
+                                setDialogState(() {
+                                  isDialogLoading = true;
+                                });
+                                final success = await _sendUpdateOfferAmount(
+                                  newPrice: _offerPrice,
+                                  isKeepTrying: true,
+                                );
+                                if (context.mounted) {
+                                  setDialogState(() {
+                                    isDialogLoading = false;
+                                  });
+                                }
+                                if (success && dialogContext.mounted) {
+                                  Navigator.of(dialogContext).pop();
+                                }
+                              },
+                        child: Text(
+                          isBn
+                              ? "বর্তমান দামে চেষ্টা করুন ($currentPriceText)"
+                              : "Keep Trying ($currentPriceText)",
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -495,7 +853,7 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          if (_offerPrice > 50) {
+                          if (_offerPrice > _initialBasePrice) {
                             setState(() {
                               _offerPrice -= 10;
                             });
@@ -577,26 +935,26 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                         ),
                         elevation: 0,
                       ),
-                      onPressed: () {
-                        final formattedPriceText = isBn 
-                            ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}" 
-                            : "$currencySymbol $_offerPrice";
-                        final updatedText = loc.translate("fare_updated_to").replaceAll('{amount}', formattedPriceText);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(updatedText),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        loc.translate("raise_fare"),
-                        style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? Colors.white70 : Colors.black87,
-                        ),
-                      ),
+                      onPressed: _isUpdatingOffer 
+                          ? null 
+                          : () => _sendUpdateOfferAmount(
+                              newPrice: _offerPrice, 
+                              isKeepTrying: false,
+                            ),
+                      child: _isUpdatingOffer
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(
+                              loc.translate("raise_fare"),
+                              style: GoogleFonts.poppins(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: isDark ? Colors.white70 : Colors.black87,
+                              ),
+                            ),
                     ),
                   ),
                 ],

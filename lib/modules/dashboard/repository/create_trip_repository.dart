@@ -358,4 +358,63 @@ class CreateTripRepository {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> updateTripOfferAmount({
+    required String customerUuid,
+    required String tripUuid,
+    required String offerAmount,
+    required String langCode,
+  }) async {
+    try {
+      final url = Uri.parse(AppUrls.updateTripOfferAmount);
+      
+      final Map<String, String> formFields = {
+        'platform': CustomMapBodyBuilder.getPlatform(),
+        'language_code': langCode,
+        'action_when': 'update_trip_offer_amount',
+        'offer_ammount': offerAmount,
+        'customer_uuid': customerUuid,
+        'trip_uuid': tripUuid,
+      };
+
+      final token = await UserDataStore.getAccessToken();
+      final headers = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json',
+      };
+      if (token != null && token.isNotEmpty) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+      
+      final response = await ApiService().post(
+        url,
+        headers: headers,
+        body: formFields,
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 400) {
+        final decoded = jsonDecode(response.body);
+        if (decoded['status'] == false) {
+          throw Exception(decoded['message'] ?? "Failed to update offer amount");
+        }
+        return decoded;
+      } else {
+        String? errorMessage;
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded['message'] != null) {
+            errorMessage = decoded['message'];
+          }
+        } catch (_) {}
+        if (errorMessage != null) {
+          throw Exception(errorMessage);
+        }
+        throw Exception("Server error: ${response.statusCode}");
+      }
+    } catch (e) {
+      debugPrint("Error updating trip offer amount: $e");
+      rethrow;
+    }
+  }
 }
+

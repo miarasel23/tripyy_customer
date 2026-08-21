@@ -89,7 +89,7 @@ class _TripTimerBadgeState extends State<TripTimerBadge> {
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    final int maxSeconds = isRideShare ? (1 * 60) : (60 * 60);
+    final int maxSeconds = isRideShare ? 40 : (30 * 60);
 
     final createdAt = _parseDateTime(
       widget.createdAt,
@@ -235,7 +235,7 @@ class _BiddingListWidgetState extends State<BiddingListWidget> {
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    final int maxSeconds = isRideShare ? (1 * 60) : (60 * 60);
+    final int maxSeconds = isRideShare ? 40 : (30 * 60);
 
     final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
     if (createdAtStr == null || createdAtStr.trim().isEmpty) return false;
@@ -363,54 +363,113 @@ class DriverBidCard extends StatefulWidget {
   State<DriverBidCard> createState() => _DriverBidCardState();
 }
 
-class _DriverBidCardState extends State<DriverBidCard> {
-  late int _maxSeconds;
-  late int _secondsLeft;
-  Timer? _timer;
+class _DriverBidCardState extends State<DriverBidCard> with SingleTickerProviderStateMixin {
+  AnimationController? _animController;
 
   @override
   void initState() {
     super.initState();
-    _initSeconds();
-    _startTimer();
+    _startSmoothAnimation();
   }
 
   @override
   void didUpdateWidget(covariant DriverBidCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.currentTrip.serviceName != widget.currentTrip.serviceName) {
-      _timer?.cancel();
-      _initSeconds();
-      _startTimer();
+      _startSmoothAnimation();
     }
   }
 
-  void _initSeconds() {
+  DateTime? _parseDateTime(String? raw, {String? countryCode}) {
+    if (raw == null || raw.trim().isEmpty) return null;
+    try {
+      String clean = raw.trim();
+      if (clean.contains(' ') && !clean.contains('T')) {
+        clean = clean.replaceAll(' ', 'T');
+      }
+
+      final code = (countryCode != null && countryCode.isNotEmpty)
+          ? countryCode.toUpperCase()
+          : AppGlobals.countryCode.toUpperCase();
+      final isBD = code == "BD";
+
+      if (!clean.endsWith('Z') && !clean.contains('+') && !RegExp(r'T\d{2}:\d{2}:\d{2}-\d{2}').hasMatch(clean)) {
+        if (isBD) {
+          clean += "+06:00";
+        }
+      }
+
+      DateTime parsed = DateTime.parse(clean);
+      return parsed.toLocal();
+    } catch (_) {
+      try {
+        int? ts = int.tryParse(raw.trim());
+        if (ts != null) {
+          if (ts < 10000000000) {
+            return DateTime.fromMillisecondsSinceEpoch(ts * 1000).toLocal();
+          } else {
+            return DateTime.fromMillisecondsSinceEpoch(ts).toLocal();
+          }
+        }
+      } catch (_) {}
+      return null;
+    }
+  }
+
+  void _startSmoothAnimation() {
     final service = widget.currentTrip.serviceName?.toLowerCase() ?? "";
     final isRideShare = service == "ride_share" || 
                         service.contains("ride_share") || 
                         service == "rideshare";
-    _maxSeconds = isRideShare ? 60 : 3600; // 1 min for RIDE_SHARE, 1 hour (3600s) for non-RIDE_SHARE
-    _secondsLeft = _maxSeconds;
-  }
+    final int totalDurationSeconds = isRideShare ? 40 : (30 * 60);
 
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (!mounted) return;
-      if (_secondsLeft > 1) {
-        setState(() {
-          _secondsLeft--;
-        });
-      } else {
-        _timer?.cancel();
-        widget.onHide(); // Automatically hide when 60s timer expires
+    final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
+    final createdAt = _parseDateTime(
+      createdAtStr,
+      countryCode: widget.currentTrip.countryCode,
+    );
+
+    double initialProgress = 0.0;
+    int remainingMs = totalDurationSeconds * 1000;
+
+    if (createdAt != null) {
+      final elapsedMs = DateTime.now().difference(createdAt).inMilliseconds;
+      if (elapsedMs > 0) {
+        initialProgress = (elapsedMs / (totalDurationSeconds * 1000)).clamp(0.0, 1.0);
+        remainingMs = (totalDurationSeconds * 1000) - elapsedMs;
+      }
+    }
+
+    if (remainingMs <= 0) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) widget.onHide();
+      });
+      return;
+    }
+
+    _animController?.dispose();
+    _animController = AnimationController(
+      vsync: this,
+      value: initialProgress,
+      duration: Duration(seconds: totalDurationSeconds),
+    );
+
+    _animController!.addListener(() {
+      if (mounted) setState(() {});
+    });
+
+    _animController!.addStatusListener((status) {
+      if (status == AnimationStatus.completed && mounted) {
+        widget.onHide();
       }
     });
+
+    _animController!.forward();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _animController?.dispose();
     super.dispose();
   }
 
@@ -556,8 +615,8 @@ class _DriverBidCardState extends State<DriverBidCard> {
     final isBn = widget.isBn;
     final bidAmount = bid.totalAmount ?? bid.bidAmount ?? 0.00;
     final formattedPrice = isBn 
-        ? '৳${_toBanglaDigits(bidAmount.round().toString())}' 
-        : 'BDT${bidAmount.round()}';
+        ? '৳ ${_toBanglaDigits(bidAmount.round().toString())}' 
+        : 'BDT ${bidAmount.round()}';
 
     // Car photo gallery info & URL
     final int photoCount = bid.carPhotos?.length ?? 0;
@@ -569,9 +628,8 @@ class _DriverBidCardState extends State<DriverBidCard> {
           : "${AppUrls.imageBaseUrl}${bid.carPhotos!.first}";
     }
 
-    final double progressFactor = ((_maxSeconds - _secondsLeft) / _maxSeconds.toDouble()).clamp(0.0, 1.0);
+    final double progressFactor = (_animController?.value ?? 0.0).clamp(0.0, 1.0);
 
-    final etaText = loc.translate("estimated_time_min").replaceAll('{count}', isBn ? _toBanglaDigits('16') : '16');
     final ridesCountStr = isBn ? _toBanglaDigits((bid.totalCompletedTrips ?? 0).toString()) : (bid.totalCompletedTrips ?? 0).toString();
     final ridesText = loc.translate("rides_count").replaceAll('{count}', ridesCountStr);
 
@@ -593,29 +651,14 @@ class _DriverBidCardState extends State<DriverBidCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 1. Top Price & ETA Row (e.g. BDT500 16 min / ৳৫০০ ১৬ মিনিট)
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                formattedPrice,
-                style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                etaText,
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: isDark ? Colors.white54 : Colors.black54,
-                ),
-              ),
-            ],
+          // 1. Top Price Row (e.g. BDT 500 / ৳ ৫০০)
+          Text(
+            formattedPrice,
+            style: GoogleFonts.poppins(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black,
+            ),
           ),
 
           const SizedBox(height: 12),
