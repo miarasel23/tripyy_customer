@@ -22,4 +22,12 @@ class AppGlobals {
       debugPrint('AppGlobals: $e');
     }
   }
+
+  static String countryCodeForLanguage(String languageCode) {
+    final lang = languageCode.toLowerCase();
+    if (lang == 'bn' || lang.contains('bn') || lang.contains('bangla')) {
+      return 'BD';
+    }
+    return 'GB';
+  }
 }

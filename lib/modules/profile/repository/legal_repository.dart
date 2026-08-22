@@ -6,13 +6,17 @@ import '../model/policy_model.dart';
 class LegalRepository {
   Future<PolicyModel?> fetchPolicies({
     required String languageCode,
-    required String countryCode,
+    String? countryCode,
   }) async {
     try {
+      final effectiveCountryCode = (languageCode.toLowerCase() == 'bn' || languageCode.toLowerCase().contains('bn'))
+          ? 'BD'
+          : 'GB';
+
       final queryParams = {
         "platform": "web",
         "language_code": languageCode,
-        "country_code": countryCode,
+        "country_code": effectiveCountryCode,
       };
 
       final uri = Uri.parse(AppUrls.privacyPolicyTermsList)
