@@ -543,30 +543,8 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     // Hide bidding overlay on bidding screen (exact match or any sub-route)
     final hideBiddingOverlay = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen));
 
-    // Allowed statuses for showing global overlay when service_name != RIDE_SHARE
-    final allowedOverlayStatuses = [
-      "IN_PROGRESS",
-      "REQUESTED",
-      "RIDE_STARTED",
-      "FIRST_COMPLETED",
-      "ARRIVED_PICKUP_LOCATION",
-      TripStatus.inProgress.toUpperCase(),
-      TripStatus.requested.toUpperCase(),
-      TripStatus.rideStarted.toUpperCase(),
-      TripStatus.firstCompleted.toUpperCase(),
-      TripStatus.arrivedPickupLocation.toUpperCase(),
-    ];
-
-    final bool isNonRideShareActive = _activeTrip != null &&
-        (_activeTrip!.serviceName?.toUpperCase() != "RIDE_SHARE") &&
-        allowedOverlayStatuses.contains(_activeTrip!.tripStatus?.toUpperCase() ?? "");
-
-    final bool isNonRideShareRequested = _requestedTrip != null &&
-        (_requestedTrip!.serviceName?.toUpperCase() != "RIDE_SHARE") &&
-        allowedOverlayStatuses.contains(_requestedTrip!.tripStatus?.toUpperCase() ?? "");
-
-    final showActiveOverlay = isNonRideShareActive && !hideActiveOverlay;
-    final showBiddingOverlay = !showActiveOverlay && isNonRideShareRequested && !hideBiddingOverlay;
+    final showActiveOverlay = _activeTrip != null && !hideActiveOverlay;
+    final showBiddingOverlay = !showActiveOverlay && _requestedTrip != null && !hideBiddingOverlay;
 
     return Directionality(
       textDirection: TextDirection.ltr,

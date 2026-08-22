@@ -37,6 +37,18 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
     "Others"
   ];
 
+  String _formatCarType(String? carType) {
+    if (carType == null || carType.isEmpty) return "Car";
+    final text = carType.replaceAll('_', ' ');
+    if (text.toUpperCase() == "MOTOR CYCEL" || text.toUpperCase() == "MOTOR CYCLE") {
+      return "Motor Cycle";
+    }
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
+
   @override
   void dispose() {
     _otherCommentController.dispose();
@@ -460,7 +472,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "${trip.carCategory?.carType ?? 'Car'} • ${driver?.averageRating?.toStringAsFixed(1) ?? '0.0'}",
+                              "${_formatCarType(widget.trip.carCategory?.carType ?? widget.trip.serviceName)} • ${driver?.averageRating?.toStringAsFixed(1) ?? '0.0'}",
                               style: GoogleFonts.poppins(
                                 color: isDark ? Colors.white70 : Colors.black87,
                                 fontSize: 14,
