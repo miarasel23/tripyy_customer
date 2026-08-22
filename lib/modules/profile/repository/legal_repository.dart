@@ -35,6 +35,7 @@ class LegalRepository {
     } catch (e) {
       // Error handled centrally by ApiService
     }
+   
     return null;
   }
 }

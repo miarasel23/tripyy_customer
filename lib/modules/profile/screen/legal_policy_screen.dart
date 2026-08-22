@@ -59,7 +59,7 @@ class _LegalPolicyScreenState extends State<LegalPolicyScreen> {
 
   Future<void> _fetchPolicy(String languageCode) async {
     final repo = LegalRepository();
-    final countryCode = AppGlobals.countryCode;
+    final countryCode = AppGlobals.countryCodeForLanguage(languageCode);
     final policyModel = await repo.fetchPolicies(
       languageCode: languageCode,
       countryCode: countryCode,
@@ -155,7 +155,12 @@ class _LegalPolicyScreenState extends State<LegalPolicyScreen> {
 </body>
 </html>''';
 
-    _controller.loadHtmlString(styledHtml);
+    await _controller.loadHtmlString(styledHtml);
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   String _getTitle(AppLocalizations loc) {
