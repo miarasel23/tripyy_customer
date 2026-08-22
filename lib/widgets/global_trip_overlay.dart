@@ -110,20 +110,40 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       if (mounted) {
         setState(() {
           if (activeResponse.trips.isNotEmpty) {
-            final activeStatuses = [
-              TripStatus.inProgress.toUpperCase(),
+            final rideShareActiveStatuses = [
+              "ACCEPTED",
+              "BOOKED",
+              "ARRIVED_PICKUP_LOCATION",
+              "RIDE_STARTED",
+              "FIRST_COMPLETED",
+              "IN_PROGRESS",
+              "ON_GOING",
               TripStatus.accepted.toUpperCase(),
               TripStatus.booked.toUpperCase(),
               TripStatus.arrivedPickupLocation.toUpperCase(),
               TripStatus.rideStarted.toUpperCase(),
               TripStatus.firstCompleted.toUpperCase(),
-              "IN_PROGRESS",
-              "ACCEPTED",
-              "ON_GOING",
+              TripStatus.inProgress.toUpperCase(),
             ];
+            final inProgressStatuses = [
+              "IN_PROGRESS",
+              "RIDE_STARTED",
+              "FIRST_COMPLETED",
+              "ARRIVED_PICKUP_LOCATION",
+              "ON_GOING",
+              TripStatus.inProgress.toUpperCase(),
+              TripStatus.rideStarted.toUpperCase(),
+              TripStatus.firstCompleted.toUpperCase(),
+              TripStatus.arrivedPickupLocation.toUpperCase(),
+            ];
+
             final found = activeResponse.trips.where((t) {
               final s = t.tripStatus?.toUpperCase() ?? "";
-              return activeStatuses.contains(s) && 
+              final service = t.serviceName?.toUpperCase() ?? "";
+              if (service != "RIDE_SHARE") {
+                return inProgressStatuses.contains(s);
+              }
+              return rideShareActiveStatuses.contains(s) && 
                      s != TripStatus.completed.toUpperCase() && 
                      s != TripStatus.cancelled.toUpperCase();
             }).toList();

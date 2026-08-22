@@ -279,7 +279,10 @@ class _MytripScreenState extends State<MytripScreen> {
     }
 
     final String serviceNameRaw = trip.serviceName ?? "Ride Share";
-    final String serviceName = serviceNameRaw.replaceAll('_', ' ');
+    String serviceName = serviceNameRaw.replaceAll('_', ' ');
+    if ((serviceNameRaw.toUpperCase().contains("HOURLY") || serviceNameRaw.toUpperCase().contains("HOUR")) && trip.hoursBooked != null && trip.hoursBooked! > 0) {
+      serviceName = "$serviceName (${trip.hoursBooked} ${trip.hoursBooked == 1 ? 'Hour' : 'Hours'})";
+    }
     final String carType = formatCarType(trip.carCategory?.carType);
     final String carAvatar = trip.carCategory?.carAvatar ?? "";
     

@@ -20,6 +20,8 @@ import '../modules/userLevel/screen/user_level.dart';
 import '../modules/voucher/screen/voucher_screen.dart';
 import '../modules/dashboard/screen/bidding_screen.dart';
 import '../modules/dashboard/screen/active_trip_screen.dart';
+import '../modules/profile/screen/legal_policy_screen.dart';
+import '../modules/chat/screen/chat_screen.dart';
 import 'app_routes.dart';
 
 class RouteGenerator {
@@ -99,6 +101,25 @@ class RouteGenerator {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => ActiveTripScreen(customerUuid: customerUuid),
+        );
+
+      case AppRoutes.legalPolicy:
+        final policyType = settings.arguments as String? ?? 'TERMS_CONDITION';
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => LegalPolicyScreen(policyType: policyType),
+        );
+
+      case AppRoutes.chat:
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => ChatScreen(
+            customerUuid: args['customerUuid'] as String? ?? '',
+            driverUuid: args['driverUuid'] as String? ?? '',
+            receiverType: args['receiverType'] as String? ?? 'DRIVER',
+            title: args['title'] as String? ?? 'Chat',
+          ),
         );
 
       default:

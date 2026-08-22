@@ -19,4 +19,6 @@ class AppRoutes {
   static const String error = '/error';
   static const String biddingScreen = '/bidding_screen';
   static const String activeTrip = '/active_trip';
+  static const String legalPolicy = '/legal_policy';
+  static const String chat = '/chat';
 }

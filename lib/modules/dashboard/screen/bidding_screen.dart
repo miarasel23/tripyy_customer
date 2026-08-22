@@ -15,6 +15,8 @@ import '../widget/bidding_list_widget.dart';
 import '../../../utils/app_urls.dart';
 import '../../../routes/app_routes.dart';
 
+import '../helper/active_trip_helper.dart';
+
 class BiddingScreen extends StatefulWidget {
   final String customerUuid;
   final String tripUuid;
@@ -264,7 +266,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
     
     // Determine title text
     String titleText = "Finding your ride";
-    String subtitleText = _currentTrip?.serviceName?.replaceAll('_', ' ') ?? "TRIPPY RIDE PREMIUM";
+    String serviceNameRaw = _currentTrip?.serviceName ?? "";
+    String subtitleText = ActiveTripHelper.formatServiceName(serviceNameRaw, hoursBooked: _currentTrip?.hoursBooked);
+    if (subtitleText.isEmpty) subtitleText = "TRIPPY RIDE PREMIUM";
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF13151B) : Colors.white,

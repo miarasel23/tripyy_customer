@@ -922,25 +922,62 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                         ),
                       ),
                       const SizedBox(height: 15),
-                      if (driver?.phone != null && driver!.phone!.isNotEmpty && driver.phone != 'N/A')
-                        GestureDetector(
-                          onTap: () => ActiveTripHelper.launchCallOrUrl(context, "tel:${driver.phone}"),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.call, color: isDark ? Colors.white : Colors.black, size: 16),
-                              const SizedBox(width: 4),
-                              Text(
-                                loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
-                                style: GoogleFonts.poppins(
-                                  color: isDark ? Colors.white : Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (driver?.phone != null && driver!.phone!.isNotEmpty && driver.phone != 'N/A') ...[
+                            GestureDetector(
+                              onTap: () => ActiveTripHelper.launchCallOrUrl(context, "tel:${driver.phone}"),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.call, color: isDark ? Colors.white : Colors.black, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
+                                    style: GoogleFonts.poppins(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                            const SizedBox(width: 16),
+                          ],
+                          if (driver?.driverUuid != null && driver!.driverUuid!.isNotEmpty)
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.chat,
+                                  arguments: {
+                                    'customerUuid': widget.customerUuid,
+                                    'driverUuid': driver.driverUuid,
+                                    'receiverType': 'DRIVER',
+                                    'title': driver.name ?? 'Driver Chat',
+                                  },
+                                );
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.chat_bubble_outline_rounded, color: isDark ? Colors.white : Colors.black, size: 16),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    loc.translate('chat') == 'chat' ? "Chat" : loc.translate('chat'),
+                                    style: GoogleFonts.poppins(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -1138,7 +1175,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                         ),
                       ),
                       Text(
-                        "${ActiveTripHelper.formatServiceName(trip.serviceName)} • ${allLocations.length} locations",
+                        "${ActiveTripHelper.formatServiceName(trip.serviceName, hoursBooked: trip.hoursBooked)} • ${allLocations.length} locations",
                         style: GoogleFonts.poppins(
                           color: isDark ? Colors.white54 : Colors.black54,
                           fontSize: 12,

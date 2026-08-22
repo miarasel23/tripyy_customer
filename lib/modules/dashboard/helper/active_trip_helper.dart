@@ -50,13 +50,19 @@ class ActiveTripHelper {
     }
   }
 
-  static String formatServiceName(String? rawName) {
+  static String formatServiceName(String? rawName, {int? hoursBooked}) {
     if (rawName == null || rawName.isEmpty) return "";
     final temp = rawName.replaceAll('_', ' ').trim();
+    String formatted;
     if (temp.toLowerCase().contains("inter city renter")) {
-      return "Inter city renter";
+      formatted = "Inter city renter";
+    } else {
+      final lower = temp.toLowerCase();
+      formatted = lower[0].toUpperCase() + lower.substring(1);
     }
-    final lower = temp.toLowerCase();
-    return lower[0].toUpperCase() + lower.substring(1);
+    if ((temp.toUpperCase().contains("HOURLY") || temp.toUpperCase().contains("HOUR")) && hoursBooked != null && hoursBooked > 0) {
+      formatted = "$formatted ($hoursBooked ${hoursBooked == 1 ? 'Hour' : 'Hours'})";
+    }
+    return formatted;
   }
 }

@@ -286,6 +286,7 @@ class RentalTrip {
   final int? seenDriverCount;
   final List<SeenDriverModel> seenDrivers;
   final List<String> seenDriverPhotos;
+  final int? hoursBooked;
 
   RentalTrip({
     this.id,
@@ -309,6 +310,7 @@ class RentalTrip {
     this.seenDriverCount,
     this.seenDrivers = const [],
     this.seenDriverPhotos = const [],
+    this.hoursBooked,
   });
 
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
@@ -336,6 +338,13 @@ class RentalTrip {
       seenDriverCount: json['seen_driver_count'] as int?,
       seenDrivers: (json['seen_drivers'] as List<dynamic>?)?.map((e) => SeenDriverModel.fromJson(e)).toList() ?? [],
       seenDriverPhotos: (json['seen_driver_photos'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
+      hoursBooked: json['hours_booked'] != null
+          ? (double.tryParse(json['hours_booked'].toString())?.round() ?? int.tryParse(json['hours_booked'].toString()))
+          : (json['hoursBooked'] != null
+              ? (double.tryParse(json['hoursBooked'].toString())?.round() ?? int.tryParse(json['hoursBooked'].toString()))
+              : (json['hours_package'] != null
+                  ? (double.tryParse(json['hours_package'].toString())?.round() ?? int.tryParse(json['hours_package'].toString()))
+                  : null)),
     );
   }
 
@@ -359,6 +368,7 @@ class RentalTrip {
     int? seenDriverCount,
     List<SeenDriverModel>? seenDrivers,
     List<String>? seenDriverPhotos,
+    int? hoursBooked,
   }) {
     return RentalTrip(
       id: id ?? this.id,
@@ -380,6 +390,7 @@ class RentalTrip {
       seenDriverCount: seenDriverCount ?? this.seenDriverCount,
       seenDrivers: seenDrivers ?? this.seenDrivers,
       seenDriverPhotos: seenDriverPhotos ?? this.seenDriverPhotos,
+      hoursBooked: hoursBooked ?? this.hoursBooked,
     );
   }
 }

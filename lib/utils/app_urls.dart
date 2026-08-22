@@ -33,6 +33,9 @@ class AppUrls {
   static const String deleteCustomerLocation = "$baseUrl/v1/customer/delete-location";
   static const String saveCustomerDriverTrack = "$baseUrl/v1/customer-driver-track/create";
   static const String customerDriverTrackGet = "$baseUrl/v1/customer-driver-track/get";
+  static const String privacyPolicyTermsList = "$baseUrl/v1/global-api/privacy-policy-terms-condition/list";
+  static const String liveChatConversation = "$baseUrl/v1/live-chat/conversation";
+  static const String liveChatSend = "$baseUrl/v1/live-chat/send";
 
   static String? get profileImageUrl {
     final image = UserDataStore.userData?.data?.user?.profilePicture;
