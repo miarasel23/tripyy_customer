@@ -29,6 +29,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   Timer? _pollingTimer;
   bool _isExpanded = false;
   bool _isReviewSheetOpen = false;
+  bool _isRedirectingToActiveTrip = false;
   final Set<String> _autoReviewShownTripUuids = {};
 
   @override
@@ -46,7 +47,13 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   }
 
   void _onRouteChanged() {
-    if (mounted) setState(() {});
+    if (mounted) {
+      setState(() {});
+      final customerUuid = UserDataStore.userData?.data?.user?.uuid;
+      if (customerUuid != null && customerUuid.isNotEmpty) {
+        _enforceActiveTripRedirection(customerUuid);
+      }
+    }
   }
 
   void _startPolling() {
@@ -132,6 +139,8 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
           }
         });
 
+        _enforceActiveTripRedirection(customerUuid);
+
         // Automatic Review Modal Trigger for Completed Trips where givenReview == false
         if (activeResponse.trips.isNotEmpty && !_isReviewSheetOpen) {
           final unreviewedCompletedTrips = activeResponse.trips.where((t) {
@@ -182,6 +191,86 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       }
     } catch (e) {
       // Silently ignore polling errors
+    }
+  }
+
+  void _enforceActiveTripRedirection(String customerUuid) {
+    if (_activeTrip == null || _isRedirectingToActiveTrip) return;
+
+    final currentRoute = globalRouteObserver.currentRoute;
+    if (currentRoute == null) return;
+
+    if (currentRoute == AppRoutes.splash || 
+        currentRoute == AppRoutes.numberInput || 
+        currentRoute == AppRoutes.otp) {
+      return;
+    }
+
+    if (currentRoute == AppRoutes.activeTrip || currentRoute.startsWith(AppRoutes.activeTrip)) {
+      return;
+    }
+
+    final status = _activeTrip!.tripStatus?.toUpperCase() ?? "";
+    final serviceName = _activeTrip!.serviceName?.toUpperCase() ?? "";
+    final bool isRideShare = serviceName == "RIDE_SHARE";
+
+    final rideShareActiveStatuses = [
+      "ACCEPTED",
+      "BOOKED",
+      "ARRIVED_PICKUP_LOCATION",
+      "RIDE_STARTED",
+      "IN_PROGRESS",
+      "FIRST_COMPLETED",
+      "ON_GOING",
+      TripStatus.accepted.toUpperCase(),
+      TripStatus.booked.toUpperCase(),
+      TripStatus.arrivedPickupLocation.toUpperCase(),
+      TripStatus.rideStarted.toUpperCase(),
+      TripStatus.inProgress.toUpperCase(),
+      TripStatus.firstCompleted.toUpperCase(),
+    ];
+
+    final inProgressStatuses = [
+      "IN_PROGRESS",
+      "RIDE_STARTED",
+      "FIRST_COMPLETED",
+      "ARRIVED_PICKUP_LOCATION",
+      "ON_GOING",
+      TripStatus.inProgress.toUpperCase(),
+      TripStatus.rideStarted.toUpperCase(),
+      TripStatus.firstCompleted.toUpperCase(),
+      TripStatus.arrivedPickupLocation.toUpperCase(),
+    ];
+
+    bool shouldRedirect = false;
+
+    if (isRideShare && rideShareActiveStatuses.contains(status)) {
+      // If accepted trip & service_name == RIDE_SHARE -> customer cannot move to another page, only active page until completed
+      shouldRedirect = true;
+    } else if (!isRideShare && inProgressStatuses.contains(status)) {
+      // For other services: if ride status is IN_PROGRESS -> automatically redirect to active page until completed
+      shouldRedirect = true;
+    }
+
+    if (shouldRedirect) {
+      _isRedirectingToActiveTrip = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          _isRedirectingToActiveTrip = false;
+          return;
+        }
+        final nav = globalNavigatorKey.currentState;
+        if (nav != null) {
+          nav.pushNamed(
+            AppRoutes.activeTrip,
+            arguments: customerUuid,
+          ).then((_) {
+            _isRedirectingToActiveTrip = false;
+          });
+        } else {
+          _isRedirectingToActiveTrip = false;
+        }
+      });
     }
   }
 
@@ -448,8 +537,30 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     // Hide bidding overlay on bidding screen (exact match or any sub-route)
     final hideBiddingOverlay = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen));
 
-    final showActiveOverlay = _activeTrip != null && !hideActiveOverlay;
-    final showBiddingOverlay = !showActiveOverlay && _requestedTrip != null && !hideBiddingOverlay;
+    // Allowed statuses for showing global overlay when service_name != RIDE_SHARE
+    final allowedOverlayStatuses = [
+      "IN_PROGRESS",
+      "REQUESTED",
+      "RIDE_STARTED",
+      "FIRST_COMPLETED",
+      "ARRIVED_PICKUP_LOCATION",
+      TripStatus.inProgress.toUpperCase(),
+      TripStatus.requested.toUpperCase(),
+      TripStatus.rideStarted.toUpperCase(),
+      TripStatus.firstCompleted.toUpperCase(),
+      TripStatus.arrivedPickupLocation.toUpperCase(),
+    ];
+
+    final bool isNonRideShareActive = _activeTrip != null &&
+        (_activeTrip!.serviceName?.toUpperCase() != "RIDE_SHARE") &&
+        allowedOverlayStatuses.contains(_activeTrip!.tripStatus?.toUpperCase() ?? "");
+
+    final bool isNonRideShareRequested = _requestedTrip != null &&
+        (_requestedTrip!.serviceName?.toUpperCase() != "RIDE_SHARE") &&
+        allowedOverlayStatuses.contains(_requestedTrip!.tripStatus?.toUpperCase() ?? "");
+
+    final showActiveOverlay = isNonRideShareActive && !hideActiveOverlay;
+    final showBiddingOverlay = !showActiveOverlay && isNonRideShareRequested && !hideBiddingOverlay;
 
     return Directionality(
       textDirection: TextDirection.ltr,

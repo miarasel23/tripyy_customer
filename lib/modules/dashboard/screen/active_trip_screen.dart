@@ -471,9 +471,72 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
-    return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF13151B) : Colors.white,
-      body: BlocListener<ActiveTripBloc, ActiveTripState>(
+    final bool isRideShare = _activeTrip?.serviceName?.toUpperCase() == "RIDE_SHARE";
+    final String currentStatus = _activeTrip?.tripStatus?.toUpperCase() ?? "";
+
+    final rideShareActiveStatuses = [
+      "ACCEPTED",
+      "BOOKED",
+      "ARRIVED_PICKUP_LOCATION",
+      "RIDE_STARTED",
+      "IN_PROGRESS",
+      "FIRST_COMPLETED",
+      "ON_GOING",
+      TripStatus.accepted.toUpperCase(),
+      TripStatus.booked.toUpperCase(),
+      TripStatus.arrivedPickupLocation.toUpperCase(),
+      TripStatus.rideStarted.toUpperCase(),
+      TripStatus.inProgress.toUpperCase(),
+      TripStatus.firstCompleted.toUpperCase(),
+    ];
+
+    final inProgressStatuses = [
+      "IN_PROGRESS",
+      "RIDE_STARTED",
+      "FIRST_COMPLETED",
+      "ARRIVED_PICKUP_LOCATION",
+      "ON_GOING",
+      TripStatus.inProgress.toUpperCase(),
+      TripStatus.rideStarted.toUpperCase(),
+      TripStatus.firstCompleted.toUpperCase(),
+      TripStatus.arrivedPickupLocation.toUpperCase(),
+    ];
+
+    bool shouldLockNavigation = false;
+    if (isRideShare && rideShareActiveStatuses.contains(currentStatus)) {
+      shouldLockNavigation = true;
+    } else if (!isRideShare && inProgressStatuses.contains(currentStatus)) {
+      shouldLockNavigation = true;
+    }
+
+    void showLockedNavigationNotice() {
+      final isBn = loc.locale.languageCode == 'bn';
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isBn
+                ? "রাইডটি চলমান রয়েছে। সম্পন্ন না হওয়া পর্যন্ত অন্য পেজে যাওয়া যাবে না।"
+                : "Ride is active. You will remain on this screen until completed.",
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+          backgroundColor: Colors.black87,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+
+    return PopScope(
+      canPop: !shouldLockNavigation,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && shouldLockNavigation) {
+          showLockedNavigationNotice();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: isDark ? const Color(0xFF13151B) : Colors.white,
+        body: BlocListener<ActiveTripBloc, ActiveTripState>(
         listener: (context, state) {
           if (state is ActiveTripSuccess) {
             final trip = state.activeTrip;
@@ -556,7 +619,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                   top: 50,
                   left: 16,
                   child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
+                    onTap: () {
+                      if (shouldLockNavigation) {
+                        showLockedNavigationNotice();
+                      } else {
+                        Navigator.of(context).pop();
+                      }
+                    },
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -586,6 +655,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
           },
         ),
       ),
+    ),
     );
   }
 
