@@ -14,6 +14,7 @@ import '../../dashboard/model/create_rental_trip_model.dart';
 import '../../../main.dart';
 import '../../../widgets/cancel_trip_dialog.dart';
 import '../../dashboard/repository/create_trip_repository.dart';
+import '../../dashboard/widget/trip_review_bottom_sheet.dart';
 
 class MytripScreen extends StatefulWidget {
   const MytripScreen({super.key});
@@ -567,7 +568,50 @@ class _MytripScreenState extends State<MytripScreen> {
                   ),
                 ],
               ],
-            )
+            ),
+
+          if (isHistory && trip.tripStatus == 'COMPLETED' && trip.givenReview == false) ...[
+            SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () async {
+                  final customerUuid = UserDataStore.userData?.data?.user?.uuid ?? "";
+                  RentalDriverBid? driver;
+                  if (trip.drivers.isNotEmpty) {
+                    try {
+                      driver = trip.drivers.firstWhere((d) => d.bidStatus == "ACCEPTED" || d.bidStatus == "COMPLETED");
+                    } catch (_) {
+                      driver = trip.drivers.first;
+                    }
+                  }
+                  await showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    isDismissible: false,
+                    enableDrag: false,
+                    builder: (ctx) => TripReviewBottomSheet(
+                      trip: trip,
+                      driver: driver,
+                      customerUuid: customerUuid,
+                    ),
+                  );
+                  _fetchCurrentTab(isSilent: false);
+                },
+                icon: Icon(Icons.star, size: 18, color: Colors.white),
+                label: Text(
+                  loc.translate("give_review") == "give_review" ? "Give Review" : loc.translate("give_review"),
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.amber.shade800,
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

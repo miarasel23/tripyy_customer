@@ -329,7 +329,9 @@ class RentalTrip {
       endDatetime: json['end_datetime']?.toString(),
       createdAt: json['created_at']?.toString() ?? json['createdAt']?.toString() ?? json['created_time']?.toString() ?? json['start_datetime']?.toString(),
       countryCode: json['country_code']?.toString() ?? json['countryCode']?.toString(),
-      givenReview: json['given_review'] as bool?,
+      givenReview: (json['given_review'] == true || json['given_review'] == 'true' || json['given_review'] == 1)
+          ? true
+          : ((json['given_review'] == false || json['given_review'] == 'false' || json['given_review'] == 0) ? false : null),
       bidSummary: json['bid_summary'] != null ? BidSummaryModel.fromJson(json['bid_summary']) : null,
       seenDriverCount: json['seen_driver_count'] as int?,
       seenDrivers: (json['seen_drivers'] as List<dynamic>?)?.map((e) => SeenDriverModel.fromJson(e)).toList() ?? [],

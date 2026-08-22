@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../modules/dashboard/model/create_rental_trip_model.dart';
 import '../modules/dashboard/model/trip_status.dart';
 import '../modules/dashboard/repository/create_trip_repository.dart';
+import '../modules/dashboard/widget/trip_review_bottom_sheet.dart';
 import '../store/user_data_store.dart';
 import '../core/utils/localization/app_localization.dart';
 import '../utils/app_colors.dart';
@@ -27,6 +28,8 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   RentalTrip? _requestedTrip;
   Timer? _pollingTimer;
   bool _isExpanded = false;
+  bool _isReviewSheetOpen = false;
+  final Set<String> _autoReviewShownTripUuids = {};
 
   @override
   void initState() {
@@ -128,6 +131,54 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
             _requestedTrip = null;
           }
         });
+
+        // Automatic Review Modal Trigger for Completed Trips where givenReview == false
+        if (activeResponse.trips.isNotEmpty && !_isReviewSheetOpen) {
+          final unreviewedCompletedTrips = activeResponse.trips.where((t) {
+            final s = t.tripStatus?.toUpperCase() ?? "";
+            return s == TripStatus.completed.toUpperCase() && t.givenReview == false;
+          }).toList();
+
+          if (unreviewedCompletedTrips.isNotEmpty) {
+            final unreviewedTrip = unreviewedCompletedTrips.first;
+            final tripUuid = unreviewedTrip.uuid;
+            if (tripUuid != null && !_autoReviewShownTripUuids.contains(tripUuid)) {
+              _autoReviewShownTripUuids.add(tripUuid);
+              _isReviewSheetOpen = true;
+
+              RentalDriverBid? driver;
+              if (unreviewedTrip.drivers.isNotEmpty) {
+                try {
+                  driver = unreviewedTrip.drivers.firstWhere(
+                    (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+                  );
+                } catch (_) {
+                  driver = unreviewedTrip.drivers.first;
+                }
+              }
+
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                final navContext = globalNavigatorKey.currentContext ?? context;
+                if (navContext.mounted) {
+                  await showModalBottomSheet(
+                    context: navContext,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    isDismissible: false,
+                    enableDrag: false,
+                    builder: (ctx) => TripReviewBottomSheet(
+                      trip: unreviewedTrip,
+                      driver: driver,
+                      customerUuid: customerUuid,
+                    ),
+                  );
+                }
+                _isReviewSheetOpen = false;
+                _fetchActiveTrip();
+              });
+            }
+          }
+        }
       }
     } catch (e) {
       // Silently ignore polling errors
@@ -750,7 +801,6 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                                   );
 
                                   if (confirm == true) {
-                                    final customerUuid = UserDataStore.userData?.data?.user?.uuid ?? UserDataStore.uuid ?? "";
                                     try {
                                       await _repo.cancelTrip(
                                         tripUuid: trip.uuid ?? "",
