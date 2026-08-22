@@ -158,7 +158,13 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
       }
     }
     
-    final finalFare = driver?.totalAmount?.toStringAsFixed(2) ?? trip.offerAmount?.toStringAsFixed(2) ?? '0.00';
+    final isBn = loc.locale.languageCode == 'bn';
+    final currencySymbol = isBn ? '৳' : 'BDT';
+    final double rawFare = driver?.totalAmount ?? trip.offerAmount ?? 0.0;
+    final String fareAmountStr = isBn
+        ? _toBanglaDigits(rawFare.round().toString())
+        : rawFare.round().toString();
+    final formattedFare = "$currencySymbol $fareAmountStr";
     final paymentMethod = trip.paymentMethod ?? 'CASH';
 
     return Padding(
@@ -263,7 +269,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          "\$$finalFare",
+                          formattedFare,
                           style: GoogleFonts.poppins(
                             color: isDark ? Colors.white : Colors.black,
                             fontSize: 32,
@@ -620,5 +626,14 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
     ),
     ),
     );
+  }
+
+  String _toBanglaDigits(String numberStr) {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const bangla = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    for (int i = 0; i < english.length; i++) {
+      numberStr = numberStr.replaceAll(english[i], bangla[i]);
+    }
+    return numberStr;
   }
 }

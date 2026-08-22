@@ -7,6 +7,7 @@ import '../../../../utils/app_urls.dart';
 import '../model/create_rental_trip_model.dart';
 import '../repository/create_trip_repository.dart';
 import '../../../../store/app_globals.dart';
+import '../helper/active_trip_helper.dart';
 
 class BiddingTripDetailsCard extends StatefulWidget {
   final bool isDark;
@@ -692,9 +693,17 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
         ? (isDark ? const Color(0xFFFF8A80) : const Color(0xFFD32F2F))
         : (isDark ? const Color(0xFF81C784) : const Color(0xFF2E7D32));
 
+    final String currentStatus = widget.currentTrip.tripStatus?.toUpperCase() ?? "";
+    final bool isRideStarted = currentStatus == "RIDE_STARTED" || currentStatus == "FIRST_COMPLETED" || currentStatus == "ON_GOING";
+    final bool isAcceptedOrInProgress = currentStatus == "ACCEPTED" || currentStatus == "IN_PROGRESS" || currentStatus == "BOOKED" || currentStatus == "ARRIVED_PICKUP_LOCATION";
+
     final driversCountStr = isBn ? _toBanglaDigits(totalDriversViewed.toString()) : totalDriversViewed.toString();
-    String driversViewedText = loc.translate("drivers_viewed_request").replaceAll('{count}', driversCountStr);
-    if (!isBn && totalDriversViewed == 1) {
+    String driversViewedText = isRideStarted
+        ? (isBn ? "গন্তব্যের দিকে যাওয়া হচ্ছে" : "ARRIVING AT DESTINATION")
+        : (isAcceptedOrInProgress
+            ? (isBn ? "ড্রাইভার পিকআপের দিকে আসছেন" : "DRIVER ARRIVING AT PICKUP LOCATION")
+            : loc.translate("drivers_viewed_request").replaceAll('{count}', driversCountStr));
+    if (!isRideStarted && !isAcceptedOrInProgress && !isBn && totalDriversViewed == 1) {
       driversViewedText = driversViewedText.replaceAll("drivers viewed", "driver viewed");
     }
 
@@ -836,7 +845,11 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    loc.translate("waiting_offers_drivers"),
+                    isRideStarted
+                        ? (isBn ? "গন্তব্যের দিকে যাওয়া হচ্ছে" : "ARRIVING AT DESTINATION")
+                        : (isAcceptedOrInProgress
+                            ? (isBn ? "ড্রাইভার পিকআপের দিকে আসছেন" : "DRIVER ARRIVING AT PICKUP LOCATION")
+                            : loc.translate("waiting_offers_drivers")),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -847,116 +860,217 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                   Divider(color: isDark ? Colors.white10 : Colors.grey.shade200, height: 1),
                   const SizedBox(height: 16),
 
-                  // Fare Adjustment Controls: [-10] BDT 379 [+10]
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (_offerPrice > _initialBasePrice) {
-                            setState(() {
-                              _offerPrice -= 10;
-                            });
-                          }
-                        },
-                        child: Container(
-                          width: 75,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF2A2E3B) : Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Text(
-                              isBn ? "-১০" : "-10",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white70 : Colors.black87,
-                              ),
-                            ),
-                          ),
+                  if (isRideStarted || isAcceptedOrInProgress) ...[
+                    Center(
+                      child: Text(
+                        isBn 
+                            ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}" 
+                            : "$currencySymbol $_offerPrice",
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
                         ),
                       ),
-
-                      Expanded(
-                        child: Text(
-                          isBn 
-                              ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}" 
-                              : "$currencySymbol $_offerPrice",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black,
-                          ),
-                        ),
-                      ),
-
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _offerPrice += 10;
-                          });
-                        },
-                        child: Container(
-                          width: 75,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: isDark ? const Color(0xFF2A2E3B) : Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Center(
-                            child: Text(
-                              isBn ? "+১০" : "+10",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white70 : Colors.black87,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // "Raise fare" Action Button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark ? const Color(0xFF2D3240) : Colors.grey.shade200,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        elevation: 0,
-                      ),
-                      onPressed: _isUpdatingOffer 
-                          ? null 
-                          : () => _sendUpdateOfferAmount(
-                              newPrice: _offerPrice, 
-                              isKeepTrying: false,
-                            ),
-                      child: _isUpdatingOffer
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(
-                              loc.translate("raise_fare"),
-                              style: GoogleFonts.poppins(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                color: isDark ? Colors.white70 : Colors.black87,
-                              ),
-                            ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: SizedBox(
+                            height: 48,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: isDark ? const Color(0xFF242731) : const Color(0xFFF4F6F9),
+                                side: BorderSide(
+                                  color: isDark ? Colors.white24 : Colors.grey.shade300,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              onPressed: () {
+                                final driver = widget.currentTrip.drivers.isNotEmpty ? widget.currentTrip.drivers.first : null;
+                                final phone = driver?.phone ?? "";
+                                if (phone.isNotEmpty) {
+                                  ActiveTripHelper.launchCallOrUrl(context, "tel:$phone");
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(isBn ? "ড্রাইভারের ফোন নম্বর পাওয়া যায়নি" : "Driver phone number unavailable"),
+                                      backgroundColor: Colors.orangeAccent,
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: Icon(Icons.call_rounded, size: 18, color: isDark ? Colors.white : Colors.black87),
+                              label: Text(
+                                isBn ? "কল" : "Call",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+
+                        Expanded(
+                          flex: 3,
+                          child: SizedBox(
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: isDark ? Colors.white : Colors.black,
+                                foregroundColor: isDark ? Colors.black : Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                elevation: 4,
+                                shadowColor: Colors.black.withValues(alpha: 0.3),
+                              ),
+                              onPressed: () {
+                                final driver = widget.currentTrip.drivers.isNotEmpty ? widget.currentTrip.drivers.first : null;
+                                final phone = driver?.phone ?? "";
+                                if (phone.isNotEmpty) {
+                                  ActiveTripHelper.launchCallOrUrl(context, "sms:$phone");
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(isBn ? "ড্রাইভারের ফোন নম্বর পাওয়া যায়নি" : "Driver phone number unavailable"),
+                                      backgroundColor: isDark ? Colors.white : Colors.black,
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.chat_bubble_rounded, size: 18),
+                              label: Text(
+                                isBn ? "চ্যাট করুন" : "Chat",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (_offerPrice > _initialBasePrice) {
+                              setState(() {
+                                _offerPrice -= 10;
+                              });
+                            }
+                          },
+                          child: Container(
+                            width: 75,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF2A2E3B) : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                isBn ? "-১০" : "-10",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white70 : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        Expanded(
+                          child: Text(
+                            isBn 
+                                ? "$currencySymbol ${_toBanglaDigits(_offerPrice.toString())}" 
+                                : "$currencySymbol $_offerPrice",
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black,
+                            ),
+                          ),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _offerPrice += 10;
+                            });
+                          },
+                          child: Container(
+                            width: 75,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: isDark ? const Color(0xFF2A2E3B) : Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                isBn ? "+১০" : "+10",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white70 : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isDark ? const Color(0xFF2D3240) : Colors.grey.shade200,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: _isUpdatingOffer 
+                            ? null 
+                            : () => _sendUpdateOfferAmount(
+                                newPrice: _offerPrice, 
+                                isKeepTrying: false,
+                              ),
+                        child: _isUpdatingOffer
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text(
+                                loc.translate("raise_fare"),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDark ? Colors.white70 : Colors.black87,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

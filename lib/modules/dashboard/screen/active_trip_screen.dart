@@ -621,30 +621,44 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
     int? etaMinutes;
     String? etaLabel;
+    final isBn = loc.locale.languageCode == 'bn';
+    final String currentStatus = trip.tripStatus?.toUpperCase() ?? "";
+    final bool isRideStarted = currentStatus == "RIDE_STARTED" || currentStatus == "FIRST_COMPLETED" || currentStatus == "ON_GOING";
+    final bool isAcceptedOrInProgress = currentStatus == "ACCEPTED" || currentStatus == "IN_PROGRESS" || currentStatus == "BOOKED" || currentStatus == "ARRIVED_PICKUP_LOCATION";
 
-    if (driverLat != null && driverLng != null) {
-      if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress) {
-        if (trip.dropoffLocations.isNotEmpty) {
-          final destLat = double.tryParse(trip.dropoffLocations.first.latitude ?? '');
-          final destLng = double.tryParse(trip.dropoffLocations.first.longitude ?? '');
-          if (destLat != null && destLng != null) {
-            final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, destLat, destLng);
-            etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
-            etaLabel = "Arriving at destination in $etaMinutes ${etaMinutes == 1 ? 'minute' : 'minutes'}";
-          }
+    if (isRideStarted) {
+      if (driverLat != null && driverLng != null && trip.dropoffLocations.isNotEmpty) {
+        final destLat = double.tryParse(trip.dropoffLocations.first.latitude ?? '');
+        final destLng = double.tryParse(trip.dropoffLocations.first.longitude ?? '');
+        if (destLat != null && destLng != null) {
+          final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, destLat, destLng);
+          etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
+          etaLabel = isBn
+              ? "গন্তব্যে পৌঁছাচ্ছেন ($etaMinutes minute)"
+              : "ARRIVING AT DESTINATION ($etaMinutes ${etaMinutes == 1 ? 'min' : 'mins'})";
+        } else {
+          etaLabel = isBn ? "গন্তব্যের দিকে যাওয়া হচ্ছে" : "ARRIVING AT DESTINATION";
         }
-      } else if (trip.tripStatus == TripStatus.arrivedPickupLocation) {
-        etaLabel = "Driver has arrived at pickup location";
       } else {
-        if (trip.pickupLocations.isNotEmpty) {
-          final pickLat = double.tryParse(trip.pickupLocations.first.latitude ?? '');
-          final pickLng = double.tryParse(trip.pickupLocations.first.longitude ?? '');
-          if (pickLat != null && pickLng != null) {
-            final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, pickLat, pickLng);
-            etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
-            etaLabel = "Driver arrives in $etaMinutes ${etaMinutes == 1 ? 'minute' : 'minutes'}";
-          }
+        etaLabel = isBn ? "গন্তব্যের দিকে যাওয়া হচ্ছে" : "ARRIVING AT DESTINATION";
+      }
+    } else if (isAcceptedOrInProgress) {
+      if (trip.tripStatus == TripStatus.arrivedPickupLocation) {
+        etaLabel = isBn ? "ড্রাইভার পিকআপ লোকেশনে পৌঁছেছেন" : "DRIVER ARRIVED AT PICKUP LOCATION";
+      } else if (driverLat != null && driverLng != null && trip.pickupLocations.isNotEmpty) {
+        final pickLat = double.tryParse(trip.pickupLocations.first.latitude ?? '');
+        final pickLng = double.tryParse(trip.pickupLocations.first.longitude ?? '');
+        if (pickLat != null && pickLng != null) {
+          final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, pickLat, pickLng);
+          etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
+          etaLabel = isBn
+              ? "পিকআপের দিকে আসছেন ($etaMinutes minute)"
+              : "DRIVER ARRIVING AT PICKUP LOCATION ($etaMinutes ${etaMinutes == 1 ? 'min' : 'mins'})";
+        } else {
+          etaLabel = isBn ? "ড্রাইভার পিকআপের দিকে আসছেন" : "DRIVER ARRIVING AT PICKUP LOCATION";
         }
+      } else {
+        etaLabel = isBn ? "ড্রাইভার পিকআপের দিকে আসছেন" : "DRIVER ARRIVING AT PICKUP LOCATION";
       }
     }
 
@@ -769,32 +783,38 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          driver?.name ?? (loc.translate('n_a') == 'n_a' ? "N/A" : loc.translate('n_a')),
+                          driver?.name != null && driver!.name!.isNotEmpty
+                              ? driver.name!
+                              : (isBn ? "ড্রাইভার" : "Driver"),
                           style: GoogleFonts.poppins(
                             color: isDark ? Colors.white : Colors.black,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isDark ? Colors.white12 : Colors.black12,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            driver?.carRegNumber ?? (loc.translate('n_a') == 'n_a' ? "N/A" : loc.translate('n_a')),
-                            style: GoogleFonts.poppins(
-                              color: isDark ? Colors.white : Colors.black,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                        if (driver?.carRegNumber != null && driver!.carRegNumber!.isNotEmpty && driver.carRegNumber != "N/A") ...[
+                          const SizedBox(height: 2),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.white12 : Colors.black12,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              driver.carRegNumber!,
+                              style: GoogleFonts.poppins(
+                                color: isDark ? Colors.white : Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                         const SizedBox(height: 4),
                         Text(
-                          "${loc.translate('trips') == 'trips' ? 'trips' : loc.translate('trips')} (${driver?.totalCompletedTrips ?? 0})",
+                          isBn
+                              ? "ট্রিপ (${_toBanglaDigits((driver?.totalCompletedTrips ?? 0).toString())})"
+                              : "Trips (${driver?.totalCompletedTrips ?? 0})",
                           style: GoogleFonts.poppins(
                             color: isDark ? Colors.white54 : Colors.black54,
                             fontSize: 12,
@@ -910,7 +930,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                       ),
                     ),
             )
-          else if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.inProgress || trip.tripStatus == TripStatus.firstCompleted)
+          else if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.firstCompleted)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ClipRRect(
@@ -925,10 +945,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     Positioned.fill(
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          double progress = 0.1;
-                          if (trip.tripStatus == TripStatus.arrivedPickupLocation) progress = 0.2;
-                          if (trip.tripStatus == TripStatus.rideStarted) progress = 0.4;
-                          if (trip.tripStatus == TripStatus.inProgress) progress = 0.6;
+                          double progress = 0.4;
                           if (trip.tripStatus == TripStatus.firstCompleted) progress = 0.75;
                           
                           return AnimatedContainer(
@@ -959,11 +976,10 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                   ],
                 ),
               ),
-            )
-          else if (trip.tripStatus != TripStatus.completed &&
+            ),
+          if (trip.tripStatus != TripStatus.completed &&
               trip.tripStatus != TripStatus.cancelled &&
               trip.tripStatus != TripStatus.rideStarted &&
-              trip.tripStatus != TripStatus.inProgress &&
               trip.tripStatus != TripStatus.firstCompleted)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -1228,5 +1244,14 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         ),
       ],
     );
+  }
+
+  String _toBanglaDigits(String numberStr) {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const bangla = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    for (int i = 0; i < english.length; i++) {
+      numberStr = numberStr.replaceAll(english[i], bangla[i]);
+    }
+    return numberStr;
   }
 }

@@ -100,12 +100,23 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       if (mounted) {
         setState(() {
           if (activeResponse.trips.isNotEmpty) {
-            // BUG FIX: Search for an active trip by status rather than blindly taking first
             final activeStatuses = [
-              TripStatus.rideStarted,
-              TripStatus.firstCompleted,
+              TripStatus.inProgress.toUpperCase(),
+              TripStatus.accepted.toUpperCase(),
+              TripStatus.booked.toUpperCase(),
+              TripStatus.arrivedPickupLocation.toUpperCase(),
+              TripStatus.rideStarted.toUpperCase(),
+              TripStatus.firstCompleted.toUpperCase(),
+              "IN_PROGRESS",
+              "ACCEPTED",
+              "ON_GOING",
             ];
-            final found = activeResponse.trips.where((t) => activeStatuses.contains(t.tripStatus)).toList();
+            final found = activeResponse.trips.where((t) {
+              final s = t.tripStatus?.toUpperCase() ?? "";
+              return activeStatuses.contains(s) && 
+                     s != TripStatus.completed.toUpperCase() && 
+                     s != TripStatus.cancelled.toUpperCase();
+            }).toList();
             _activeTrip = found.isNotEmpty ? found.first : null;
           } else {
             _activeTrip = null;
@@ -697,6 +708,84 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                                 ),
                               );
                             }),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 44,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Colors.redAccent, width: 1.2),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                onPressed: () async {
+                                  final isBn = loc.locale.languageCode == 'bn';
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      backgroundColor: isDark ? const Color(0xFF1C1E26) : Colors.white,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                      title: Text(
+                                        loc.translate('cancel_trip') == 'cancel_trip' ? "Cancel Trip" : loc.translate('cancel_trip'),
+                                        style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black),
+                                      ),
+                                      content: Text(
+                                        isBn ? "আপনি কি নিশ্চিত যে আপনি এই ট্রিপটি বাতিল করতে চান?" : "Are you sure you want to cancel this trip?",
+                                        style: GoogleFonts.poppins(color: isDark ? Colors.white70 : Colors.black87),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.of(ctx).pop(false),
+                                          child: Text(isBn ? "না" : "No", style: GoogleFonts.poppins(color: isDark ? Colors.white60 : Colors.black54)),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.redAccent,
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                          ),
+                                          onPressed: () => Navigator.of(ctx).pop(true),
+                                          child: Text(isBn ? "হ্যাঁ, বাতিল করুন" : "Yes, Cancel", style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  if (confirm == true) {
+                                    final customerUuid = UserDataStore.userData?.data?.user?.uuid ?? UserDataStore.uuid ?? "";
+                                    try {
+                                      await _repo.cancelTrip(
+                                        tripUuid: trip.uuid ?? "",
+                                        comment: "Cancelled via overlay",
+                                        langCode: loc.locale.languageCode,
+                                      );
+                                      if (mounted) {
+                                        setState(() { _activeTrip = null; });
+                                        _fetchActiveTrip();
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(isBn ? "ট্রিপ বাতিল করা হয়েছে" : "Trip cancelled successfully"),
+                                            backgroundColor: Colors.redAccent,
+                                          ),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text(e.toString()), backgroundColor: Colors.redAccent),
+                                        );
+                                      }
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  loc.translate('cancel_trip') == 'cancel_trip' ? "Cancel Trip" : loc.translate('cancel_trip'),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         )
                       : const SizedBox.shrink(),

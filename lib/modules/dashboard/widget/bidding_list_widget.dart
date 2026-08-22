@@ -714,8 +714,8 @@ class _DriverBidCardState extends State<DriverBidCard> with SingleTickerProvider
                               const SizedBox(width: 2),
                               Text(
                                 isBn 
-                                    ? _toBanglaDigits(bid.averageRating?.toStringAsFixed(2) ?? "0.0")
-                                    : (bid.averageRating?.toStringAsFixed(2) ?? "0.0"),
+                                    ? _toBanglaDigits((bid.averageRating == null || bid.averageRating == 0) ? "0.0" : bid.averageRating!.toStringAsFixed(1))
+                                    : ((bid.averageRating == null || bid.averageRating == 0) ? "0.0" : bid.averageRating!.toStringAsFixed(1)),
                                 style: GoogleFonts.poppins(
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
