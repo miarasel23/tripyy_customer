@@ -183,6 +183,12 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                   );
                 }
                 _isReviewSheetOpen = false;
+                if (mounted) {
+                  setState(() {
+                    _activeTrip = null;
+                    _requestedTrip = null;
+                  });
+                }
                 _fetchActiveTrip();
               });
             }

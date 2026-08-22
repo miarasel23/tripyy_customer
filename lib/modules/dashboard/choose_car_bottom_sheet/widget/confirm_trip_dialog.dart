@@ -29,6 +29,18 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
   bool _showCustomPriceInput = false;
   int? _selectedQuickPrice;
 
+  String _formatCarType(String? carType) {
+    if (carType == null || carType.isEmpty) return "";
+    final text = carType.replaceAll('_', ' ');
+    if (text.toUpperCase() == "MOTOR CYCEL" || text.toUpperCase() == "MOTOR CYCLE") {
+      return "Motor Cycle";
+    }
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -266,7 +278,7 @@ class _ConfirmTripDialogState extends State<ConfirmTripDialog> {
                       // Trip Details: Service, Vehicle, Payment
                       _buildDetailRow(loc.translate("service"), widget.serviceName.replaceAll('_', ' '), subTextColor, textColor),
                       const SizedBox(height: 8),
-                      _buildDetailRow(loc.translate("vehicle"), "${widget.selectedCar.carType} (${widget.selectedCar.setCapacity})", subTextColor, textColor),
+                      _buildDetailRow(loc.translate("vehicle"), "${_formatCarType(widget.selectedCar.carType)} (${widget.selectedCar.setCapacity})", subTextColor, textColor),
                       const SizedBox(height: 8),
                       _buildDetailRow(loc.translate("payment"), "CASH", subTextColor, textColor),
                     ],

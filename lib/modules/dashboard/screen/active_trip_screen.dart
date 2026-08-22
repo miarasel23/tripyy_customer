@@ -18,6 +18,7 @@ import '../../../core/utils/localization/app_localization.dart';
 import '../../../core/utils/ui_utils.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_urls.dart';
+import '../../../routes/app_routes.dart';
 import '../../../widgets/cancel_trip_dialog.dart';
 
 class ActiveTripScreen extends StatefulWidget {
@@ -60,6 +61,18 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     context.read<ActiveTripBloc>().add(StopActiveTripPolling());
     _mapController?.dispose();
     super.dispose();
+  }
+
+  String _formatCarType(String? carType) {
+    if (carType == null || carType.isEmpty) return "";
+    final text = carType.replaceAll('_', ' ');
+    if (text.toUpperCase() == "MOTOR CYCEL" || text.toUpperCase() == "MOTOR CYCLE") {
+      return "Motor Cycle";
+    }
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 
   Future<void> _fetchRoutePolylinesForTrip(RentalTrip trip) async {
@@ -162,7 +175,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       );
     }
 
-    final result = await showModalBottomSheet(
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -175,9 +188,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       ),
     );
 
-    if (result == true && mounted) {
+    if (mounted) {
       final updatedTrip = trip.copyWith(givenReview: true);
       context.read<ActiveTripBloc>().add(UpdateActiveTripLocalReview(updatedTrip));
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.bottomNav,
+        (route) => false,
+      );
     }
   }
 
@@ -897,7 +914,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        trip.carCategory?.carType ?? "",
+                        _formatCarType(trip.carCategory?.carType),
                         style: GoogleFonts.poppins(
                           color: isDark ? Colors.white : Colors.black,
                           fontWeight: FontWeight.bold,

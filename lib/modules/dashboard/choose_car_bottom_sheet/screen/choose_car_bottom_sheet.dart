@@ -48,6 +48,18 @@ class ChooseCarBottomSheet extends StatefulWidget {
 class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
   bool _isCreatingTrip = false;
 
+  String _formatCarType(String? carType) {
+    if (carType == null || carType.isEmpty) return "";
+    final text = carType.replaceAll('_', ' ');
+    if (text.toUpperCase() == "MOTOR CYCEL" || text.toUpperCase() == "MOTOR CYCLE") {
+      return "Motor Cycle";
+    }
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
+
   Future<void> _handleCreateTrip(Car selectedCar) async {
     final loc = AppLocalizations.of(context);
     final result = await showDialog<Map<String, dynamic>>(
@@ -330,7 +342,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        car.carType,
+                                        _formatCarType(car.carType),
                                         style: GoogleFonts.poppins(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w700,
@@ -458,7 +470,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                     ),
                                     SizedBox(width: 12),
                                     Text(
-                                      "TRIPPY ${selectedCar.carType}",
+                                      "TRIPPY ${_formatCarType(selectedCar.carType)}",
                                       style: GoogleFonts.poppins(
                                         color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                                         fontSize: 16,

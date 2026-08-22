@@ -266,9 +266,21 @@ class _MytripScreenState extends State<MytripScreen> {
 
     final String currencySymbol = loc.locale.languageCode == 'bn' ? '৳' : 'BDT ';
 
+    String formatCarType(String? c) {
+      if (c == null || c.isEmpty) return "Car";
+      final text = c.replaceAll('_', ' ');
+      if (text.toUpperCase() == "MOTOR CYCEL" || text.toUpperCase() == "MOTOR CYCLE") {
+        return "Motor Cycle";
+      }
+      return text.split(' ').map((word) {
+        if (word.isEmpty) return word;
+        return word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }).join(' ');
+    }
+
     final String serviceNameRaw = trip.serviceName ?? "Ride Share";
     final String serviceName = serviceNameRaw.replaceAll('_', ' ');
-    final String carType = trip.carCategory?.carType ?? "Car";
+    final String carType = formatCarType(trip.carCategory?.carType);
     final String carAvatar = trip.carCategory?.carAvatar ?? "";
     
     double price = trip.offerAmount ?? 0.0;
