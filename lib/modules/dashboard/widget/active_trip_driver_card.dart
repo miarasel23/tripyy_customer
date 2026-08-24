@@ -13,8 +13,6 @@ class ActiveTripDriverCard extends StatelessWidget {
   final bool isDark;
   final bool isBn;
   final AppLocalizations loc;
-  final String Function(String?) formatCarType;
-  final String Function(String) toBanglaDigits;
 
   const ActiveTripDriverCard({
     super.key,
@@ -24,8 +22,6 @@ class ActiveTripDriverCard extends StatelessWidget {
     required this.isDark,
     required this.isBn,
     required this.loc,
-    required this.formatCarType,
-    required this.toBanglaDigits,
   });
 
   @override
@@ -118,7 +114,7 @@ class ActiveTripDriverCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   isBn
-                      ? "ট্রিপ (${toBanglaDigits((driver?.totalCompletedTrips ?? 0).toString())})"
+                      ? "ট্রিপ (${ActiveTripHelper.toBanglaDigits((driver?.totalCompletedTrips ?? 0).toString())})"
                       : "Trips (${driver?.totalCompletedTrips ?? 0})",
                   style: GoogleFonts.poppins(
                     color: isDark ? Colors.white54 : Colors.black54,
@@ -132,7 +128,7 @@ class ActiveTripDriverCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                formatCarType(trip.carCategory?.carType),
+                ActiveTripHelper.formatCarType(trip.carCategory?.carType),
                 style: GoogleFonts.poppins(
                   color: isDark ? Colors.white : Colors.black,
                   fontWeight: FontWeight.bold,
