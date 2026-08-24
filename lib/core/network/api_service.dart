@@ -68,7 +68,7 @@ class ApiService {
 
   Future<http.Response> get(Uri url, {Map<String, String>? headers, bool showSnackBarOnError = true}) async {
     try {
-      final response = await http.get(url, headers: headers);
+      final response = await http.get(url, headers: headers).timeout(const Duration(seconds: 15));
       _handleErrorResponse(response);
       return response;
     } catch (e) {
@@ -81,7 +81,7 @@ class ApiService {
 
   Future<http.Response> post(Uri url, {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
     try {
-      final response = await http.post(url, headers: headers, body: body, encoding: encoding);
+      final response = await http.post(url, headers: headers, body: body, encoding: encoding).timeout(const Duration(seconds: 15));
       _handleErrorResponse(response);
       return response;
     } catch (e) {

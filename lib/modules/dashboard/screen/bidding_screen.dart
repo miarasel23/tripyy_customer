@@ -5,7 +5,6 @@ import '../../../core/utils/localization/app_localization.dart';
 import '../../../utils/app_colors.dart';
 import '../model/create_rental_trip_model.dart';
 import '../repository/create_trip_repository.dart';
-import '../../../widgets/radar_animation.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import '../../../main.dart';
 import '../../../widgets/cancel_trip_dialog.dart';
@@ -60,13 +59,13 @@ class _BiddingScreenState extends State<BiddingScreen> {
       builder: (_) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1C1E26) : Colors.white,
         title: Text(
-          loc.translate("accept_trip_confirm") ?? "Are you sure you want to accept this trip?",
+          loc.translate("accept_trip_confirm"),
           style: GoogleFonts.poppins(color: isDark ? Colors.white : Colors.black, fontSize: 16),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(loc.translate("no") ?? "No", style: const TextStyle(color: Colors.grey)),
+            child: Text(loc.translate("no"), style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -79,7 +78,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
             ),
             onPressed: () => Navigator.of(context).pop(true),
             child: Text(
-              loc.translate("yes") ?? "Yes", 
+              loc.translate("yes"), 
               style: GoogleFonts.poppins(
                 color: isDark ? Colors.black : Colors.white,
                 fontWeight: FontWeight.w600,

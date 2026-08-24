@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/utils/ui_utils.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import '../../../core/utils/localization/app_localization.dart';
 import '../../searchLocation/model/search_location_model.dart';
 import '../../searchLocation/repository/search_location_repository.dart';
@@ -23,7 +20,6 @@ import '../widget/date_time_selection_dialogs.dart';
 
 import '../helper/map_helper.dart';
 import '../model/trip_price_details_model.dart';
-import '../repository/trip_price_details_repository.dart';
 import '../controller/trip_price_details_bloc.dart';
 import '../controller/trip_price_details_event.dart';
 import '../controller/trip_price_details_state.dart';
