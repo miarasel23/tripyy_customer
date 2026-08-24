@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/utils/localization/app_localization.dart';
@@ -10,10 +12,56 @@ import '../controller/send_otp_event.dart';
 import '../controller/send_otp_state.dart';
 import '../../../core/utils/ui_utils.dart';
 
-class NumberInputScreen extends StatelessWidget {
-  NumberInputScreen({super.key});
+class NumberInputScreen extends StatefulWidget {
+  const NumberInputScreen({super.key});
 
+  @override
+  State<NumberInputScreen> createState() => _NumberInputScreenState();
+}
+
+class _NumberInputScreenState extends State<NumberInputScreen> {
   final TextEditingController numberField = TextEditingController();
+  late TapGestureRecognizer _termsGestureRecognizer;
+
+  @override
+  void initState() {
+    super.initState();
+    _termsGestureRecognizer = TapGestureRecognizer()..onTap = _openTermsAndConditions;
+    numberField.addListener(_onNumberChanged);
+  }
+
+  @override
+  void dispose() {
+    numberField.removeListener(_onNumberChanged);
+    numberField.dispose();
+    _termsGestureRecognizer.dispose();
+    super.dispose();
+  }
+
+  void _onNumberChanged() {
+    setState(() {});
+  }
+
+  void _openTermsAndConditions() {
+    Navigator.pushNamed(
+      context,
+      AppRoutes.legalPolicy,
+      arguments: 'TERMS_CONDITION',
+    );
+  }
+
+  String? _getValidationError(bool isBn) {
+    final text = numberField.text.trim();
+    if (text.isEmpty) {
+      return null;
+    }
+    if (text.length < 11) {
+      return isBn
+          ? "ফোন নম্বরটি অবশ্যই ১১ ডিজিটের হতে হবে"
+          : "Phone number must be exactly 11 digits";
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +69,10 @@ class NumberInputScreen extends StatelessWidget {
 
     return BlocBuilder<LocalizationBloc, LocalizationState>(
       builder: (context, localizationState) {
+        final isBn = localizationState.locale.languageCode == "bn";
+        final validationError = _getValidationError(isBn);
+        final bool isValid = numberField.text.trim().length == 11;
+
         return BlocListener<SendOtpBloc, SendOtpState>(
           listener: (context, state) {
             if (state.status == OtpStatus.failure) {
@@ -66,9 +118,12 @@ class NumberInputScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     BlocBuilder<SendOtpBloc, SendOtpState>(
                       builder: (context, state) {
+                        final isBtnEnabled = isValid && state.status != OtpStatus.loading;
                         return ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, // Pathao/inDrive vibrant color
+                            backgroundColor: isBtnEnabled
+                                ? (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black)
+                                : Colors.grey.shade400,
                             foregroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                             minimumSize: const Size(double.infinity, 54),
                             shape: RoundedRectangleBorder(
@@ -76,38 +131,39 @@ class NumberInputScreen extends StatelessWidget {
                             ),
                             elevation: 0,
                           ),
-                          onPressed: state.status == OtpStatus.loading
-                              ? null
-                              : () {
-                                  if (numberField.text.isEmpty) return;
+                          onPressed: isBtnEnabled
+                              ? () {
                                   context.read<SendOtpBloc>().add(
                                     SendOtp(
                                       numberField.text,
                                       localizationState.locale.languageCode,
                                     ),
                                   );
-                                },
+                                }
+                              : null,
                           child: switch (state.status) {
-                            OtpStatus.loading =>
-                              SizedBox(
+                            OtpStatus.loading => SizedBox(
                                 height: 24,
                                 width: 24,
-                                child: CircularProgressIndicator(color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white, strokeWidth: 2.5),
+                                child: CircularProgressIndicator(
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
+                                  strokeWidth: 2.5,
+                                ),
                               ),
                             OtpStatus.failure => Text(
-                              loc.translate("retry"),
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                loc.translate("retry"),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
                             _ => Text(
-                              loc.translate("continue"),
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                loc.translate("continue"),
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
                           },
                         );
                       },
@@ -126,20 +182,19 @@ class NumberInputScreen extends StatelessWidget {
                       loc.translate("enter_your_phone_number"),
                       style: GoogleFonts.poppins(
                         fontSize: 26,
-                        fontWeight: FontWeight.bold, // Uber's bold header
+                        fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "We will send you a verification code",
+                      isBn ? "আমরা আপনাকে একটি যাচাইকরণ কোড পাঠাব" : "We will send you a verification code",
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: Colors.grey.shade600,
                       ),
                     ),
                     const SizedBox(height: 40),
-                    // inDrive style elevated card for the input
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -157,7 +212,7 @@ class NumberInputScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Mobile Number",
+                            isBn ? "মোবাইল নম্বর" : "Mobile Number",
                             style: GoogleFonts.poppins(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -165,7 +220,24 @@ class NumberInputScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 12),
-                          numberBasedLoginField(loc, numberField),
+                          numberBasedLoginField(loc, numberField, validationError),
+                          if (validationError != null) ...[
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.error_outline_rounded, size: 16, color: Colors.red.shade600),
+                                const SizedBox(width: 6),
+                                Text(
+                                  validationError,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12,
+                                    color: Colors.red.shade600,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -236,6 +308,7 @@ class NumberInputScreen extends StatelessWidget {
         children: [
           TextSpan(
             text: "Terms and Conditions",
+            recognizer: _termsGestureRecognizer,
             style: GoogleFonts.poppins(
               fontSize: 12,
               color: Colors.black,
@@ -257,6 +330,7 @@ class NumberInputScreen extends StatelessWidget {
         children: [
           TextSpan(
             text: "শর্তাবলী ও নিয়মাবলীর ",
+            recognizer: _termsGestureRecognizer,
             style: GoogleFonts.poppins(
               fontSize: 12,
               color: Colors.black,
@@ -273,12 +347,15 @@ class NumberInputScreen extends StatelessWidget {
     );
   }
 
-  Widget numberBasedLoginField(AppLocalizations loc, TextEditingController controller) {
+  Widget numberBasedLoginField(AppLocalizations loc, TextEditingController controller, String? error) {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F3F5), // Pathao style light grey fill
-        borderRadius: BorderRadius.circular(16), // Softer, rounder edges
+        color: const Color(0xFFF1F3F5),
+        borderRadius: BorderRadius.circular(16),
+        border: error != null
+            ? Border.all(color: Colors.red.shade400, width: 1.5)
+            : null,
       ),
       child: Row(
         children: [
@@ -289,7 +366,7 @@ class NumberInputScreen extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Text(
-            "+880",
+            "+88",
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -306,7 +383,11 @@ class NumberInputScreen extends StatelessWidget {
           Expanded(
             child: TextFormField(
               controller: controller,
-              keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(11),
+              ],
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

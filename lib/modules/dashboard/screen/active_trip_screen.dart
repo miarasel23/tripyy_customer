@@ -928,23 +928,42 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                           if (driver?.phone != null && driver!.phone!.isNotEmpty && driver.phone != 'N/A') ...[
                             GestureDetector(
                               onTap: () => ActiveTripHelper.launchCallOrUrl(context, "tel:${driver.phone}"),
-                              child: Row(
+                              child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.call, color: isDark ? Colors.white : Colors.black, size: 16),
-                                  const SizedBox(width: 4),
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF4ADE80), Color(0xFF22C55E)],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF22C55E).withValues(alpha: 0.4),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(Icons.call_rounded, color: Colors.white, size: 22),
+                                  ),
+                                  const SizedBox(height: 6),
                                   Text(
                                     loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
                                     style: GoogleFonts.poppins(
-                                      color: isDark ? Colors.white : Colors.black,
-                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 18),
                           ],
                           if (driver?.driverUuid != null && driver!.driverUuid!.isNotEmpty)
                             GestureDetector(
@@ -960,16 +979,35 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                                   },
                                 );
                               },
-                              child: Row(
+                              child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.chat_bubble_outline_rounded, color: isDark ? Colors.white : Colors.black, size: 16),
-                                  const SizedBox(width: 4),
+                                  Container(
+                                    width: 48,
+                                    height: 48,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFF0E52FF), Color(0xFF0038D6)],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF0E52FF).withValues(alpha: 0.4),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
+                                  ),
+                                  const SizedBox(height: 6),
                                   Text(
                                     loc.translate('chat') == 'chat' ? "Chat" : loc.translate('chat'),
                                     style: GoogleFonts.poppins(
-                                      color: isDark ? Colors.white : Colors.black,
-                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white70 : Colors.black87,
+                                      fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
                                   ),

@@ -879,83 +879,107 @@ class _BiddingTripDetailsCardState extends State<BiddingTripDetailsCard> {
                     Row(
                       children: [
                         Expanded(
-                          flex: 2,
-                          child: SizedBox(
-                            height: 48,
-                            child: OutlinedButton.icon(
-                              style: OutlinedButton.styleFrom(
-                                backgroundColor: isDark ? const Color(0xFF242731) : const Color(0xFFF4F6F9),
-                                side: BorderSide(
-                                  color: isDark ? Colors.white24 : Colors.grey.shade300,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                              ),
-                              onPressed: () {
-                                final driver = widget.currentTrip.drivers.isNotEmpty ? widget.currentTrip.drivers.first : null;
-                                final phone = driver?.phone ?? "";
-                                if (phone.isNotEmpty) {
-                                  ActiveTripHelper.launchCallOrUrl(context, "tel:$phone");
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(isBn ? "ড্রাইভারের ফোন নম্বর পাওয়া যায়নি" : "Driver phone number unavailable"),
-                                      backgroundColor: Colors.orangeAccent,
+                          child: GestureDetector(
+                            onTap: () {
+                              final driver = widget.currentTrip.drivers.isNotEmpty ? widget.currentTrip.drivers.first : null;
+                              final phone = driver?.phone ?? "";
+                              if (phone.isNotEmpty) {
+                                ActiveTripHelper.launchCallOrUrl(context, "tel:$phone");
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isBn ? "ড্রাইভারের ফোন নম্বর পাওয়া যায়নি" : "Driver phone number unavailable"),
+                                    backgroundColor: Colors.orangeAccent,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFF4ADE80), Color(0xFF22C55E)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
-                                  );
-                                }
-                              },
-                              icon: Icon(Icons.call_rounded, size: 18, color: isDark ? Colors.white : Colors.black87),
-                              label: Text(
-                                isBn ? "কল" : "Call",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDark ? Colors.white : Colors.black87,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF22C55E).withValues(alpha: 0.4),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(Icons.call_rounded, size: 24, color: Colors.white),
                                 ),
-                              ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  isBn ? "কল" : "Call",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.white70 : Colors.black87,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        const SizedBox(width: 10),
 
                         Expanded(
-                          flex: 3,
-                          child: SizedBox(
-                            height: 48,
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: isDark ? Colors.white : Colors.black,
-                                foregroundColor: isDark ? Colors.black : Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                elevation: 4,
-                                shadowColor: Colors.black.withValues(alpha: 0.3),
-                              ),
-                              onPressed: () {
-                                final driver = widget.currentTrip.drivers.isNotEmpty ? widget.currentTrip.drivers.first : null;
-                                final phone = driver?.phone ?? "";
-                                if (phone.isNotEmpty) {
-                                  ActiveTripHelper.launchCallOrUrl(context, "sms:$phone");
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(isBn ? "ড্রাইভারের ফোন নম্বর পাওয়া যায়নি" : "Driver phone number unavailable"),
-                                      backgroundColor: isDark ? Colors.white : Colors.black,
+                          child: GestureDetector(
+                            onTap: () {
+                              final driver = widget.currentTrip.drivers.isNotEmpty ? widget.currentTrip.drivers.first : null;
+                              final phone = driver?.phone ?? "";
+                              if (phone.isNotEmpty) {
+                                ActiveTripHelper.launchCallOrUrl(context, "sms:$phone");
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(isBn ? "ড্রাইভারের ফোন নম্বর পাওয়া যায়নি" : "Driver phone number unavailable"),
+                                    backgroundColor: isDark ? Colors.white : Colors.black,
+                                  ),
+                                );
+                              }
+                            },
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 52,
+                                  height: 52,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFF0E52FF), Color(0xFF0038D6)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
                                     ),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.chat_bubble_rounded, size: 18),
-                              label: Text(
-                                isBn ? "চ্যাট করুন" : "Chat",
-                                style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF0E52FF).withValues(alpha: 0.4),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(Icons.chat_bubble_rounded, size: 22, color: Colors.white),
                                 ),
-                              ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  isBn ? "চ্যাট" : "Chat",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.white70 : Colors.black87,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
