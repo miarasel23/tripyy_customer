@@ -12,6 +12,8 @@ import '../model/trip_status.dart';
 import 'active_trip_event.dart';
 import 'active_trip_state.dart';
 
+import '../helper/customer_location_tracker.dart';
+
 class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
   final CreateTripRepository _repo = CreateTripRepository();
   Timer? _pollingTimer;
@@ -188,44 +190,11 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
   }
 
   Future<void> _trackCustomerLocation(String customerUuid, String langCode) async {
-    try {
-      final permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-        return;
-      }
-      final position = await Geolocator.getCurrentPosition();
-      
-      final repo = SearchLocationRepository();
-      final query = "${position.latitude},${position.longitude}";
-      final searchResponse = await repo.searchLocations(query, langCode);
-      
-      if (searchResponse.data != null && searchResponse.data!.isNotEmpty) {
-        final geolocationUuid = searchResponse.data!.first.uuid;
-        if (geolocationUuid == null) return;
-        
-        final url = Uri.parse(AppUrls.saveCustomerDriverTrack);
-        final token = await UserDataStore.getAccessToken();
-        final headers = {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Accept': 'application/json',
-        };
-        if (token != null && token.isNotEmpty) {
-          headers['Authorization'] = 'Bearer $token';
-        }
-        
-        final body = {
-          "platform": "android",
-          "language_code": langCode,
-          "action_when": "track_location_insert",
-          "customer_uuid": customerUuid,
-          "geolocation_uuid": geolocationUuid,
-        };
-        
-        await http.post(url, headers: headers, body: body).timeout(const Duration(seconds: 10));
-      }
-    } catch (e) {
-      print("[ACTIVE TRIP BLOC] Error tracking customer location: $e");
-    }
+    await CustomerLocationTracker.instance.trackCustomerLocationIfNeeded(
+      customerUuid: customerUuid,
+      langCode: langCode,
+      minDistanceMeters: 5.0,
+    );
   }
 
   Future<Map<String, double>?> _getDriverLocation(String? driverUuid, String langCode) async {

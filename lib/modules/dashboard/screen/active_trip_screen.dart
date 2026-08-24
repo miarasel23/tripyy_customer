@@ -14,6 +14,7 @@ import '../model/create_rental_trip_model.dart';
 import '../model/trip_status.dart';
 import '../helper/map_helper.dart';
 import '../widget/trip_review_bottom_sheet.dart';
+import '../widget/active_trip_driver_card.dart';
 import '../../../core/utils/localization/app_localization.dart';
 import '../../../core/utils/ui_utils.dart';
 import '../../../utils/app_colors.dart';
@@ -818,208 +819,15 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
           // Driver Info Card
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF252833) : Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Row(
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundImage: (driver?.profilePicture != null && AppUrls.getImageUrl(driver!.profilePicture) != null)
-                            ? NetworkImage(AppUrls.getImageUrl(driver!.profilePicture)!)
-                            : null,
-                        backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
-                        child: (driver?.profilePicture == null || AppUrls.getImageUrl(driver!.profilePicture) == null)
-                            ? Icon(Icons.person, color: isDark ? Colors.white70 : Colors.black54)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: -8,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: isDark ? Colors.white : Colors.black,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                driver?.averageRating?.toStringAsFixed(1) ?? "0.0",
-                                style: GoogleFonts.poppins(color: isDark ? Colors.black : Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                              ),
-                              Icon(Icons.star, color: isDark ? Colors.black : Colors.white, size: 10),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          driver?.name != null && driver!.name!.isNotEmpty
-                              ? driver.name!
-                              : (isBn ? "ড্রাইভার" : "Driver"),
-                          style: GoogleFonts.poppins(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        if (driver?.carRegNumber != null && driver!.carRegNumber!.isNotEmpty && driver.carRegNumber != "N/A") ...[
-                          const SizedBox(height: 2),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isDark ? Colors.white12 : Colors.black12,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              driver.carRegNumber!,
-                              style: GoogleFonts.poppins(
-                                color: isDark ? Colors.white : Colors.black,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 4),
-                        Text(
-                          isBn
-                              ? "ট্রিপ (${_toBanglaDigits((driver?.totalCompletedTrips ?? 0).toString())})"
-                              : "Trips (${driver?.totalCompletedTrips ?? 0})",
-                          style: GoogleFonts.poppins(
-                            color: isDark ? Colors.white54 : Colors.black54,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        _formatCarType(trip.carCategory?.carType),
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (driver?.phone != null && driver!.phone!.isNotEmpty && driver.phone != 'N/A') ...[
-                            GestureDetector(
-                              onTap: () => ActiveTripHelper.launchCallOrUrl(context, "tel:${driver.phone}"),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFF4ADE80), Color(0xFF22C55E)],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFF22C55E).withValues(alpha: 0.4),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(Icons.call_rounded, color: Colors.white, size: 22),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    loc.translate('call') == 'call' ? "Call" : loc.translate('call'),
-                                    style: GoogleFonts.poppins(
-                                      color: isDark ? Colors.white70 : Colors.black87,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 18),
-                          ],
-                          if (driver?.driverUuid != null && driver!.driverUuid!.isNotEmpty)
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  AppRoutes.chat,
-                                  arguments: {
-                                    'customerUuid': widget.customerUuid,
-                                    'driverUuid': driver.driverUuid,
-                                    'receiverType': 'DRIVER',
-                                    'title': driver.name ?? 'Driver Chat',
-                                  },
-                                );
-                              },
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFF0E52FF), Color(0xFF0038D6)],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFF0E52FF).withValues(alpha: 0.4),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(Icons.chat_bubble_rounded, color: Colors.white, size: 20),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    loc.translate('chat') == 'chat' ? "Chat" : loc.translate('chat'),
-                                    style: GoogleFonts.poppins(
-                                      color: isDark ? Colors.white70 : Colors.black87,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            child: ActiveTripDriverCard(
+              trip: trip,
+              driver: driver,
+              customerUuid: widget.customerUuid,
+              isDark: isDark,
+              isBn: isBn,
+              loc: loc,
+              formatCarType: _formatCarType,
+              toBanglaDigits: _toBanglaDigits,
             ),
           ),
 
