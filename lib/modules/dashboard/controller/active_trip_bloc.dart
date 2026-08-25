@@ -28,6 +28,20 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
         );
 
         if (response.trips.isNotEmpty) {
+          // FIRST: check if the most recent trip is cancelled — redirect immediately
+          final cancelledStatuses = [
+            TripStatus.cancelled,
+            TripStatus.givenBidCancelled,
+            TripStatus.acceptedBidCancelled,
+            TripStatus.noShow,
+          ];
+          final mostRecentTrip = response.trips.first;
+          if (cancelledStatuses.contains(mostRecentTrip.tripStatus)) {
+            _pollingTimer?.cancel();
+            emit(NoActiveTrip("Trip has been cancelled"));
+            return;
+          }
+
           final activeStatuses = [
             TripStatus.accepted,
             TripStatus.booked,
