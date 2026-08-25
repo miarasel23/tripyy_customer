@@ -162,7 +162,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     icon: IconTheme(
                       data: IconThemeData(
                         color: state.selectedIndex == 0
-                            ? Colors.blue
+                            ? Theme.of(context).colorScheme.onSurface
                             : Colors.grey,
                       ),
                       child: Icon(Icons.person),
@@ -173,7 +173,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     icon: IconTheme(
                       data: IconThemeData(
                         color: state.selectedIndex == 1
-                            ? Colors.blue
+                            ? Theme.of(context).colorScheme.onSurface
                             : Colors.grey,
                       ),
                       child: Icon(Icons.train_sharp),
@@ -184,7 +184,7 @@ class _MainBottomNavBarScreenState extends State<MainBottomNavBarScreen> {
                     icon: IconTheme(
                       data: IconThemeData(
                         color: state.selectedIndex == 2
-                            ? Colors.blue
+                            ? Theme.of(context).colorScheme.onSurface
                             : Colors.grey,
                       ),
                       child: Icon(Icons.home_outlined),

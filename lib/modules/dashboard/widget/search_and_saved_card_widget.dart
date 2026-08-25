@@ -395,19 +395,38 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                   const SizedBox(width: 8),
                                   GestureDetector(
                                     onTap: widget.onMyLocationTapped,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: _isFetchingLocation
-                                          ? SizedBox(
-                                              width: 18,
-                                              height: 18,
-                                              child: CircularProgressIndicator(strokeWidth: 2),
-                                            )
-                                          : Icon(Icons.my_location, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 18),
+                                    child: Builder(
+                                      builder: (context) {
+                                        final isDark = Theme.of(context).brightness == Brightness.dark;
+                                        return Container(
+                                          width: 38,
+                                          height: 38,
+                                          decoration: BoxDecoration(
+                                            color: isDark ? const Color(0xFF2E2E2E) : const Color(0xFFEEEEEE),
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: isDark ? const Color(0xFF444444) : const Color(0xFFCCCCCC),
+                                              width: 1,
+                                            ),
+                                          ),
+                                          child: _isFetchingLocation
+                                              ? Center(
+                                                  child: SizedBox(
+                                                    width: 16,
+                                                    height: 16,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                      color: isDark ? Colors.white70 : Colors.black54,
+                                                    ),
+                                                  ),
+                                                )
+                                              : Icon(
+                                                  Icons.my_location_rounded,
+                                                  color: isDark ? Colors.white70 : Colors.black87,
+                                                  size: 18,
+                                                ),
+                                        );
+                                      },
                                     ),
                                   ),
                                 ] else ...[
@@ -456,12 +475,20 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
                                   });
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.all(6),
+                                  width: 38,
+                                  height: 38,
                                   decoration: BoxDecoration(
                                     color: Theme.of(context).colorScheme.onSurface,
-                                    shape: BoxShape.circle,
+                                    borderRadius: BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
-                                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.surface, size: 18),
+                                  child: Icon(Icons.add_rounded, color: Theme.of(context).colorScheme.surface, size: 20),
                                 ),
                               ),
                             ],
