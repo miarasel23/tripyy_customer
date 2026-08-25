@@ -18,6 +18,12 @@ class GlobalTripOverlay extends StatefulWidget {
 
   const GlobalTripOverlay({super.key, required this.child});
 
+  static _GlobalTripOverlayState? _instance;
+
+  static void clearActiveTrip() {
+    _instance?._clearTripState();
+  }
+
   @override
   State<GlobalTripOverlay> createState() => _GlobalTripOverlayState();
 }
@@ -35,15 +41,33 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   @override
   void initState() {
     super.initState();
+    GlobalTripOverlay._instance = this;
     _startPolling();
     globalRouteObserver.routeNotifier.addListener(_onRouteChanged);
   }
 
   @override
   void dispose() {
+    if (GlobalTripOverlay._instance == this) {
+      GlobalTripOverlay._instance = null;
+    }
     _pollingTimer?.cancel();
     globalRouteObserver.routeNotifier.removeListener(_onRouteChanged);
     super.dispose();
+  }
+
+  void _clearTripState() {
+    if (mounted) {
+      setState(() {
+        _activeTrip = null;
+        _requestedTrip = null;
+        _isRedirectingToActiveTrip = false;
+      });
+    } else {
+      _activeTrip = null;
+      _requestedTrip = null;
+      _isRedirectingToActiveTrip = false;
+    }
   }
 
   void _onRouteChanged() {

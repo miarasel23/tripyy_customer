@@ -17,6 +17,8 @@ import '../../../core/utils/localization/app_localization.dart';
 import '../../../core/utils/ui_utils.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/cancel_trip_dialog.dart';
+import '../../../widgets/global_trip_overlay.dart';
+import '../../../main.dart';
 
 class ActiveTripScreen extends StatefulWidget {
   final String customerUuid;
@@ -38,6 +40,35 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   bool _isReviewSheetShown = false;
   Marker? _driverMarker;
   double _driverRotation = 0.0;
+
+  void _clearLocalTripState() {
+    if (mounted) {
+      setState(() {
+        _activeTrip = null;
+        _polylines.clear();
+        _markers.clear();
+        _driverMarker = null;
+      });
+    } else {
+      _activeTrip = null;
+      _polylines.clear();
+      _markers.clear();
+      _driverMarker = null;
+    }
+  }
+
+  void _returnToHomePreservingState() {
+    _clearLocalTripState();
+    GlobalTripOverlay.clearActiveTrip();
+    final nav = globalNavigatorKey.currentState ?? (mounted ? Navigator.of(context) : null);
+    if (nav != null) {
+      if (nav.canPop()) {
+        nav.popUntil((route) => route.isFirst || route.settings.name == AppRoutes.bottomNav);
+      } else {
+        nav.pushReplacementNamed(AppRoutes.bottomNav);
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -326,6 +357,17 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
 
             _updateDriverMarker(trip, state.driverLatitude, state.driverLongitude);
 
+            final statusUpper = trip.tripStatus?.toUpperCase() ?? "";
+            final isCancelled = statusUpper == TripStatus.cancelled.toUpperCase() ||
+                                statusUpper == TripStatus.givenBidCancelled.toUpperCase() ||
+                                statusUpper == TripStatus.acceptedBidCancelled.toUpperCase() ||
+                                statusUpper == TripStatus.noShow.toUpperCase();
+
+            if (isCancelled) {
+              _returnToHomePreservingState();
+              return;
+            }
+
             if (trip.tripStatus == TripStatus.completed && trip.givenReview != true) {
               if (!_isReviewSheetShown) {
                 _isReviewSheetShown = true;
@@ -335,8 +377,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               }
             }
           } else if (state is ActiveTripCancelledSuccess) {
-            UiUtils.showAppSnackBar(context, state.message, type: 'success');
-            Navigator.of(context).pop();
+            _returnToHomePreservingState();
+          } else if (state is NoActiveTrip) {
+            _returnToHomePreservingState();
           } else if (state is ActiveTripFailure) {
             UiUtils.showAppSnackBar(context, state.error, type: 'error');
           }
@@ -351,8 +394,11 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               return _buildErrorScreen(state.error);
             }
 
-            if (state is NoActiveTrip && _activeTrip == null) {
-              return _buildErrorScreen(state.message);
+            if (state is NoActiveTrip) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _returnToHomePreservingState();
+              });
+              return Center(child: CircularProgressIndicator(color: isDark ? Colors.white : Colors.black));
             }
 
             if (_activeTrip == null) {
