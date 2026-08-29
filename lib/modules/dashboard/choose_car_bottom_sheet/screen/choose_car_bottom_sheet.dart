@@ -100,7 +100,18 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
       );
 
       final repo = CreateTripRepository();
-      await repo.createRentalTrip(req);
+      final response = await repo.createRentalTrip(req);
+
+      String newTripUuid = "";
+      if (response['data'] != null && response['data'] is Map) {
+        newTripUuid = response['data']['uuid']?.toString() ?? response['data']['trip_uuid']?.toString() ?? "";
+      } else if (response['data'] != null && response['data'] is String) {
+        newTripUuid = response['data'].toString();
+      } else if (response['uuid'] != null) {
+        newTripUuid = response['uuid'].toString();
+      } else if (response['trip_uuid'] != null) {
+        newTripUuid = response['trip_uuid'].toString();
+      }
 
       if (mounted) {
         // Dismiss bottom sheet
@@ -110,7 +121,10 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
         Navigator.pushNamed(
           context,
           AppRoutes.biddingScreen,
-          arguments: UserDataStore.uuid ?? "",
+          arguments: {
+            'customerUuid': UserDataStore.uuid ?? "",
+            'tripUuid': newTripUuid,
+          },
         );
       }
     } catch (e) {

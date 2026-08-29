@@ -915,6 +915,7 @@ class _DriverBidCardState extends State<DriverBidCard> with SingleTickerProvider
                 child: SizedBox(
                   height: 46,
                   child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () => widget.onAcceptBid(bid),
                     child: Stack(
                       children: [

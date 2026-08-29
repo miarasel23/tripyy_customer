@@ -97,8 +97,11 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     List<LatLng> newRoutePoints = [];
     Set<Marker> newMarkers = {};
 
+    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
+    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
+
     List<LocationModel> allLocations = [];
-    if (trip.tripStatus == TripStatus.firstCompleted) {
+    if (isReturnTrip && isFirstCompleted) {
       allLocations.addAll(trip.dropoffLocations);
       allLocations.addAll(trip.pickupLocations);
     } else {
@@ -313,7 +316,10 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     ];
 
     bool shouldLockNavigation = false;
-    if (isRideShare && rideShareActiveStatuses.contains(currentStatus)) {
+    final bool isFirstCompleted = currentStatus == "FIRST_COMPLETED" || currentStatus == TripStatus.firstCompleted.toUpperCase();
+    if (isFirstCompleted) {
+      shouldLockNavigation = false;
+    } else if (isRideShare && rideShareActiveStatuses.contains(currentStatus)) {
       shouldLockNavigation = true;
     } else if (!isRideShare && inProgressStatuses.contains(currentStatus)) {
       shouldLockNavigation = true;
@@ -518,13 +524,17 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     String? etaLabel;
     final isBn = loc.locale.languageCode == 'bn';
     final String currentStatus = trip.tripStatus?.toUpperCase() ?? "";
-    final bool isRideStarted = currentStatus == "RIDE_STARTED" || currentStatus == "FIRST_COMPLETED" || currentStatus == "ON_GOING";
+    final bool isStartedOrFirstCompleted = currentStatus == "RIDE_STARTED" || currentStatus == "FIRST_COMPLETED" || currentStatus == "ON_GOING";
     final bool isAcceptedOrInProgress = currentStatus == "ACCEPTED" || currentStatus == "IN_PROGRESS" || currentStatus == "BOOKED" || currentStatus == "ARRIVED_PICKUP_LOCATION";
+    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
+    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
+    final currentPickupLocs = (isReturnTrip && isFirstCompleted) ? trip.dropoffLocations : trip.pickupLocations;
+    final currentDropoffLocs = (isReturnTrip && isFirstCompleted) ? trip.pickupLocations : trip.dropoffLocations;
 
-    if (isRideStarted) {
-      if (driverLat != null && driverLng != null && trip.dropoffLocations.isNotEmpty) {
-        final destLat = double.tryParse(trip.dropoffLocations.first.latitude ?? '');
-        final destLng = double.tryParse(trip.dropoffLocations.first.longitude ?? '');
+    if (isStartedOrFirstCompleted) {
+      if (driverLat != null && driverLng != null && currentDropoffLocs.isNotEmpty) {
+        final destLat = double.tryParse(currentDropoffLocs.first.latitude ?? '');
+        final destLng = double.tryParse(currentDropoffLocs.first.longitude ?? '');
         if (destLat != null && destLng != null) {
           final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, destLat, destLng);
           etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
@@ -540,9 +550,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     } else if (isAcceptedOrInProgress) {
       if (trip.tripStatus == TripStatus.arrivedPickupLocation) {
         etaLabel = isBn ? "ড্রাইভার পিকআপ লোকেশনে পৌঁছেছেন" : "DRIVER ARRIVED AT PICKUP LOCATION";
-      } else if (driverLat != null && driverLng != null && trip.pickupLocations.isNotEmpty) {
-        final pickLat = double.tryParse(trip.pickupLocations.first.latitude ?? '');
-        final pickLng = double.tryParse(trip.pickupLocations.first.longitude ?? '');
+      } else if (driverLat != null && driverLng != null && currentPickupLocs.isNotEmpty) {
+        final pickLat = double.tryParse(currentPickupLocs.first.latitude ?? '');
+        final pickLng = double.tryParse(currentPickupLocs.first.longitude ?? '');
         if (pickLat != null && pickLng != null) {
           final double distanceInMeters = Geolocator.distanceBetween(driverLat, driverLng, pickLat, pickLng);
           etaMinutes = (distanceInMeters / 300.0).ceil().clamp(1, 120);
@@ -724,8 +734,11 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   }
 
   Widget _buildRouteProgress(bool isDark, RentalTrip trip, AppLocalizations loc) {
+    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
+    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
+
     List<LocationModel> allLocations = [];
-    if (trip.tripStatus == TripStatus.firstCompleted) {
+    if (isReturnTrip && isFirstCompleted) {
       allLocations.addAll(trip.dropoffLocations);
       allLocations.addAll(trip.pickupLocations);
     } else {
@@ -855,7 +868,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    trip.tripStatus == TripStatus.firstCompleted ? "End Time" : "Start Time",
+                                    "Start Time",
                                     style: GoogleFonts.poppins(
                                       color: isDark ? Colors.white54 : Colors.black54,
                                       fontSize: 12,

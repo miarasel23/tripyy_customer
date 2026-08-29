@@ -82,9 +82,9 @@ class RouteGenerator {
         final args = settings.arguments;
         String customerUuid = "";
         String tripUuid = "";
-        if (args is Map<String, dynamic>) {
-          customerUuid = args['customerUuid'] as String? ?? "";
-          tripUuid = args['tripUuid'] as String? ?? "";
+        if (args is Map) {
+          customerUuid = args['customerUuid']?.toString() ?? args['customer_uuid']?.toString() ?? "";
+          tripUuid = args['tripUuid']?.toString() ?? args['trip_uuid']?.toString() ?? "";
         } else if (args is String) {
           customerUuid = args;
         }

@@ -106,6 +106,9 @@ class _BiddingScreenState extends State<BiddingScreen> {
       final bgColor = isDark ? Colors.white : Colors.black;
       final textColor = isDark ? Colors.black : Colors.white;
       try {
+        final effectiveBidUuid = bid.rentBidUuid ?? bid.driverUuid ?? "";
+        final effectiveTripUuid = _currentTrip?.uuid ?? widget.tripUuid;
+
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text("Accepting trip...", style: TextStyle(color: textColor)), 
@@ -116,7 +119,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
         
         final response = await _repo.acceptTrip(
           customerUuid: widget.customerUuid,
-          bidUuid: bid.rentBidUuid ?? "",
+          bidUuid: effectiveBidUuid,
+          tripUuid: effectiveTripUuid,
           langCode: loc.locale.languageCode,
         );
 
@@ -132,7 +136,6 @@ class _BiddingScreenState extends State<BiddingScreen> {
         _pollingTimer?.cancel(); // null-safe cancel before navigation
         GlobalTripOverlay.clearActiveTrip();
         if (mounted) {
-          final effectiveTripUuid = _currentTrip?.uuid ?? widget.tripUuid;
           Navigator.pushReplacementNamed(
             context,
             AppRoutes.activeTrip,

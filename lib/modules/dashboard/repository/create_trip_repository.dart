@@ -190,18 +190,25 @@ class CreateTripRepository {
   Future<Map<String, dynamic>> acceptTrip({
     required String customerUuid,
     required String bidUuid,
+    String? tripUuid,
     required String langCode,
   }) async {
     try {
       final url = Uri.parse(AppUrls.acceptTripForCustomer);
       
+      final Map<String, dynamic> data = {
+        'customer_uuid': customerUuid,
+        'bid_uuid': bidUuid,
+        'rent_bid_uuid': bidUuid,
+      };
+      if (tripUuid != null && tripUuid.isNotEmpty) {
+        data['trip_uuid'] = tripUuid;
+      }
+
       final Map<String, dynamic> bodyData = CustomMapBodyBuilder.build(
         actionWhen: 'accept_trip_for_customer',
         languageCode: langCode,
-        data: {
-          'customer_uuid': customerUuid,
-          'bid_uuid': bidUuid,
-        },
+        data: data,
       );
       
       final Map<String, String> formFields = bodyData.map((key, value) => MapEntry(key, value.toString()));
