@@ -13,7 +13,7 @@ import '../widget/bidding_trip_details_card.dart';
 import '../widget/bidding_list_widget.dart';
 import '../../../utils/app_urls.dart';
 import '../../../routes/app_routes.dart';
-
+import '../../../store/user_data_store.dart';
 import '../../../widgets/global_trip_overlay.dart';
 import '../helper/active_trip_helper.dart';
 
@@ -108,6 +108,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
       try {
         final effectiveBidUuid = bid.rentBidUuid ?? bid.driverUuid ?? "";
         final effectiveTripUuid = _currentTrip?.uuid ?? widget.tripUuid;
+        final custUuid = widget.customerUuid.isNotEmpty ? widget.customerUuid : (await UserDataStore.getUuid() ?? UserDataStore.uuid ?? "");
 
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
@@ -118,7 +119,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
         );
         
         final response = await _repo.acceptTrip(
-          customerUuid: widget.customerUuid,
+          customerUuid: custUuid,
           bidUuid: effectiveBidUuid,
           tripUuid: effectiveTripUuid,
           langCode: loc.locale.languageCode,
@@ -140,7 +141,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
             context,
             AppRoutes.activeTrip,
             arguments: {
-              'customerUuid': widget.customerUuid,
+              'customerUuid': custUuid,
               'tripUuid': effectiveTripUuid,
             },
           );

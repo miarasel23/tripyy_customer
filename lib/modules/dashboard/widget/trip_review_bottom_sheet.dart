@@ -91,13 +91,18 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
 
       if (mounted) {
         GlobalTripOverlay.clearActiveTrip();
+        GlobalTripOverlay.markTripReviewed(widget.trip.uuid);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(loc.translate('review_submitted') == 'review_submitted' ? 'Review submitted successfully!' : loc.translate('review_submitted'))),
         );
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.bottomNav,
-          (route) => false,
-        );
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop(true);
+        } else {
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRoutes.bottomNav,
+            (route) => false,
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

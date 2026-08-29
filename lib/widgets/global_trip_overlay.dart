@@ -19,9 +19,17 @@ class GlobalTripOverlay extends StatefulWidget {
   const GlobalTripOverlay({super.key, required this.child});
 
   static _GlobalTripOverlayState? _instance;
+  static final Set<String> _reviewedTripUuids = {};
+  static bool isReviewModalOpen = false;
 
   static void clearActiveTrip() {
     _instance?._clearTripState();
+  }
+
+  static void markTripReviewed(String? uuid) {
+    if (uuid != null && uuid.isNotEmpty) {
+      _reviewedTripUuids.add(uuid);
+    }
   }
 
   @override
@@ -164,6 +172,10 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
             final found = activeResponse.trips.where((t) {
               final s = t.tripStatus?.toUpperCase() ?? "";
               final service = t.serviceName?.toUpperCase() ?? "";
+              final uuid = t.uuid ?? "";
+              if (GlobalTripOverlay._reviewedTripUuids.contains(uuid)) {
+                return false;
+              }
               if (service != "RIDE_SHARE") {
                 return inProgressStatuses.contains(s);
               }
@@ -185,11 +197,18 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
 
         _enforceActiveTripRedirection(customerUuid);
 
+        final currentRoute = globalRouteObserver.currentRoute ?? "";
+        final isOnActiveTripScreen = currentRoute == AppRoutes.activeTrip || currentRoute.startsWith(AppRoutes.activeTrip);
+
         // Automatic Review Modal Trigger for Completed Trips where givenReview == false
-        if (activeResponse.trips.isNotEmpty && !_isReviewSheetOpen) {
+        // DO NOT trigger review modal from GlobalTripOverlay if the user is already on ActiveTripScreen (which handles its own modal)
+        if (activeResponse.trips.isNotEmpty && !_isReviewSheetOpen && !GlobalTripOverlay.isReviewModalOpen && !isOnActiveTripScreen) {
           final unreviewedCompletedTrips = activeResponse.trips.where((t) {
             final s = t.tripStatus?.toUpperCase() ?? "";
-            return s == TripStatus.completed.toUpperCase() && t.givenReview == false;
+            final uuid = t.uuid ?? "";
+            return s == TripStatus.completed.toUpperCase() && 
+                   t.givenReview == false && 
+                   !GlobalTripOverlay._reviewedTripUuids.contains(uuid);
           }).toList();
 
           if (unreviewedCompletedTrips.isNotEmpty) {
@@ -198,6 +217,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
             if (tripUuid != null && !_autoReviewShownTripUuids.contains(tripUuid)) {
               _autoReviewShownTripUuids.add(tripUuid);
               _isReviewSheetOpen = true;
+              GlobalTripOverlay.isReviewModalOpen = true;
 
               RentalDriverBid? driver;
               if (unreviewedTrip.drivers.isNotEmpty) {
@@ -213,20 +233,29 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
               WidgetsBinding.instance.addPostFrameCallback((_) async {
                 final navContext = globalNavigatorKey.currentContext ?? context;
                 if (navContext.mounted) {
-                  await showModalBottomSheet(
-                    context: navContext,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    isDismissible: false,
-                    enableDrag: false,
-                    builder: (ctx) => TripReviewBottomSheet(
-                      trip: unreviewedTrip,
-                      driver: driver,
-                      customerUuid: customerUuid,
-                    ),
-                  );
+                  try {
+                    await showModalBottomSheet(
+                      context: navContext,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      isDismissible: false,
+                      enableDrag: false,
+                      builder: (ctx) => TripReviewBottomSheet(
+                        trip: unreviewedTrip,
+                        driver: driver,
+                        customerUuid: customerUuid,
+                      ),
+                    );
+                  } finally {
+                    GlobalTripOverlay.isReviewModalOpen = false;
+                  }
                 }
                 _isReviewSheetOpen = false;
+                GlobalTripOverlay.isReviewModalOpen = false;
+                GlobalTripOverlay.clearActiveTrip();
+                if (tripUuid != null) {
+                  GlobalTripOverlay.markTripReviewed(tripUuid);
+                }
                 if (mounted) {
                   setState(() {
                     _activeTrip = null;
@@ -267,7 +296,12 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
 
     final status = _activeTrip!.tripStatus?.toUpperCase() ?? "";
     final serviceName = _activeTrip!.serviceName?.toUpperCase() ?? "";
+    final tripUuid = _activeTrip!.uuid ?? "";
     final bool isRideShare = serviceName == "RIDE_SHARE";
+
+    if (GlobalTripOverlay._reviewedTripUuids.contains(tripUuid)) {
+      return;
+    }
 
     // If first leg is completed (FIRST_COMPLETED), customer is allowed to navigate to other routes
     if (status == "FIRST_COMPLETED" || status == TripStatus.firstCompleted.toUpperCase()) {

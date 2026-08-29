@@ -113,6 +113,8 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
         newTripUuid = response['trip_uuid'].toString();
       }
 
+      final custUuid = await UserDataStore.getUuid() ?? UserDataStore.uuid ?? "";
+
       if (mounted) {
         // Dismiss bottom sheet
         Navigator.pop(context);
@@ -122,7 +124,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
           context,
           AppRoutes.biddingScreen,
           arguments: {
-            'customerUuid': UserDataStore.uuid ?? "",
+            'customerUuid': custUuid,
             'tripUuid': newTripUuid,
           },
         );

@@ -423,7 +423,7 @@ class _DriverBidCardState extends State<DriverBidCard> with SingleTickerProvider
                         service == "rideshare";
     final int totalDurationSeconds = isRideShare ? 40 : (30 * 60);
 
-    final createdAtStr = widget.currentTrip.createdAt ?? widget.currentTrip.startDatetime;
+    final createdAtStr = widget.currentTrip.createdAt;
     final createdAt = _parseDateTime(
       createdAtStr,
       countryCode: widget.currentTrip.countryCode,
@@ -434,13 +434,20 @@ class _DriverBidCardState extends State<DriverBidCard> with SingleTickerProvider
 
     if (createdAt != null) {
       final elapsedMs = DateTime.now().difference(createdAt).inMilliseconds;
-      if (elapsedMs > 0) {
+      if (elapsedMs > 0 && elapsedMs < totalDurationSeconds * 1000) {
         initialProgress = (elapsedMs / (totalDurationSeconds * 1000)).clamp(0.0, 1.0);
         remainingMs = (totalDurationSeconds * 1000) - elapsedMs;
+      } else if (elapsedMs >= totalDurationSeconds * 1000) {
+        remainingMs = 0;
       }
     }
 
-    if (remainingMs <= 0) {
+    if (!isRideShare) {
+      if (remainingMs <= 0) {
+        remainingMs = totalDurationSeconds * 1000;
+        initialProgress = 0.0;
+      }
+    } else if (remainingMs <= 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) widget.onHide();
       });

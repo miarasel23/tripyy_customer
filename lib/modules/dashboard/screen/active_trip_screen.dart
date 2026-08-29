@@ -63,11 +63,10 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     GlobalTripOverlay.clearActiveTrip();
     final nav = globalNavigatorKey.currentState ?? (mounted ? Navigator.of(context) : null);
     if (nav != null) {
-      if (nav.canPop()) {
-        nav.popUntil((route) => route.isFirst || route.settings.name == AppRoutes.bottomNav);
-      } else {
-        nav.pushReplacementNamed(AppRoutes.bottomNav);
-      }
+      nav.pushNamedAndRemoveUntil(
+        AppRoutes.bottomNav,
+        (route) => false,
+      );
     }
   }
 
@@ -168,26 +167,31 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       );
     }
 
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      isDismissible: false,
-      enableDrag: false,
-      builder: (ctx) => TripReviewBottomSheet(
-        trip: trip,
-        driver: driver,
-        customerUuid: widget.customerUuid,
-      ),
-    );
+    GlobalTripOverlay.isReviewModalOpen = true;
+    try {
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        isDismissible: false,
+        enableDrag: false,
+        builder: (ctx) => TripReviewBottomSheet(
+          trip: trip,
+          driver: driver,
+          customerUuid: widget.customerUuid,
+        ),
+      );
+    } finally {
+      GlobalTripOverlay.isReviewModalOpen = false;
+    }
+
+    GlobalTripOverlay.clearActiveTrip();
+    GlobalTripOverlay.markTripReviewed(trip.uuid);
 
     if (mounted) {
       final updatedTrip = trip.copyWith(givenReview: true);
       context.read<ActiveTripBloc>().add(UpdateActiveTripLocalReview(updatedTrip));
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.bottomNav,
-        (route) => false,
-      );
+      _returnToHomePreservingState();
     }
   }
 
