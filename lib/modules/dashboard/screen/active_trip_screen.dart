@@ -731,6 +731,17 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       allLocations.addAll(trip.dropoffLocations);
     }
 
+    final isBn = loc.locale.languageCode == 'bn';
+    final carName = ActiveTripHelper.formatCarType(trip.carCategory?.carType);
+    final serviceName = ActiveTripHelper.formatServiceName(trip.serviceName, hoursBooked: trip.hoursBooked);
+    final locText = isBn
+        ? "${ActiveTripHelper.toBanglaDigits(allLocations.length.toString())}টি লোকেশন"
+        : "${allLocations.length} locations";
+
+    final routeSubtitle = carName.isNotEmpty
+        ? "$carName - $serviceName - $locText"
+        : "$serviceName - $locText";
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -758,7 +769,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                         ),
                       ),
                       Text(
-                        "${ActiveTripHelper.formatServiceName(trip.serviceName, hoursBooked: trip.hoursBooked)} • ${allLocations.length} locations",
+                        routeSubtitle,
                         style: GoogleFonts.poppins(
                           color: isDark ? Colors.white54 : Colors.black54,
                           fontSize: 12,
@@ -775,67 +786,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 12),
-        if (trip.startDatetime != null)
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.02),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        trip.tripStatus == TripStatus.firstCompleted ? "End Time" : "Start Time",
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white54 : Colors.black54,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        ActiveTripHelper.formatDate(trip.tripStatus == TripStatus.firstCompleted ? trip.endDatetime : trip.startDatetime),
-                        style: GoogleFonts.poppins(
-                          color: isDark ? Colors.white : Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (trip.serviceName == 'RETURN' && trip.tripStatus != TripStatus.firstCompleted)
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Return Time",
-                          style: GoogleFonts.poppins(
-                            color: isDark ? Colors.white54 : Colors.black54,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          ActiveTripHelper.formatDate(trip.endDatetime),
-                          style: GoogleFonts.poppins(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-              ],
-            ),
-          ),
 
-        const SizedBox(height: 16),
-        
+        const SizedBox(height: 10),
+
         Stack(
           alignment: Alignment.center,
           children: [
@@ -877,13 +830,73 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             ),
           ],
         ),
+
         AnimatedSize(
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeInOut,
           child: _isRouteExpanded
               ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 14),
+                    if (trip.startDatetime != null)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.02),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    trip.tripStatus == TripStatus.firstCompleted ? "End Time" : "Start Time",
+                                    style: GoogleFonts.poppins(
+                                      color: isDark ? Colors.white54 : Colors.black54,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  Text(
+                                    ActiveTripHelper.formatDate(trip.tripStatus == TripStatus.firstCompleted ? trip.endDatetime : trip.startDatetime),
+                                    style: GoogleFonts.poppins(
+                                      color: isDark ? Colors.white : Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (trip.serviceName == 'RETURN' && trip.tripStatus != TripStatus.firstCompleted)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Return Time",
+                                      style: GoogleFonts.poppins(
+                                        color: isDark ? Colors.white54 : Colors.black54,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      ActiveTripHelper.formatDate(trip.endDatetime),
+                                      style: GoogleFonts.poppins(
+                                        color: isDark ? Colors.white : Colors.black,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    const SizedBox(height: 16),
                     ...List.generate(allLocations.length, (index) {
                       final isLast = index == allLocations.length - 1;
                       final isFirst = index == 0;

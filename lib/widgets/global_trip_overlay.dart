@@ -256,7 +256,10 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       return;
     }
 
-    if (currentRoute == AppRoutes.activeTrip || currentRoute.startsWith(AppRoutes.activeTrip)) {
+    if (currentRoute == AppRoutes.activeTrip || 
+        currentRoute.startsWith(AppRoutes.activeTrip) ||
+        currentRoute == AppRoutes.chat ||
+        currentRoute.startsWith(AppRoutes.chat)) {
       return;
     }
 
@@ -581,11 +584,13 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
   Widget build(BuildContext context) {
     // Determine current route name, preferring the ModalRoute (available immediately) and falling back to the observer
     final routeName = ModalRoute.of(context)?.settings.name ?? globalRouteObserver.currentRoute;
-    // Hide overlay on active trip screen (exact match or any sub‑route) to make this page fully invisible
-    final hideActiveOverlay = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith(AppRoutes.activeTrip));
+    final isChatRoute = routeName != null && (routeName == AppRoutes.chat || routeName.startsWith(AppRoutes.chat));
+
+    // Hide overlay on active trip screen or chat screen (exact match or any sub‑route)
+    final hideActiveOverlay = (routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith(AppRoutes.activeTrip))) || isChatRoute;
     
-    // Hide bidding overlay on bidding screen (exact match or any sub-route)
-    final hideBiddingOverlay = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen));
+    // Hide bidding overlay on bidding screen or chat screen (exact match or any sub-route)
+    final hideBiddingOverlay = (routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen))) || isChatRoute;
 
     final showActiveOverlay = _activeTrip != null && !hideActiveOverlay;
     final showBiddingOverlay = !showActiveOverlay && _requestedTrip != null && !hideBiddingOverlay;
