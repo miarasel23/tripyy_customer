@@ -97,10 +97,18 @@ class RouteGenerator {
         );
 
       case AppRoutes.activeTrip:
-        final customerUuid = settings.arguments as String? ?? "";
+        String customerUuid = "";
+        String? tripUuid;
+        if (settings.arguments is String) {
+          customerUuid = settings.arguments as String;
+        } else if (settings.arguments is Map) {
+          final map = settings.arguments as Map;
+          customerUuid = map['customerUuid']?.toString() ?? map['customer_uuid']?.toString() ?? "";
+          tripUuid = map['tripUuid']?.toString() ?? map['trip_uuid']?.toString();
+        }
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => ActiveTripScreen(customerUuid: customerUuid),
+          builder: (_) => ActiveTripScreen(customerUuid: customerUuid, tripUuid: tripUuid),
         );
 
       case AppRoutes.legalPolicy:

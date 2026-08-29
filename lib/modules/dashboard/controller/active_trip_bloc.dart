@@ -17,25 +17,50 @@ import '../helper/customer_location_tracker.dart';
 class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
   final CreateTripRepository _repo = CreateTripRepository();
   Timer? _pollingTimer;
+  String? _currentTripUuid;
 
   ActiveTripBloc() : super(ActiveTripInitial()) {
     on<FetchActiveTrip>((event, emit) async {
       try {
-        final response = await _repo.fetchBids(
-          customerUuid: event.customerUuid,
-          langCode: event.languageCode,
-          tripStatus: TripStatus.all,
-        );
+        final targetTripUuid = (event.tripUuid != null && event.tripUuid!.trim().isNotEmpty)
+            ? event.tripUuid!.trim()
+            : _currentTripUuid;
+
+        RentalBidListResponse response;
+        if (targetTripUuid != null && targetTripUuid.length >= 36) {
+          try {
+            response = await _repo.fetchSingleTrip(
+              customerUuid: event.customerUuid,
+              langCode: event.languageCode,
+              tripUuid: targetTripUuid,
+              tripStatus: 'ALL',
+            );
+          } catch (_) {
+            response = await _repo.fetchBids(
+              customerUuid: event.customerUuid,
+              langCode: event.languageCode,
+              tripStatus: TripStatus.all,
+            );
+          }
+        } else {
+          response = await _repo.fetchBids(
+            customerUuid: event.customerUuid,
+            langCode: event.languageCode,
+            tripStatus: TripStatus.all,
+          );
+        }
 
         if (response.trips.isNotEmpty) {
-          // FIRST: check if the most recent trip is cancelled — redirect immediately
+          final mostRecentTrip = response.trips.first;
+          if (mostRecentTrip.uuid != null && mostRecentTrip.uuid!.length >= 36) {
+            _currentTripUuid = mostRecentTrip.uuid;
+          }
           final cancelledStatuses = [
             TripStatus.cancelled,
             TripStatus.givenBidCancelled,
             TripStatus.acceptedBidCancelled,
             TripStatus.noShow,
           ];
-          final mostRecentTrip = response.trips.first;
           if (cancelledStatuses.contains(mostRecentTrip.tripStatus)) {
             _pollingTimer?.cancel();
             emit(NoActiveTrip("Trip has been cancelled"));
@@ -166,10 +191,16 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
 
     on<StartActiveTripPolling>((event, emit) {
       _pollingTimer?.cancel();
+      add(FetchActiveTrip(
+        customerUuid: event.customerUuid,
+        languageCode: event.languageCode,
+        tripUuid: event.tripUuid,
+      ));
       _pollingTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
         add(FetchActiveTrip(
           customerUuid: event.customerUuid,
           languageCode: event.languageCode,
+          tripUuid: event.tripUuid,
         ));
       });
     });

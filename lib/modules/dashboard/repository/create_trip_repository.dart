@@ -121,6 +121,72 @@ class CreateTripRepository {
     }
   }
 
+  Future<RentalBidListResponse> fetchSingleTrip({
+    required String customerUuid,
+    required String langCode,
+    String? tripUuid,
+    String? platform,
+    String tripStatus = 'ALL',
+  }) async {
+    int retryCount = 0;
+    const int maxRetries = 5;
+    
+    while (true) {
+      try {
+        final Map<String, dynamic> dataMap = {
+          'customer_uuid': customerUuid,
+          'trip_uuid': tripUuid ?? '',
+          'trip_status': tripStatus,
+        };
+
+        final queryParams = CustomMapBodyBuilder.build(
+          actionWhen: 'rental_bid_trip_single_for_customer',
+          languageCode: langCode,
+          data: dataMap,
+        ).map((key, value) => MapEntry(key, value.toString()));
+
+        final uri = Uri.parse(AppUrls.rentalBidTripSingleForCustomer).replace(queryParameters: queryParams);
+        final token = await UserDataStore.getAccessToken();
+        final headers = {
+          'Accept': 'application/json',
+          'Connection': 'close',
+        };
+        if (token != null && token.isNotEmpty) {
+          headers['Authorization'] = 'Bearer $token';
+        }
+        
+        final response = await ApiService().get(
+          uri,
+          headers: headers,
+          showSnackBarOnError: false,
+        );
+        
+        if (response.statusCode == 200) {
+          final decoded = jsonDecode(response.body);
+          if (decoded['status'] == false) {
+            throw Exception(decoded['message'] ?? "Unknown server error");
+          }
+          return RentalBidListResponse.fromJson(decoded);
+        } else {
+          throw Exception("Server error: ${response.statusCode}");
+        }
+      } catch (e) {
+        retryCount++;
+        final isNetworkError = e is http.ClientException || 
+                             e.toString().contains('ClientException') || 
+                             e.toString().contains('SocketException') || 
+                             e.toString().contains('HttpException') ||
+                             e.toString().contains('Connection closed');
+        
+        if (isNetworkError && retryCount < maxRetries) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          continue;
+        }
+        rethrow;
+      }
+    }
+  }
+
   Future<Map<String, dynamic>> acceptTrip({
     required String customerUuid,
     required String bidUuid,

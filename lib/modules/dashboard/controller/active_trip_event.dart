@@ -5,13 +5,15 @@ abstract class ActiveTripEvent {}
 class FetchActiveTrip extends ActiveTripEvent {
   final String customerUuid;
   final String languageCode;
-  FetchActiveTrip({required this.customerUuid, required this.languageCode});
+  final String? tripUuid;
+  FetchActiveTrip({required this.customerUuid, required this.languageCode, this.tripUuid});
 }
 
 class StartActiveTripPolling extends ActiveTripEvent {
   final String customerUuid;
   final String languageCode;
-  StartActiveTripPolling({required this.customerUuid, required this.languageCode});
+  final String? tripUuid;
+  StartActiveTripPolling({required this.customerUuid, required this.languageCode, this.tripUuid});
 }
 
 class StopActiveTripPolling extends ActiveTripEvent {}

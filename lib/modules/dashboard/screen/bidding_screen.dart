@@ -122,7 +122,10 @@ class _BiddingScreenState extends State<BiddingScreen> {
           Navigator.pushReplacementNamed(
             context,
             AppRoutes.activeTrip,
-            arguments: widget.customerUuid,
+            arguments: {
+              'customerUuid': widget.customerUuid,
+              'tripUuid': widget.tripUuid,
+            },
           );
         }
       } catch (e) {

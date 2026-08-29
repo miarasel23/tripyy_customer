@@ -436,6 +436,8 @@ class RentalBidListResponse {
     
     if (data is List) {
       parsedTrips = data.map((e) => RentalTrip.fromJson(e)).toList();
+    } else if (data is Map<String, dynamic>) {
+      parsedTrips = [RentalTrip.fromJson(data)];
     }
 
     return RentalBidListResponse(

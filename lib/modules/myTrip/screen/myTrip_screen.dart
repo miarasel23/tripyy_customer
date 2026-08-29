@@ -546,7 +546,14 @@ class _MytripScreenState extends State<MytripScreen> {
                       onPressed: () {
                         final customerUuid = UserDataStore.userData?.data?.user?.uuid ?? "";
                         if (isAccepted || isHistory) {
-                          Navigator.pushNamed(context, AppRoutes.activeTrip, arguments: customerUuid);
+                          Navigator.pushNamed(
+                            context,
+                            AppRoutes.activeTrip,
+                            arguments: {
+                              'customerUuid': customerUuid,
+                              'tripUuid': trip.uuid,
+                            },
+                          );
                         } else {
                           Navigator.pushNamed(context, AppRoutes.biddingScreen, arguments: {
                             'customerUuid': customerUuid,

@@ -316,7 +316,10 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
         if (nav != null) {
           nav.pushNamed(
             AppRoutes.activeTrip,
-            arguments: customerUuid,
+            arguments: {
+              'customerUuid': customerUuid,
+              'tripUuid': _activeTrip?.uuid,
+            },
           ).then((_) {
             _isRedirectingToActiveTrip = false;
           });
@@ -650,7 +653,13 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
           // Navigate to active trip screen when tapped
           final customerUuid = UserDataStore.userData?.data?.user?.uuid;
           if (customerUuid != null) {
-            globalNavigatorKey.currentState?.pushNamed(AppRoutes.activeTrip, arguments: customerUuid);
+            globalNavigatorKey.currentState?.pushNamed(
+              AppRoutes.activeTrip,
+              arguments: {
+                'customerUuid': customerUuid,
+                'tripUuid': trip.uuid,
+              },
+            );
           }
         },
         child: Container(
@@ -719,7 +728,13 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                       onPressed: () {
                         final customerUuid = UserDataStore.userData?.data?.user?.uuid;
                         if (customerUuid != null) {
-                          globalNavigatorKey.currentState?.pushNamed(AppRoutes.activeTrip, arguments: customerUuid);
+                          globalNavigatorKey.currentState?.pushNamed(
+                            AppRoutes.activeTrip,
+                            arguments: {
+                              'customerUuid': customerUuid,
+                              'tripUuid': trip.uuid,
+                            },
+                          );
                         }
                       },
                       style: ElevatedButton.styleFrom(

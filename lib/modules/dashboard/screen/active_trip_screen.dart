@@ -22,8 +22,9 @@ import '../../../main.dart';
 
 class ActiveTripScreen extends StatefulWidget {
   final String customerUuid;
+  final String? tripUuid;
 
-  const ActiveTripScreen({super.key, required this.customerUuid});
+  const ActiveTripScreen({super.key, required this.customerUuid, this.tripUuid});
 
   @override
   State<ActiveTripScreen> createState() => _ActiveTripScreenState();
@@ -79,6 +80,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
         StartActiveTripPolling(
           customerUuid: widget.customerUuid,
           languageCode: loc.locale.languageCode,
+          tripUuid: widget.tripUuid,
         ),
       );
     });
