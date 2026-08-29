@@ -74,7 +74,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
       phones.add('01997709990');
     }
     if (emails.isEmpty) {
-      emails.add('help@tripyservice@gamil.com');
+      emails.add('help.tripyservice@gmail.com');
     }
 
     if (mounted) {
@@ -89,19 +89,23 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
   Future<void> _launchUrl(BuildContext context, String urlString) async {
     final Uri uri = Uri.parse(urlString);
     try {
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      } else {
+      final launched = await launchUrl(
+        uri,
+        mode: urlString.startsWith('mailto:') 
+            ? LaunchMode.externalApplication 
+            : LaunchMode.platformDefault,
+      );
+      if (!launched) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not launch $urlString')),
+            SnackBar(content: Text('Could not open support option: $urlString')),
           );
         }
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error launching $urlString')),
+          SnackBar(content: Text('Error: $e')),
         );
       }
     }
