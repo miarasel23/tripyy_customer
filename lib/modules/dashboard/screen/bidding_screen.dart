@@ -14,41 +14,53 @@ import '../widget/bidding_list_widget.dart';
 import '../../../utils/app_urls.dart';
 import '../../../routes/app_routes.dart';
 
+import '../../../widgets/global_trip_overlay.dart';
 import '../helper/active_trip_helper.dart';
 
 class BiddingScreen extends StatefulWidget {
   final String customerUuid;
   final String tripUuid;
 
-  const BiddingScreen({super.key, required this.customerUuid, this.tripUuid = ""});
+  const BiddingScreen({
+    super.key,
+    required this.customerUuid,
+    required this.tripUuid,
+  });
 
   @override
   State<BiddingScreen> createState() => _BiddingScreenState();
 }
 
 class _BiddingScreenState extends State<BiddingScreen> {
-  // BUG FIX: Use nullable Timer to prevent crash in dispose() if init fails
-  Timer? _pollingTimer;
   final CreateTripRepository _repo = CreateTripRepository();
-  bool _isLoading = true;
   RentalTrip? _currentTrip;
-  String? _errorMessage;
+  Timer? _pollingTimer;
+  int _lastBidCount = 0;
   int _previousDriverCount = 0;
-
-  bool _isInit = false;
+  bool _isDisposed = false;
+  bool _isLoading = true;
+  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && (_pollingTimer == null || !_pollingTimer!.isActive)) {
+        _startPolling();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    _pollingTimer?.cancel();
+    super.dispose();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_isInit) {
-      _isInit = true;
-      _startPolling();
-    }
   }
 
   Future<void> _acceptTrip(BuildContext context, bool isDark, RentalDriverBid bid) async {
@@ -56,7 +68,8 @@ class _BiddingScreenState extends State<BiddingScreen> {
     
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      barrierDismissible: false,
+      builder: (dialogCtx) => AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1C1E26) : Colors.white,
         title: Text(
           loc.translate("accept_trip_confirm"),
@@ -64,7 +77,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(dialogCtx).pop(false),
             child: Text(loc.translate("no"), style: const TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
@@ -76,7 +89,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
               ),
               elevation: 0,
             ),
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(dialogCtx).pop(true),
             child: Text(
               loc.translate("yes"), 
               style: GoogleFonts.poppins(
@@ -89,11 +102,10 @@ class _BiddingScreenState extends State<BiddingScreen> {
       ),
     );
 
-    if (confirm == true && _currentTrip != null) {
+    if (confirm == true) {
       final bgColor = isDark ? Colors.white : Colors.black;
       final textColor = isDark ? Colors.black : Colors.white;
       try {
-
         globalScaffoldMessengerKey.currentState?.showSnackBar(
           SnackBar(
             content: Text("Accepting trip...", style: TextStyle(color: textColor)), 
@@ -118,13 +130,15 @@ class _BiddingScreenState extends State<BiddingScreen> {
         );
         
         _pollingTimer?.cancel(); // null-safe cancel before navigation
+        GlobalTripOverlay.clearActiveTrip();
         if (mounted) {
+          final effectiveTripUuid = _currentTrip?.uuid ?? widget.tripUuid;
           Navigator.pushReplacementNamed(
             context,
             AppRoutes.activeTrip,
             arguments: {
               'customerUuid': widget.customerUuid,
-              'tripUuid': widget.tripUuid,
+              'tripUuid': effectiveTripUuid,
             },
           );
         }
@@ -256,11 +270,7 @@ class _BiddingScreenState extends State<BiddingScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _pollingTimer?.cancel(); // BUG FIX: null-safe cancel
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {

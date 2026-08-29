@@ -74,23 +74,29 @@ class MyRouteObserver extends NavigatorObserver {
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    currentRoute = route.settings.name;
-    routeNotifier.value = currentRoute;
-    _persistRoute(currentRoute);
+    if (route.settings.name != null) {
+      currentRoute = route.settings.name;
+      routeNotifier.value = currentRoute;
+      _persistRoute(currentRoute);
+    }
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    currentRoute = previousRoute?.settings.name;
-    routeNotifier.value = currentRoute;
-    _persistRoute(currentRoute);
+    if (previousRoute?.settings.name != null) {
+      currentRoute = previousRoute?.settings.name;
+      routeNotifier.value = currentRoute;
+      _persistRoute(currentRoute);
+    }
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    currentRoute = newRoute?.settings.name;
-    routeNotifier.value = currentRoute;
-    _persistRoute(currentRoute);
+    if (newRoute?.settings.name != null) {
+      currentRoute = newRoute?.settings.name;
+      routeNotifier.value = currentRoute;
+      _persistRoute(currentRoute);
+    }
   }
 }
 

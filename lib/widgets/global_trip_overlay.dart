@@ -259,7 +259,9 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     if (currentRoute == AppRoutes.activeTrip || 
         currentRoute.startsWith(AppRoutes.activeTrip) ||
         currentRoute == AppRoutes.chat ||
-        currentRoute.startsWith(AppRoutes.chat)) {
+        currentRoute.startsWith(AppRoutes.chat) ||
+        currentRoute == AppRoutes.biddingScreen ||
+        currentRoute.startsWith(AppRoutes.biddingScreen)) {
       return;
     }
 
@@ -588,12 +590,12 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     // Determine current route name, preferring the ModalRoute (available immediately) and falling back to the observer
     final routeName = ModalRoute.of(context)?.settings.name ?? globalRouteObserver.currentRoute;
     final isChatRoute = routeName != null && (routeName == AppRoutes.chat || routeName.startsWith(AppRoutes.chat));
+    final isBiddingRoute = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen));
+    final isActiveTripRoute = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith(AppRoutes.activeTrip));
 
-    // Hide overlay on active trip screen or chat screen (exact match or any sub‑route)
-    final hideActiveOverlay = (routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith(AppRoutes.activeTrip))) || isChatRoute;
-    
-    // Hide bidding overlay on bidding screen or chat screen (exact match or any sub-route)
-    final hideBiddingOverlay = (routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen))) || isChatRoute;
+    // Hide overlays on active trip screen, chat screen, or bidding screen
+    final hideActiveOverlay = isActiveTripRoute || isChatRoute || isBiddingRoute;
+    final hideBiddingOverlay = isBiddingRoute || isChatRoute || isActiveTripRoute;
 
     final showActiveOverlay = _activeTrip != null && !hideActiveOverlay;
     final showBiddingOverlay = !showActiveOverlay && _requestedTrip != null && !hideBiddingOverlay;

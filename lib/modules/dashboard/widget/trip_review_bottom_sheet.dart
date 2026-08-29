@@ -4,6 +4,7 @@ import '../../../core/utils/localization/app_localization.dart';
 import '../../../utils/app_colors.dart';
 import '../../../utils/app_urls.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/global_trip_overlay.dart';
 import '../model/create_rental_trip_model.dart';
 import '../repository/create_trip_repository.dart';
 
@@ -89,6 +90,7 @@ class _TripReviewBottomSheetState extends State<TripReviewBottomSheet> {
       );
 
       if (mounted) {
+        GlobalTripOverlay.clearActiveTrip();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(loc.translate('review_submitted') == 'review_submitted' ? 'Review submitted successfully!' : loc.translate('review_submitted'))),
         );
