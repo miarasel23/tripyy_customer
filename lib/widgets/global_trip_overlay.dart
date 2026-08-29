@@ -626,8 +626,10 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
 
   @override
   Widget build(BuildContext context) {
-    // Determine current route name, preferring the ModalRoute (available immediately) and falling back to the observer
-    final routeName = ModalRoute.of(context)?.settings.name ?? globalRouteObserver.currentRoute;
+    // Always use the route observer (not ModalRoute.of) to detect the current pushed route.
+    // ModalRoute.of(context) returns the route of GlobalTripOverlay's own context (the root),
+    // NOT the currently displayed named route, so it cannot reliably detect /bidding_screen etc.
+    final routeName = globalRouteObserver.currentRoute;
     final isChatRoute = routeName != null && (routeName == AppRoutes.chat || routeName.startsWith(AppRoutes.chat));
     final isBiddingRoute = routeName != null && (routeName == AppRoutes.biddingScreen || routeName.startsWith(AppRoutes.biddingScreen));
     final isActiveTripRoute = routeName != null && (routeName == AppRoutes.activeTrip || routeName.startsWith(AppRoutes.activeTrip));
@@ -662,6 +664,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
       ),
     );
   }
+
 
   Widget _buildOverlayContent(BuildContext context) {
     final trip = _activeTrip!;
