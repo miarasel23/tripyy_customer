@@ -358,12 +358,14 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        _formatCarType(car.carType),
+                                        _formatCarType(car.carType).toUpperCase(),
                                         style: GoogleFonts.poppins(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
                                           color: Theme.of(context).colorScheme.onSurface,
                                         ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       const SizedBox(height: 4),
                                       Row(
@@ -371,15 +373,15 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                         children: [
                                           Icon(
                                             Icons.person_outline,
-                                            size: 14,
+                                            size: 13,
                                             color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                           ),
                                           const SizedBox(width: 4),
                                           Text(
                                             '${car.setCapacity} Seats',
                                             style: GoogleFonts.poppins(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w500,
                                               color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                             ),
                                           ),
@@ -388,6 +390,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                     ],
                                   ),
                                 ),
+                                const SizedBox(width: 16), // Spacer to prevent overlapping
                                 // Price & Distance (Right)
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -395,13 +398,12 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                   children: [
                                     if (car.minimumBookingPrice != null)
                                       Text(
-                                        '${loc.translate("up_to")} ' + 
-                                        (loc.locale.languageCode == 'bn' 
-                                            ? '৳${car.minimumBookingPrice}' 
-                                            : 'BDT ${car.minimumBookingPrice}'),
+                                        loc.locale.languageCode == 'bn' 
+                                            ? '${loc.translate("up_to")} ৳${car.minimumBookingPrice}' 
+                                            : '${loc.translate("up_to")} BDT ${car.minimumBookingPrice}',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
                                           color: Theme.of(context).colorScheme.onSurface,
                                         ),
                                       ),
@@ -410,8 +412,8 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                       Text(
                                         '${car.distance} km',
                                         style: GoogleFonts.poppins(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w400,
                                           color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600],
                                         ),
                                       ),
@@ -486,7 +488,7 @@ class _ChooseCarBottomSheetState extends State<ChooseCarBottomSheet> {
                                     ),
                                     SizedBox(width: 12),
                                     Text(
-                                      "TRIPPY ${_formatCarType(selectedCar.carType)}",
+                                      "TIPPY ${_formatCarType(selectedCar.carType).toUpperCase()}",
                                       style: GoogleFonts.poppins(
                                         color: Theme.of(context).brightness == Brightness.dark ? Colors.black : Colors.white,
                                         fontSize: 16,
