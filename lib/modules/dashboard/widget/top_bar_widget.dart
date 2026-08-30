@@ -52,7 +52,7 @@ class TopBarWidget extends StatelessWidget {
             children: [
               SvgPicture.string(
                 svgString,
-                height: 24,
+                height: 28,
                 fit: BoxFit.contain,
               ),
             ],
