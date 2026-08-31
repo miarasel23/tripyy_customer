@@ -34,8 +34,39 @@ class OtpReceiveRepository {
         body: data,
       );
 
+      // Log response for developer visibility during debug/run
+      print("receivingOtp Status: ${response.statusCode}");
+      print("receivingOtp Body: ${response.body}");
+
+      Map<String, dynamic>? jsonData;
+      try {
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map) {
+          jsonData = Map<String, dynamic>.from(decoded);
+        }
+      } catch (e) {
+        print("receivingOtp JSON decode error: $e");
+      }
+
+      if (jsonData != null) {
+        final statusValue = jsonData['status'];
+        bool isSuccess = false;
+        if (statusValue == true || statusValue == 'true' || statusValue == 1 || statusValue == '1') {
+          isSuccess = true;
+        }
+
+        if (!isSuccess) {
+          final String? message = jsonData['message']?.toString();
+          if (message != null && message.trim().isNotEmpty) {
+            return message;
+          }
+        }
+      }
+
       if (response.statusCode == 200) {
-        final jsonData = jsonDecode(response.body);
+        if (jsonData == null) {
+          return "Invalid response format";
+        }
         OtpReceiveModel otpReceiveModel = OtpReceiveModel.fromJson(jsonData);
         await UserDataStore.saveAccessToken(
           otpReceiveModel.data!.accessToken!,
@@ -49,6 +80,9 @@ class OtpReceiveRepository {
 
         return null;
       } else {
+        if (jsonData != null && jsonData['message'] != null) {
+          return jsonData['message'].toString();
+        }
         return "Server error: ${response.statusCode}";
       }
     } on SocketException {
