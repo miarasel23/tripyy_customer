@@ -263,5 +263,7 @@
   "fare_updated_to": "Fare updated to {amount}",
   "cash": "Cash",
   "cancel_request": "Cancel request",
-  "expired": "Expired"
+  "expired": "Expired",
+  "delete_account_confirm_title": "Delete Account?",
+  "delete_account_confirm_msg": "Are you sure you want to request account deletion? Your account will be permanently deleted within 30 days."
 }

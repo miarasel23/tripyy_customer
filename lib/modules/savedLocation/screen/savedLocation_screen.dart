@@ -70,8 +70,7 @@ class _SavedlocationScreenState extends State<SavedlocationScreen> {
           }
         }
       }
-    } catch (e) {
-      debugPrint("Failed to fetch saved locations: $e");
+    } catch (_) {
     } finally {
       if (mounted) {
         setState(() {
@@ -253,11 +252,8 @@ class _SearchLocationBottomSheetState extends State<_SearchLocationBottomSheet> 
   }
 
   Future<void> _saveLocation(SearchLocationData loc) async {
-    debugPrint(">>> _saveLocation called: uuid=${loc.uuid}, address=${loc.address}");
-    
     // Load from SharedPreferences since static variable may not be set yet
     final customerUuid = UserDataStore.uuid ?? await UserDataStore.getUuid();
-    debugPrint(">>> customerUuid=$customerUuid");
     
     if (customerUuid == null || customerUuid.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error: Not logged in')));
@@ -278,29 +274,23 @@ class _SearchLocationBottomSheetState extends State<_SearchLocationBottomSheet> 
       final languageCode = AppLocalizations.of(context).locale.languageCode;
       
       if (widget.oldLocationUuid != null) {
-        debugPrint(">>> Deleting old location: ${widget.oldLocationUuid}");
         try {
           await repo.deleteCustomerLocation(
             customerUuid: customerUuid,
             locationUuid: widget.oldLocationUuid!,
             languageCode: languageCode,
           );
-        } catch (e) {
-          debugPrint(">>> Failed to delete old location: $e");
+        } catch (_) {
           // Proceed with save anyway
         }
       }
 
-      debugPrint(">>> Calling saveCustomerLocation: geoLocatUuid=${loc.uuid}, locationType=${widget.locationType}");
-      
       final response = await repo.saveCustomerLocation(
         customerUuid: customerUuid,
         geoLocatUuid: loc.uuid!,
         locationType: widget.locationType,
         languageCode: languageCode,
       );
-
-      debugPrint(">>> Save response: $response");
 
       if (response['status'] == true) {
         if (mounted) {
@@ -318,7 +308,6 @@ class _SearchLocationBottomSheetState extends State<_SearchLocationBottomSheet> 
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'] ?? 'Failed to save')));
       }
     } catch (e) {
-      debugPrint(">>> Error saving: $e");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       if (mounted) {

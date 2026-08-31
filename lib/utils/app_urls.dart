@@ -32,6 +32,7 @@ class AppUrls {
 
   static const String saveCustomerLocation = "$baseUrl/v1/customer/save-location";
   static const String deleteCustomerLocation = "$baseUrl/v1/customer/delete-location";
+  static const String deleteAccountRequest = "$baseUrl/v1/customer/delete-request";
   static const String saveCustomerDriverTrack = "$baseUrl/v1/customer-driver-track/create";
   static const String customerDriverTrackGet = "$baseUrl/v1/customer-driver-track/get";
   static const String privacyPolicyTermsList = "$baseUrl/v1/global-api/privacy-policy-terms-condition/list";

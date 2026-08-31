@@ -26,9 +26,7 @@ class MapHelper {
           }
         }
       }
-    } catch (e) {
-      debugPrint('getPlaceIdFromCoordinates failed: $e');
-    }
+    } catch (_) {}
     return null;
   }
 

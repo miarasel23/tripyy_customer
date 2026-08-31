@@ -123,8 +123,7 @@ void onStart(ServiceInstance service) async {
             final Map<String, dynamic> translations = jsonDecode(jsonStr);
             title = translations['notification_new_bid_title'] ?? title;
             body = translations['notification_new_bid_body'] ?? body;
-          } catch (err) {
-            debugPrint("BackgroundService: Failed to load localization asset: $err");
+          } catch (_) {
             if (langCode == 'bn') {
               title = 'ড্রাইভার পাওয়া গেছে!';
               body = 'একজন ড্রাইভার আপনার অনুরোধ করা ট্রিপে বিড করেছেন। বিড দেখতে ট্যাপ করুন।';
@@ -150,8 +149,6 @@ void onStart(ServiceInstance service) async {
         }
         lastNotifiedBidsCount = currentBids;
       }
-    } catch (e) {
-      debugPrint('Background fetch error: $e');
-    }
+    } catch (_) {}
   });
 }

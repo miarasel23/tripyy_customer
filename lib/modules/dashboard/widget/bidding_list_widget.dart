@@ -203,11 +203,7 @@ class _BiddingListWidgetState extends State<BiddingListWidget> {
       _repo.cancelRentBid(
         bidUuid: bidUuid,
         langCode: loc.locale.languageCode,
-      ).then((response) {
-        debugPrint("Rent bid cancelled successfully: ${response['message']}");
-      }).catchError((error) {
-        debugPrint("Error cancelling rent bid: $error");
-      });
+      );
     }
   }
 

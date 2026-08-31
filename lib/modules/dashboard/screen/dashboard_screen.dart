@@ -255,8 +255,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
           });
         }
-      } catch (e) {
-        debugPrint('Failed to fetch UUID for map location: $e');
+      } catch (_) {
         _searchCardKey.currentState?.updateActiveFieldText('');
       }
 

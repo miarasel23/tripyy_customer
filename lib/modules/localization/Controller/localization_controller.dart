@@ -18,9 +18,7 @@ class LocalizationBloc extends Bloc<ChangeLanguageEvent, LocalizationState> {
       try {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('active_language_code', event.languageCode);
-      } catch (e) {
-        debugPrint("LocalizationBloc: Error saving language: $e");
-      }
+      } catch (_) {}
       emit(LocalizationState(locale: Locale(event.languageCode)));
     });
   }

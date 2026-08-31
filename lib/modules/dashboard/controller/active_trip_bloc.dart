@@ -244,7 +244,6 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
 
   Future<Map<String, double>?> _getDriverLocation(String? driverUuid, String langCode) async {
     if (driverUuid == null || driverUuid.isEmpty) {
-      print("[ACTIVE TRIP BLOC] _getDriverLocation called with empty driverUuid");
       return null;
     }
     try {
@@ -283,9 +282,7 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
           }
         }
       }
-    } catch (e) {
-      print("[ACTIVE TRIP BLOC] Error getting driver location: $e");
-    }
+    } catch (_) {}
     return null;
   }
 

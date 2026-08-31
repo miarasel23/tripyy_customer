@@ -20,25 +20,15 @@ class _SplashScreenState extends State<SplashScreen> {
       // Attempt to load user data from local store safely
       try {
         await UserDataStore.getUserData();
-        debugPrint("Splash: Loaded user data successfully: ${UserDataStore.userData?.data?.user?.fullName}");
-      } catch (e, stack) {
-        debugPrint("Splash: Error loading user data: $e");
-        debugPrint(stack.toString());
-      }
+      } catch (_) {}
 
       try {
         await UserDataStore.getAccessToken();
-        debugPrint("Splash: Loaded access token: ${UserDataStore.accessToken}");
-      } catch (e) {
-        debugPrint("Splash: Error loading token: $e");
-      }
+      } catch (_) {}
 
       try {
         await UserDataStore.getUuid();
-        debugPrint("Splash: Loaded UUID: ${UserDataStore.uuid}");
-      } catch (e) {
-        debugPrint("Splash: Error loading UUID: $e");
-      }
+      } catch (_) {}
       
       final token = UserDataStore.accessToken;
       final uuid = UserDataStore.uuid;
@@ -46,10 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (mounted) {
         if (isLoggedIn) {
-          debugPrint("Splash: Logged in user detected, entering home page immediately.");
           Navigator.pushReplacementNamed(context, AppRoutes.bottomNav);
         } else {
-          debugPrint("Splash: New/Logged out user, showing splash animation.");
           await Future.delayed(const Duration(seconds: 2));
           if (!mounted) return;
           await UserDataStore.clearAllData();

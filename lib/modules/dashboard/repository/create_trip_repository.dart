@@ -15,8 +15,6 @@ class CreateTripRepository {
       
       final Map<String, String> formFields = request.toJson().map((key, value) => MapEntry(key, value.toString()));
 
-      debugPrint("Creating rental trip with form payload: $formFields");
-
       final token = await UserDataStore.getAccessToken();
       final headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -25,8 +23,6 @@ class CreateTripRepository {
       if (token != null && token.isNotEmpty) {
         headers['Authorization'] = 'Bearer $token';
       }
-      print("header: $headers");
-      print("formFields: $formFields");
 
       final response = await ApiService().post(
         url,
@@ -55,7 +51,6 @@ class CreateTripRepository {
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error creating rental trip: $e");
       rethrow;
     }
   }
@@ -248,7 +243,6 @@ class CreateTripRepository {
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error accepting trip: $e");
       rethrow;
     }
   }
@@ -307,7 +301,6 @@ class CreateTripRepository {
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error cancelling trip: $e");
       rethrow;
     }
   }
@@ -370,7 +363,6 @@ class CreateTripRepository {
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error submitting review: $e");
       rethrow;
     }
   }
@@ -427,7 +419,6 @@ class CreateTripRepository {
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error cancelling rent bid: $e");
       rethrow;
     }
   }
@@ -485,7 +476,6 @@ class CreateTripRepository {
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {
-      debugPrint("Error updating trip offer amount: $e");
       rethrow;
     }
   }

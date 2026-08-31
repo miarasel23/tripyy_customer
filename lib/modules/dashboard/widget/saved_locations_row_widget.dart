@@ -58,8 +58,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
         }
         _calculateDistances();
       }
-    } catch (e) {
-      debugPrint("Failed to fetch saved locations: $e");
+    } catch (_) {
     } finally {
       if (mounted) {
         setState(() {
@@ -92,9 +91,7 @@ class _SavedLocationsRowWidgetState extends State<SavedLocationsRowWidget> {
       }
       
       if (mounted) setState(() {});
-    } catch (e) {
-      debugPrint("Failed to calculate distances: $e");
-    }
+    } catch (_) {}
   }
 
   @override

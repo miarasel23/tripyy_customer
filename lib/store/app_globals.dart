@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 
 class AppGlobals {
   static String platform = "web";
@@ -18,9 +17,7 @@ class AppGlobals {
       if (localeName.contains('_')) {
         countryCode = localeName.split('_').last;
       }
-    } catch (e) {
-      debugPrint('AppGlobals: $e');
-    }
+    } catch (_) {}
   }
 
   static String countryCodeForLanguage(String languageCode) {

@@ -66,7 +66,6 @@ class EditProfileRepository {
       platform = "ios";
     }
     final response = await request.send();
-    print('response.statusCode: ${response.statusCode}');
     if (response.statusCode == 200) {
      final uri = Uri.parse(AppUrls.getCurrentCustomerUser).replace(
           queryParameters: {

@@ -61,8 +61,6 @@ class ApiService {
           duration: const Duration(seconds: 4),
         ),
       );
-    } else {
-      debugPrint('Error SnackBar failed: globalNavigatorKey.currentContext is null');
     }
   }
 

@@ -34,9 +34,7 @@ class OtpReceiveRepository {
         body: data,
       );
 
-      // Log response for developer visibility during debug/run
-      print("receivingOtp Status: ${response.statusCode}");
-      print("receivingOtp Body: ${response.body}");
+
 
       Map<String, dynamic>? jsonData;
       try {
@@ -44,9 +42,7 @@ class OtpReceiveRepository {
         if (decoded is Map) {
           jsonData = Map<String, dynamic>.from(decoded);
         }
-      } catch (e) {
-        print("receivingOtp JSON decode error: $e");
-      }
+      } catch (_) {}
 
       if (jsonData != null) {
         final statusValue = jsonData['status'];

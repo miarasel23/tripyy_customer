@@ -24,6 +24,7 @@ import '../../editProfile/controller/edit_profile_picture_state.dart';
 import '../../../utils/enums.dart';
 import '../../theme/controller/theme_bloc.dart';
 import '../../localization/Controller/localization_controller.dart';
+import '../../../store/app_globals.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -34,6 +35,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _isNotifLoading = false;
+  bool _isDeleteLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -487,6 +489,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               _buildListItem(
+                icon: Icons.delete_forever_outlined,
+                title: loc.translate("delete_account"),
+                trailingWidget: _isDeleteLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red),
+                      )
+                    : null,
+                onTap: _isDeleteLoading
+                    ? () {}
+                    : () => _showDeleteAccountConfirmation(context, loc, user),
+                isDestructive: true,
+              ),
+              _buildListItem(
                 icon: Icons.logout,
                 title: loc.translate("logout"),
                 onTap: () async {
@@ -714,11 +731,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             }
                           } else {
-                            print("GET ERROR: ${getResponse.statusCode} - ${getResponse.body}");
                             throw Exception("Failed to fetch user: ${getResponse.body}");
                           }
                         } else {
-                           print("POST ERROR: ${response.statusCode} - ${response.body}");
                            throw Exception("Failed to update profile: ${response.body}");
                         }
                       } catch (e) {
@@ -745,6 +760,150 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       },
     );
+  }
+
+  void _showDeleteAccountConfirmation(BuildContext context, AppLocalizations loc, dynamic user) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(
+            loc.translate("delete_account_confirm_title"),
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: Colors.red.shade600,
+            ),
+          ),
+          content: Text(
+            loc.translate("delete_account_confirm_msg"),
+            style: GoogleFonts.poppins(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                loc.translate("cancel"),
+                style: GoogleFonts.poppins(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _executeDeleteAccount(loc, user);
+              },
+              child: Text(
+                loc.translate("delete_account"),
+                style: GoogleFonts.poppins(
+                  color: Colors.red.shade600,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _executeDeleteAccount(AppLocalizations loc, dynamic user) async {
+    setState(() {
+      _isDeleteLoading = true;
+    });
+
+    try {
+      final response = await http.get(
+        Uri.parse(AppUrls.deleteAccountRequest).replace(
+          queryParameters: {
+            "platform": AppGlobals.platform,
+            "language_code": loc.locale.languageCode,
+            "action_when": "user_delete_request",
+            "phone_number": user?.phoneNumber ?? "",
+            "user_type": "CUSTOMER",
+          },
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer ${UserDataStore.accessToken}'
+        },
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        final jsonData = jsonDecode(response.body);
+        final isSuccess = jsonData['status'] == true;
+        final message = jsonData['message'] ?? (isSuccess ? "Request processed successfully" : "Failed to delete account");
+
+        if (mounted) {
+          await showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext ctx) {
+              return AlertDialog(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                title: Text(
+                  loc.translate("delete_account"),
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                content: Text(
+                  message.toString(),
+                  style: GoogleFonts.poppins(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
+
+          if (isSuccess) {
+            await UserDataStore.clearAllData();
+            if (mounted) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                AppRoutes.numberInput,
+                (route) => false,
+              );
+            }
+          }
+        }
+      } else {
+        String errorMsg = "Server error: ${response.statusCode}";
+        try {
+          final decoded = jsonDecode(response.body);
+          if (decoded['message'] != null) {
+            errorMsg = decoded['message'].toString();
+          }
+        } catch (_) {}
+        if (mounted) {
+          UiUtils.showApiErrorPopup(context, errorMsg);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        UiUtils.showApiErrorPopup(context, e.toString());
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isDeleteLoading = false;
+        });
+      }
+    }
   }
 }
 

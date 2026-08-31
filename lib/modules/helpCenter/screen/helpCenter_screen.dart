@@ -152,8 +152,6 @@ class HelpcenterScreen extends StatelessWidget {
               try {
                 await launchUrl(uri);
               } catch (_) {}
-            } else {
-              print("clicked $operation");
             }
           },
           child: Container(

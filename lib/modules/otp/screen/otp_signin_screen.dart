@@ -70,9 +70,7 @@ class _OtpSignInState extends State<OtpSignIn> {
     // Dispatch SendOtp to actually request a new code
     try {
       context.read<SendOtpBloc>().add(SendOtp(widget.number, langCode));
-    } catch (e) {
-      print("SendOtpBloc not available here.");
-    }
+    } catch (_) {}
   }
 
   @override

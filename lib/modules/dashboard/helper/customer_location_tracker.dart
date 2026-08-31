@@ -45,7 +45,6 @@ class CustomerLocationTracker {
         );
 
         if (distanceInMeters < minDistanceMeters) {
-          print("[LOCATION TRACKER] Moved ${distanceInMeters.toStringAsFixed(2)}m (< ${minDistanceMeters}m). Skipping API call.");
           return;
         }
       }
@@ -79,11 +78,8 @@ class CustomerLocationTracker {
         final response = await http.post(url, headers: headers, body: body).timeout(const Duration(seconds: 10));
         if (response.statusCode == 200 || response.statusCode == 201) {
           _lastTrackedPosition = position;
-          print("[LOCATION TRACKER] Location tracked successfully to /v1/customer-driver-track/create");
         }
       }
-    } catch (e) {
-      print("[LOCATION TRACKER] Error tracking customer location: $e");
-    }
+    } catch (_) {}
   }
 }

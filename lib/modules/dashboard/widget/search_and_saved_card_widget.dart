@@ -60,9 +60,7 @@ class SearchAndSavedCardWidgetState extends State<SearchAndSavedCardWidget> {
           widget.onDestinationSelected!(loc);
         }
       }
-    } catch (e) {
-      debugPrint("Failed to resolve dropoff address: $e");
-    }
+    } catch (_) {}
   }
 
   void _setupFocusListener(FocusNode node) {
