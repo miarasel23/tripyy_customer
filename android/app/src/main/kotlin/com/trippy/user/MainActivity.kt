@@ -1,4 +1,4 @@
-package com.example.trippy_customer
+package com.trippy.user
 
 import io.flutter.embedding.android.FlutterActivity
 
