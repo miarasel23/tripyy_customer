@@ -41,6 +41,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   bool _isReviewSheetShown = false;
   Marker? _driverMarker;
   double _driverRotation = 0.0;
+  bool _isNavigatingToHome = false;
 
   void _clearLocalTripState() {
     if (mounted) {
@@ -58,15 +59,43 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     }
   }
 
-  void _returnToHomePreservingState() {
-    _clearLocalTripState();
+  void _returnToHomePreservingState({String? message}) {
+    if (_isNavigatingToHome) return;
+    _isNavigatingToHome = true;
+
+    try {
+      context.read<ActiveTripBloc>().add(StopActiveTripPolling());
+    } catch (_) {}
+
+    final tripUuid = widget.tripUuid ?? _activeTrip?.uuid;
+    if (tripUuid != null && tripUuid.isNotEmpty) {
+      GlobalTripOverlay.markTripCancelled(tripUuid);
+    }
     GlobalTripOverlay.clearActiveTrip();
+    _clearLocalTripState();
+
+    if (message != null && message.isNotEmpty) {
+      globalScaffoldMessengerKey.currentState?.hideCurrentSnackBar();
+      globalScaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: Text(message, style: const TextStyle(color: Colors.white)),
+          backgroundColor: Colors.black87,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
+
     final nav = globalNavigatorKey.currentState ?? (mounted ? Navigator.of(context) : null);
     if (nav != null) {
-      nav.pushNamedAndRemoveUntil(
-        AppRoutes.bottomNav,
-        (route) => false,
-      );
+      if (nav.canPop()) {
+        nav.popUntil((route) => route.settings.name == AppRoutes.bottomNav || route.isFirst);
+      } else {
+        nav.pushNamedAndRemoveUntil(
+          AppRoutes.bottomNav,
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -375,8 +404,18 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                                 statusUpper == TripStatus.acceptedBidCancelled.toUpperCase() ||
                                 statusUpper == TripStatus.noShow.toUpperCase();
 
-            if (isCancelled) {
-              _returnToHomePreservingState();
+            final hasActiveDriver = trip.drivers.any(
+              (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+            );
+            final hasCancelledBid = trip.drivers.any(
+              (d) => d.bidStatus == 'ACCEPTED_BID_CANCELLED' || d.bidStatus == 'CANCELLED',
+            );
+            final isDriverCancelled = trip.drivers.isNotEmpty && !hasActiveDriver && hasCancelledBid;
+
+            if (isCancelled || isDriverCancelled) {
+              final isBn = loc.locale.languageCode == 'bn';
+              final cancelMsg = isBn ? "ড্রাইভার ট্রিপটি বাতিল করেছেন।" : "Driver has cancelled the trip.";
+              _returnToHomePreservingState(message: cancelMsg);
               return;
             }
 
@@ -389,9 +428,13 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               }
             }
           } else if (state is ActiveTripCancelledSuccess) {
-            _returnToHomePreservingState();
+            final isBn = loc.locale.languageCode == 'bn';
+            final cancelMsg = isBn ? "ট্রিপ সফলভাবে বাতিল করা হয়েছে।" : state.message;
+            _returnToHomePreservingState(message: cancelMsg);
           } else if (state is NoActiveTrip) {
-            _returnToHomePreservingState();
+            final isBn = loc.locale.languageCode == 'bn';
+            final cancelMsg = isBn ? "ড্রাইভার ট্রিপটি বাতিল করেছেন।" : state.message;
+            _returnToHomePreservingState(message: cancelMsg);
           } else if (state is ActiveTripFailure) {
             UiUtils.showAppSnackBar(context, state.error, type: 'error');
           }
@@ -407,9 +450,6 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             }
 
             if (state is NoActiveTrip) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                _returnToHomePreservingState();
-              });
               return Center(child: CircularProgressIndicator(color: isDark ? Colors.white : Colors.black));
             }
 

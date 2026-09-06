@@ -20,6 +20,7 @@ class GlobalTripOverlay extends StatefulWidget {
 
   static _GlobalTripOverlayState? _instance;
   static final Set<String> _reviewedTripUuids = {};
+  static final Set<String> _cancelledTripUuids = {};
   static bool isReviewModalOpen = false;
 
   static void clearActiveTrip() {
@@ -29,6 +30,12 @@ class GlobalTripOverlay extends StatefulWidget {
   static void markTripReviewed(String? uuid) {
     if (uuid != null && uuid.isNotEmpty) {
       _reviewedTripUuids.add(uuid);
+    }
+  }
+
+  static void markTripCancelled(String? uuid) {
+    if (uuid != null && uuid.isNotEmpty) {
+      _cancelledTripUuids.add(uuid);
     }
   }
 
@@ -173,15 +180,32 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
               final s = t.tripStatus?.toUpperCase() ?? "";
               final service = t.serviceName?.toUpperCase() ?? "";
               final uuid = t.uuid ?? "";
-              if (GlobalTripOverlay._reviewedTripUuids.contains(uuid)) {
+              if (GlobalTripOverlay._reviewedTripUuids.contains(uuid) ||
+                  GlobalTripOverlay._cancelledTripUuids.contains(uuid)) {
                 return false;
+              }
+              if (s == TripStatus.completed.toUpperCase() ||
+                  s == TripStatus.cancelled.toUpperCase() ||
+                  s == TripStatus.acceptedBidCancelled.toUpperCase() ||
+                  s == TripStatus.givenBidCancelled.toUpperCase() ||
+                  s == TripStatus.noShow.toUpperCase()) {
+                return false;
+              }
+              if (t.drivers.isNotEmpty) {
+                final hasActiveDriver = t.drivers.any(
+                  (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+                );
+                final hasCancelledBid = t.drivers.any(
+                  (d) => d.bidStatus == 'ACCEPTED_BID_CANCELLED' || d.bidStatus == 'CANCELLED',
+                );
+                if (!hasActiveDriver && hasCancelledBid) {
+                  return false;
+                }
               }
               if (service != "RIDE_SHARE") {
                 return inProgressStatuses.contains(s);
               }
-              return rideShareActiveStatuses.contains(s) && 
-                     s != TripStatus.completed.toUpperCase() && 
-                     s != TripStatus.cancelled.toUpperCase();
+              return rideShareActiveStatuses.contains(s);
             }).toList();
             _activeTrip = found.isNotEmpty ? found.first : null;
           } else {
@@ -299,7 +323,16 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     final tripUuid = _activeTrip!.uuid ?? "";
     final bool isRideShare = serviceName == "RIDE_SHARE";
 
-    if (GlobalTripOverlay._reviewedTripUuids.contains(tripUuid)) {
+    if (GlobalTripOverlay._reviewedTripUuids.contains(tripUuid) ||
+        GlobalTripOverlay._cancelledTripUuids.contains(tripUuid)) {
+      return;
+    }
+
+    if (status == TripStatus.completed.toUpperCase() ||
+        status == TripStatus.cancelled.toUpperCase() ||
+        status == TripStatus.acceptedBidCancelled.toUpperCase() ||
+        status == TripStatus.givenBidCancelled.toUpperCase() ||
+        status == TripStatus.noShow.toUpperCase()) {
       return;
     }
 

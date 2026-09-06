@@ -67,6 +67,20 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
             return;
           }
 
+          if (mostRecentTrip.drivers.isNotEmpty) {
+            final hasActiveDriver = mostRecentTrip.drivers.any(
+              (d) => d.bidStatus == 'ACCEPTED' || d.bidStatus == 'COMPLETED',
+            );
+            final hasCancelledBid = mostRecentTrip.drivers.any(
+              (d) => d.bidStatus == 'ACCEPTED_BID_CANCELLED' || d.bidStatus == 'CANCELLED',
+            );
+            if (!hasActiveDriver && hasCancelledBid) {
+              _pollingTimer?.cancel();
+              emit(NoActiveTrip("Driver has cancelled the trip"));
+              return;
+            }
+          }
+
           final activeStatuses = [
             TripStatus.accepted,
             TripStatus.booked,
@@ -168,14 +182,22 @@ class ActiveTripBloc extends Bloc<ActiveTripEvent, ActiveTripState> {
             ));
 
             // Stop polling once terminal state is reached
-            final terminalStatuses = [TripStatus.completed, TripStatus.cancelled];
+            final terminalStatuses = [
+              TripStatus.completed,
+              TripStatus.cancelled,
+              TripStatus.givenBidCancelled,
+              TripStatus.acceptedBidCancelled,
+              TripStatus.noShow,
+            ];
             if (terminalStatuses.contains(activeTrip.tripStatus)) {
               _pollingTimer?.cancel();
             }
           } else {
+            _pollingTimer?.cancel();
             emit(NoActiveTrip("No active trip found."));
           }
         } else {
+          _pollingTimer?.cancel();
           emit(NoActiveTrip("No active trip found."));
         }
       } catch (e) {
