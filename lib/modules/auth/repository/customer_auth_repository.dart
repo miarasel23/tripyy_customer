@@ -37,6 +37,10 @@ class AuthRepository {
           throw Exception(json['message'] ?? "OTP failed");
         }
       } else {
+        final json = response.body;
+        if (json is Map && json['message'] != null) {
+          throw Exception(json['message']);
+        }
         throw Exception("Server error: ${response.statusCode}");
       }
     } catch (e) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -33,9 +34,20 @@ class SendOtpRepository {
         body: data,
       );
 
+      dynamic body;
+      try {
+        body = jsonDecode(response.body);
+      } catch (_) {}
+
       if (response.statusCode == 200) {
+        if (body is Map && body['status'] == false) {
+          return body['message']?.toString() ?? "Failed to send OTP";
+        }
         return null;
       } else {
+        if (body is Map && body['message'] != null) {
+          return body['message'].toString();
+        }
         return "Server error: ${response.statusCode}";
       }
     } on SocketException {

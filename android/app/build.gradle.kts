@@ -1,8 +1,18 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Load keystore properties
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 android {
@@ -29,6 +39,9 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // Inject Google Maps API key from key.properties into AndroidManifest at build time
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] =
+            keystoreProperties.getProperty("googleMapsApiKey", "AIzaSyAYf-MPMgwHhXT2h-kKSchXFH5GiwuURcw")
     }
 
     buildTypes {
