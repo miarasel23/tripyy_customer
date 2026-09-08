@@ -19,10 +19,12 @@ class Car {
 
   factory Car.fromJson(Map<String, dynamic> json) {
     num? minPrice;
-    if (json['rent_calculation'] != null) {
+    if (json['rent_calculation'] != null && json['rent_calculation'] is Map) {
       minPrice = json['rent_calculation']['minimum_booking_price'];
-    } else {
+    } else if (json['minimum_booking_price'] != null) {
       minPrice = json['minimum_booking_price'];
+    } else if (json['price_sets'] != null && json['price_sets'] is List && (json['price_sets'] as List).isNotEmpty) {
+      minPrice = json['price_sets'][0]?['minimum_booking_price'];
     }
 
     String? parsedDistance;
@@ -34,14 +36,16 @@ class Car {
 
     String? priceSetUuid;
     if (json['price_sets'] != null && json['price_sets'] is List && (json['price_sets'] as List).isNotEmpty) {
-      priceSetUuid = json['price_sets'][0]['uuid'];
+      priceSetUuid = json['price_sets'][0]?['uuid']?.toString();
     }
 
     return Car(
-      uuid: json['uuid'],
-      carType: json['car_type'],
-      setCapacity: json['set_capacity'],
-      carAvatar: json['car_avatar'],
+      uuid: json['uuid']?.toString() ?? '',
+      carType: json['car_type']?.toString() ?? '',
+      setCapacity: json['set_capacity'] is int
+          ? json['set_capacity'] as int
+          : int.tryParse('${json['set_capacity']}') ?? 0,
+      carAvatar: json['car_avatar']?.toString() ?? '',
       minimumBookingPrice: minPrice,
       distance: parsedDistance,
       priceSetUuid: priceSetUuid,
@@ -51,20 +55,25 @@ class Car {
 
 class ServiceGroup {
   final String serviceName;
-  final String avatar;
+  final String? avatar;
   final List<Car> cars;
 
   ServiceGroup({
     required this.serviceName,
-    required this.avatar,
+    this.avatar,
     required this.cars,
   });
 
   factory ServiceGroup.fromJson(Map<String, dynamic> json) {
     return ServiceGroup(
-      serviceName: json['service_name'],
-      avatar: json['avatar'],
-      cars: (json['cars'] as List).map((e) => Car.fromJson(e)).toList(),
+      serviceName: json['service_name']?.toString() ?? '',
+      avatar: json['avatar']?.toString(),
+      cars: json['cars'] is List
+          ? (json['cars'] as List)
+              .whereType<Map<String, dynamic>>()
+              .map((e) => Car.fromJson(e))
+              .toList()
+          : [],
     );
   }
 }
@@ -77,9 +86,13 @@ class ServiceResponse {
   factory ServiceResponse.fromJson(Map<String, dynamic> json) {
     final Map<String, ServiceGroup> services = {};
 
-    (json['data'] as Map<String, dynamic>).forEach((key, value) {
-      services[key] = ServiceGroup.fromJson(value);
-    });
+    if (json['data'] is Map<String, dynamic>) {
+      (json['data'] as Map<String, dynamic>).forEach((key, value) {
+        if (value is Map<String, dynamic>) {
+          services[key] = ServiceGroup.fromJson(value);
+        }
+      });
+    }
 
     return ServiceResponse(groups: services);
   }

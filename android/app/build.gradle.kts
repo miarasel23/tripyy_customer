@@ -18,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "com.trippy.user"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = "28.2.13676358"
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -44,11 +44,20 @@ android {
             keystoreProperties.getProperty("googleMapsApiKey", "AIzaSyAYf-MPMgwHhXT2h-kKSchXFH5GiwuURcw")
     }
 
+    signingConfigs {
+        create("release") {
+            keyAlias = keystoreProperties["keyAlias"] as? String ?: "trippy"
+            keyPassword = keystoreProperties["keyPassword"] as? String ?: "Trippy@2379##"
+            storeFile = file(keystoreProperties["storeFile"] as? String ?: "trippy.jks")
+            storePassword = keystoreProperties["storePassword"] as? String ?: "Trippy@2379##"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
     }
 }

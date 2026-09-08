@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../utils/app_urls.dart';
+import '../../../utils/enums.dart';
 import '../../../core/utils/localization/app_localization.dart';
+import '../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart';
+import '../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_events.dart';
 import '../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
-import '../choose_car_bottom_sheet/screen/choose_car_bottom_sheet.dart';
 
 class ServicesSectionWidget extends StatelessWidget {
   final ChooseCarBottomSheetState state;
@@ -19,6 +22,37 @@ class ServicesSectionWidget extends StatelessWidget {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final loc = AppLocalizations.of(context);
     final langCode = loc.locale.languageCode;
+
+    if (keys.isEmpty) {
+      if (state.status == ChooseCarBottomSheetStatus.loading) {
+        return _buildShimmerLoading(isLight);
+      }
+      if (state.status == ChooseCarBottomSheetStatus.failure) {
+        return Container(
+          height: 50,
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              Text(
+                loc.translate("error_loading"),
+                style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+              ),
+              const SizedBox(width: 8),
+              TextButton.icon(
+                onPressed: () {
+                  context.read<ChooseCarBottomSheetBloc>().add(
+                    LoadServices(languageCode: langCode),
+                  );
+                },
+                icon: const Icon(Icons.refresh, size: 16),
+                label: const Text("Retry", style: TextStyle(fontSize: 12)),
+              ),
+            ],
+          ),
+        );
+      }
+      return const SizedBox.shrink();
+    }
     
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -31,7 +65,7 @@ class ServicesSectionWidget extends StatelessWidget {
 
           return GestureDetector(
             onTap: () {
-              if (key != null) {
+              if (key.isNotEmpty) {
                 final cars = state.groups?[key]?.cars ?? [];
                 onServiceTap(key, cars);
               }
@@ -66,7 +100,7 @@ class ServicesSectionWidget extends StatelessWidget {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: _buildServiceIcon(avatar, context),
+                      child: _buildServiceIcon(avatar, key, context),
                     ),
                   ),
                   const SizedBox(height: 3),
@@ -95,27 +129,68 @@ class ServicesSectionWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceIcon(String? avatar, BuildContext context) {
+  Widget _buildShimmerLoading(bool isLight) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
+      child: Row(
+        children: List.generate(4, (index) {
+          return Shimmer.fromColors(
+            baseColor: isLight ? Colors.grey[300]! : Colors.grey[800]!,
+            highlightColor: isLight ? Colors.grey[100]! : Colors.grey[700]!,
+            child: Container(
+              margin: const EdgeInsets.only(right: 10),
+              width: 100,
+              height: 102,
+              decoration: BoxDecoration(
+                color: isLight ? Colors.white : const Color(0xFF2A2F3D),
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildServiceIcon(String? avatar, String? serviceKey, BuildContext context) {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final iconColor = isLight ? Colors.blue[600] : Colors.blue[200];
     
     if (avatar != null && avatar.isNotEmpty) {
       final imageUrl = AppUrls.getImageUrl(avatar);
-      return Image.network(
-        imageUrl!,
+      if (imageUrl != null) {
+        return Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Shimmer.fromColors(
+              baseColor: isLight ? Colors.grey[300]! : Colors.grey[700]!,
+              highlightColor: isLight ? Colors.grey[100]! : Colors.grey[500]!,
+              child: Container(
+                color: isLight ? Colors.white : Colors.black,
+              ),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return _buildAssetOrFallback(serviceKey, iconColor);
+          },
+        );
+      }
+    }
+    return _buildAssetOrFallback(serviceKey, iconColor);
+  }
+
+  Widget _buildAssetOrFallback(String? serviceKey, Color? iconColor) {
+    if (serviceKey != null && serviceKey.isNotEmpty) {
+      return Image.asset(
+        'assets/services/$serviceKey.png',
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Shimmer.fromColors(
-            baseColor: isLight ? Colors.grey[300]! : Colors.grey[700]!,
-            highlightColor: isLight ? Colors.grey[100]! : Colors.grey[500]!,
-            child: Container(
-              color: isLight ? Colors.white : Colors.black,
-            ),
-          );
-        },
         errorBuilder: (context, error, stackTrace) {
           return Center(child: Icon(Icons.directions_car, color: iconColor, size: 32));
         },

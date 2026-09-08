@@ -11,6 +11,7 @@ import '../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_bloc.dart'
 import '../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_events.dart';
 import '../choose_car_bottom_sheet/controller/choose_car_bottom_sheet_state.dart';
 import '../choose_car_bottom_sheet/model/choose_car_model.dart';
+import '../../../utils/enums.dart';
 
 // Import extracted widgets
 import '../widget/top_bar_widget.dart';
@@ -72,6 +73,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         LoadServices(languageCode: loc.locale.languageCode),
       );
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final bloc = context.read<ChooseCarBottomSheetBloc>();
+    if (bloc.state.groups == null && bloc.state.status != ChooseCarBottomSheetStatus.loading) {
+      final loc = AppLocalizations.of(context);
+      bloc.add(LoadServices(languageCode: loc.locale.languageCode));
+    }
   }
 
   @override
