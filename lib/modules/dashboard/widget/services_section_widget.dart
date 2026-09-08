@@ -157,9 +157,9 @@ class ServicesSectionWidget extends StatelessWidget {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final iconColor = isLight ? Colors.blue[600] : Colors.blue[200];
     
-    if (avatar != null && avatar.isNotEmpty) {
+    if (avatar != null && avatar.trim().isNotEmpty) {
       final imageUrl = AppUrls.getImageUrl(avatar);
-      if (imageUrl != null) {
+      if (imageUrl != null && imageUrl.isNotEmpty) {
         return Image.network(
           imageUrl,
           fit: BoxFit.cover,
@@ -185,18 +185,77 @@ class ServicesSectionWidget extends StatelessWidget {
   }
 
   Widget _buildAssetOrFallback(String? serviceKey, Color? iconColor) {
-    if (serviceKey != null && serviceKey.isNotEmpty) {
+    final relevantAsset = _getRelevantServiceAsset(serviceKey);
+    if (relevantAsset != null) {
       return Image.asset(
-        'assets/services/$serviceKey.png',
+        relevantAsset,
         fit: BoxFit.cover,
         width: double.infinity,
         height: double.infinity,
         errorBuilder: (context, error, stackTrace) {
-          return Center(child: Icon(Icons.directions_car, color: iconColor, size: 32));
+          return _buildNoImagePlaceholder(iconColor);
         },
       );
     }
-    return Center(child: Icon(Icons.directions_car, color: iconColor, size: 32));
+    return _buildNoImagePlaceholder(iconColor);
+  }
+
+  String? _getRelevantServiceAsset(String? serviceKey) {
+    if (serviceKey == null || serviceKey.trim().isEmpty) return null;
+    final normalized = serviceKey.toUpperCase().trim();
+
+    const validAssets = {
+      'RIDE_SHARE': 'assets/services/RIDE_SHARE.png',
+      'INTER_CITY_RENTER': 'assets/services/INTER_CITY_RENTER.png',
+      'RETURN': 'assets/services/RETURN.png',
+      'HOURLY': 'assets/services/HOURLY.png',
+      'AIRPORT_RENTER': 'assets/services/AIRPORT_RENTER.png',
+      'WEDDING_CAR': 'assets/services/WEDDING_CAR.png',
+      'PACKAGE_DELIVERY': 'assets/services/PACKAGE_DELIVERY.png',
+      'OUTSTATION_RIDE': 'assets/services/OUTSTATION_RIDE.png',
+    };
+
+    if (validAssets.containsKey(normalized)) {
+      return validAssets[normalized];
+    }
+
+    if (normalized.contains('OUTSTATION')) return 'assets/services/OUTSTATION_RIDE.png';
+    if (normalized.contains('PACKAGE') || normalized.contains('DELIVERY') || normalized.contains('PARCEL')) {
+      return 'assets/services/PACKAGE_DELIVERY.png';
+    }
+    if (normalized.contains('HOUR')) return 'assets/services/HOURLY.png';
+    if (normalized.contains('AIRPORT')) return 'assets/services/AIRPORT_RENTER.png';
+    if (normalized.contains('WEDDING')) return 'assets/services/WEDDING_CAR.png';
+    if (normalized.contains('RIDE') || normalized.contains('SHARE')) return 'assets/services/RIDE_SHARE.png';
+    if (normalized.contains('INTER') || normalized.contains('CITY')) return 'assets/services/INTER_CITY_RENTER.png';
+    if (normalized.contains('RETURN')) return 'assets/services/RETURN.png';
+
+    return null;
+  }
+
+  Widget _buildNoImagePlaceholder(Color? iconColor) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.image_not_supported_outlined,
+            color: iconColor?.withValues(alpha: 0.6) ?? Colors.grey.shade400,
+            size: 22,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            "No Image",
+            style: GoogleFonts.poppins(
+              fontSize: 9,
+              fontWeight: FontWeight.w500,
+              color: iconColor?.withValues(alpha: 0.7) ?? Colors.grey.shade400,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   String _formatServiceName(String? key, String langCode) {

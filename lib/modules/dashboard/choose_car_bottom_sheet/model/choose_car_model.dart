@@ -2,7 +2,7 @@ class Car {
   final String uuid;
   final String carType;
   final int setCapacity;
-  final String carAvatar;
+  final String? carAvatar;
   final num? minimumBookingPrice;
   final String? distance;
   final String? priceSetUuid;
@@ -11,7 +11,7 @@ class Car {
     required this.uuid,
     required this.carType,
     required this.setCapacity,
-    required this.carAvatar,
+    this.carAvatar,
     this.minimumBookingPrice,
     this.distance,
     this.priceSetUuid,
@@ -45,7 +45,7 @@ class Car {
       setCapacity: json['set_capacity'] is int
           ? json['set_capacity'] as int
           : int.tryParse('${json['set_capacity']}') ?? 0,
-      carAvatar: json['car_avatar']?.toString() ?? '',
+      carAvatar: json['car_avatar']?.toString(),
       minimumBookingPrice: minPrice,
       distance: parsedDistance,
       priceSetUuid: priceSetUuid,
