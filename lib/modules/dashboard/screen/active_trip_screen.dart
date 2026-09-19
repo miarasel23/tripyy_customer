@@ -104,13 +104,24 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final loc = AppLocalizations.of(context);
-      context.read<ActiveTripBloc>().add(
+      final activeBloc = context.read<ActiveTripBloc>();
+      activeBloc.add(
         StartActiveTripPolling(
           customerUuid: widget.customerUuid,
           languageCode: loc.locale.languageCode,
           tripUuid: widget.tripUuid,
         ),
       );
+      if (activeBloc.state is ActiveTripSuccess) {
+        final currentTrip = (activeBloc.state as ActiveTripSuccess).activeTrip;
+        _activeTrip = currentTrip;
+        _fetchRoutePolylinesForTrip(currentTrip);
+        _updateDriverMarker(
+          currentTrip,
+          (activeBloc.state as ActiveTripSuccess).driverLatitude,
+          (activeBloc.state as ActiveTripSuccess).driverLongitude,
+        );
+      }
     });
   }
 
@@ -125,17 +136,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     List<LatLng> newRoutePoints = [];
     Set<Marker> newMarkers = {};
 
-    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
-    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
-
-    List<LocationModel> allLocations = [];
-    if (isReturnTrip && isFirstCompleted) {
-      allLocations.addAll(trip.dropoffLocations);
-      allLocations.addAll(trip.pickupLocations);
-    } else {
-      allLocations.addAll(trip.pickupLocations);
-      allLocations.addAll(trip.dropoffLocations);
-    }
+    final isReturnTrip = trip.isReturnTrip;
+    final isFirstCompleted = trip.isFirstCompleted;
+    final allLocations = trip.routeLocations;
 
     for (int i = 0; i < allLocations.length; i++) {
       final loc = allLocations[i];
@@ -145,18 +148,26 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
       newRoutePoints.add(point);
 
       double hue;
+      String markerTitle;
       if (i == 0) {
         hue = BitmapDescriptor.hueGreen;
+        markerTitle = (isReturnTrip && isFirstCompleted) ? "Pickup (Return)" : "Pickup";
       } else if (i == allLocations.length - 1) {
         hue = BitmapDescriptor.hueRed;
+        markerTitle = (isReturnTrip && isFirstCompleted) ? "Dropoff (Return)" : "Dropoff";
       } else {
         hue = BitmapDescriptor.hueYellow;
+        markerTitle = "Stop $i";
       }
       newMarkers.add(
         Marker(
           markerId: MarkerId('loc_$i'),
           position: point,
           icon: BitmapDescriptor.defaultMarkerWithHue(hue),
+          infoWindow: InfoWindow(
+            title: markerTitle,
+            snippet: loc.address,
+          ),
         ),
       );
     }
@@ -392,7 +403,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
             final oldTrip = _activeTrip;
             _activeTrip = trip;
 
-            if (oldTrip?.uuid != trip.uuid) {
+            if (oldTrip?.uuid != trip.uuid || oldTrip?.tripStatus != trip.tripStatus || _polylines.isEmpty) {
               _fetchRoutePolylinesForTrip(trip);
             }
 
@@ -568,12 +579,10 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
     String? etaLabel;
     final isBn = loc.locale.languageCode == 'bn';
     final String currentStatus = trip.tripStatus?.toUpperCase() ?? "";
-    final bool isStartedOrFirstCompleted = currentStatus == "RIDE_STARTED" || currentStatus == "FIRST_COMPLETED" || currentStatus == "ON_GOING";
+    final bool isStartedOrFirstCompleted = currentStatus == "RIDE_STARTED" || trip.isFirstCompleted || currentStatus == "ON_GOING";
     final bool isAcceptedOrInProgress = currentStatus == "ACCEPTED" || currentStatus == "IN_PROGRESS" || currentStatus == "BOOKED" || currentStatus == "ARRIVED_PICKUP_LOCATION";
-    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
-    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
-    final currentPickupLocs = (isReturnTrip && isFirstCompleted) ? trip.dropoffLocations : trip.pickupLocations;
-    final currentDropoffLocs = (isReturnTrip && isFirstCompleted) ? trip.pickupLocations : trip.dropoffLocations;
+    final currentPickupLocs = trip.effectivePickupLocations;
+    final currentDropoffLocs = trip.effectiveDropoffLocations;
 
     if (isStartedOrFirstCompleted) {
       if (driverLat != null && driverLng != null && currentDropoffLocs.isNotEmpty) {
@@ -693,7 +702,9 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
           const SizedBox(height: 24),
 
           // Action Button Area
-          if (trip.tripStatus == TripStatus.rideStarted || trip.tripStatus == TripStatus.firstCompleted)
+          if (trip.tripStatus == TripStatus.rideStarted ||
+              trip.tripStatus?.toUpperCase() == 'RIDE_STARTED' ||
+              trip.isFirstCompleted)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: ClipRRect(
@@ -709,7 +720,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                       child: LayoutBuilder(
                         builder: (context, constraints) {
                           double progress = 0.4;
-                          if (trip.tripStatus == TripStatus.firstCompleted) progress = 0.75;
+                          if (trip.isFirstCompleted) progress = 0.75;
                           
                           return AnimatedContainer(
                             duration: const Duration(seconds: 1),
@@ -741,9 +752,12 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
               ),
             ),
           if (trip.tripStatus != TripStatus.completed &&
+              trip.tripStatus?.toUpperCase() != 'COMPLETED' &&
               trip.tripStatus != TripStatus.cancelled &&
+              trip.tripStatus?.toUpperCase() != 'CANCELLED' &&
               trip.tripStatus != TripStatus.rideStarted &&
-              trip.tripStatus != TripStatus.firstCompleted)
+              trip.tripStatus?.toUpperCase() != 'RIDE_STARTED' &&
+              !trip.isFirstCompleted)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: GestureDetector(
@@ -778,17 +792,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
   }
 
   Widget _buildRouteProgress(bool isDark, RentalTrip trip, AppLocalizations loc) {
-    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
-    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
-
-    List<LocationModel> allLocations = [];
-    if (isReturnTrip && isFirstCompleted) {
-      allLocations.addAll(trip.dropoffLocations);
-      allLocations.addAll(trip.pickupLocations);
-    } else {
-      allLocations.addAll(trip.pickupLocations);
-      allLocations.addAll(trip.dropoffLocations);
-    }
+    final allLocations = trip.routeLocations;
 
     final isBn = loc.locale.languageCode == 'bn';
     final carName = ActiveTripHelper.formatCarType(trip.carCategory?.carType);
@@ -898,7 +902,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 14),
-                    if (trip.startDatetime != null)
+                    if (trip.effectiveStartDatetime != null && trip.effectiveStartDatetime!.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
@@ -919,7 +923,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                                     ),
                                   ),
                                   Text(
-                                    ActiveTripHelper.formatDate(trip.tripStatus == TripStatus.firstCompleted ? trip.endDatetime : trip.startDatetime),
+                                    ActiveTripHelper.formatDate(trip.effectiveStartDatetime),
                                     style: GoogleFonts.poppins(
                                       color: isDark ? Colors.white : Colors.black,
                                       fontSize: 14,
@@ -929,7 +933,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                                 ],
                               ),
                             ),
-                            if (trip.serviceName == 'RETURN' && trip.tripStatus != TripStatus.firstCompleted)
+                            if (trip.effectiveEndDatetime != null && trip.effectiveEndDatetime!.isNotEmpty)
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -942,7 +946,7 @@ class _ActiveTripScreenState extends State<ActiveTripScreen> {
                                       ),
                                     ),
                                     Text(
-                                      ActiveTripHelper.formatDate(trip.endDatetime),
+                                      ActiveTripHelper.formatDate(trip.effectiveEndDatetime),
                                       style: GoogleFonts.poppins(
                                         color: isDark ? Colors.white : Colors.black,
                                         fontSize: 14,

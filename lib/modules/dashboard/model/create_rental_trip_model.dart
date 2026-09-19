@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'trip_status.dart';
 
 String _getPlatformName() {
   switch (defaultTargetPlatform) {
@@ -313,11 +314,62 @@ class RentalTrip {
     this.hoursBooked,
   });
 
+  bool get isReturnTrip {
+    return serviceName?.toUpperCase() == 'RETURN';
+  }
+
+  bool get isFirstCompleted {
+    final status = (tripStatus ?? '').toUpperCase();
+    return status == 'FIRST_COMPLETED' ||
+        status == 'FRIST_COMPLETED' ||
+        tripStatus == TripStatus.firstCompleted;
+  }
+
+  List<LocationModel> get effectivePickupLocations {
+    if (isReturnTrip && isFirstCompleted) {
+      return dropoffLocations;
+    }
+    return pickupLocations;
+  }
+
+  List<LocationModel> get effectiveDropoffLocations {
+    if (isReturnTrip && isFirstCompleted) {
+      return pickupLocations;
+    }
+    return dropoffLocations;
+  }
+
+  List<LocationModel> get routeLocations {
+    List<LocationModel> all = [];
+    if (isReturnTrip && isFirstCompleted) {
+      all.addAll(dropoffLocations.reversed);
+      all.addAll(pickupLocations.reversed);
+    } else {
+      all.addAll(pickupLocations);
+      all.addAll(dropoffLocations);
+    }
+    return all;
+  }
+
+  String? get effectiveStartDatetime {
+    if (isReturnTrip && isFirstCompleted) {
+      return endDatetime ?? startDatetime;
+    }
+    return startDatetime;
+  }
+
+  String? get effectiveEndDatetime {
+    if (isReturnTrip && isFirstCompleted) {
+      return null;
+    }
+    return endDatetime;
+  }
+
   factory RentalTrip.fromJson(Map<String, dynamic> json) {
     return RentalTrip(
       id: json['id'],
       uuid: json['uuid'],
-      serviceName: json['service_name'],
+      serviceName: json['service_name']?.toString() ?? json['trip_type']?.toString(),
       carCategory: json['car_category'] != null ? CarCategoryModel.fromJson(json['car_category']) : null,
       priceInfo: json['price_info'] != null ? PriceInfoModel.fromJson(json['price_info']) : null,
       pickupLocations: (json['pickup_locations'] as List<dynamic>?)?.map((e) => LocationModel.fromJson(e)).toList() ?? [],

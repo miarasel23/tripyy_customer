@@ -704,17 +704,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final loc = AppLocalizations.of(context);
 
-    final bool isReturnTrip = trip.serviceName?.toUpperCase() == 'RETURN';
-    final bool isFirstCompleted = trip.tripStatus == TripStatus.firstCompleted || trip.tripStatus?.toUpperCase() == 'FIRST_COMPLETED';
-
-    List<LocationModel> allLocations = [];
-    if (isReturnTrip && isFirstCompleted) {
-      allLocations.addAll(trip.dropoffLocations);
-      allLocations.addAll(trip.pickupLocations);
-    } else {
-      allLocations.addAll(trip.pickupLocations);
-      allLocations.addAll(trip.dropoffLocations);
-    }
+    final allLocations = trip.routeLocations;
 
     if (allLocations.isEmpty) return const SizedBox.shrink();
 
@@ -849,7 +839,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                                 ),
                               ),
                               Text(
-                                _formatDate(trip.tripStatus == TripStatus.firstCompleted ? trip.endDatetime : trip.startDatetime),
+                                _formatDate(trip.effectiveStartDatetime),
                                 style: GoogleFonts.poppins(
                                   color: isDark ? Colors.white : Colors.black,
                                   fontSize: 14,
@@ -859,7 +849,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                             ],
                           ),
                         ),
-                        if (trip.serviceName == 'RETURN' && trip.tripStatus != TripStatus.firstCompleted)
+                        if (trip.effectiveEndDatetime != null && trip.effectiveEndDatetime!.isNotEmpty)
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -872,7 +862,7 @@ class _GlobalTripOverlayState extends State<GlobalTripOverlay> {
                                   ),
                                 ),
                                 Text(
-                                  _formatDate(trip.endDatetime),
+                                  _formatDate(trip.effectiveEndDatetime),
                                   style: GoogleFonts.poppins(
                                     color: isDark ? Colors.white : Colors.black,
                                     fontSize: 14,
